@@ -20,12 +20,12 @@ public class CheckOutput {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
     SoldierAccessImpl soldierAccess;
     @Autowired
     SerOfUnitRepository serOfUnitRepository;
 
-    public CheckOutput(SoldierAccessImpl soldierAccessImpl) {
-        this.soldierAccess = soldierAccessImpl;
+    public CheckOutput( ) {
     }
 
 
