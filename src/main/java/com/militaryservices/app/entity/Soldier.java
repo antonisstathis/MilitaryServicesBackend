@@ -35,6 +35,8 @@ public class Soldier implements Serializable {
 	private List<Service> services;
 	@Column
 	private boolean fired;
+	@Column
+	private String company;
 
 	@ManyToOne
 	@JoinColumn(name = "unit_id")
@@ -96,6 +98,14 @@ public class Soldier implements Serializable {
 
 	public List<Service> getAllServices() {
 		return services;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
 	}
 
 	public boolean isFired() {

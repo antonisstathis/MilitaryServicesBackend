@@ -98,18 +98,11 @@ public class SoldierAccessImpl {
 		return allSoldiers;
 	}
 
-	/*
 	@Transactional
 	public void updateSoldier(Soldier soldier) {
 
 		entityManager.merge(soldier);
-		Soldier sold = findById(soldier.getID());
-		sold.setName(soldier.getName());
-		sold.setSurname(soldier.getSurname());
-		sold.setSituation(soldier.getSituation());
-		sold.setActive(soldier.getActive());
 	}
-	 */
 
 	/*
 	@Transactional
@@ -182,6 +175,11 @@ public class SoldierAccessImpl {
 		historicalData = nativeQuery.getResultList();
 
 		return historicalData;
+	}
+
+	@Transactional
+	public Soldier findSoldierById(int soldId) {
+		return entityManager.find(Soldier.class,soldId);
 	}
 
 	public int getCalculations(Unit unit) {

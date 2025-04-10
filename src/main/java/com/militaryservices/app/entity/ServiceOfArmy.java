@@ -16,6 +16,9 @@ public class ServiceOfArmy {
     @Column
     private String armed;
 
+    @Column(name = "ser_description")
+    private String serviceDescription;
+
     public ServiceOfArmy() {
 
     }
@@ -33,6 +36,10 @@ public class ServiceOfArmy {
         return armed;
     }
 
+    public String getServiceDescription() {
+        return serviceDescription;
+    }
+
     public Boolean isArmed() {
 
         if( armed.equals("ένοπλη") )
@@ -47,5 +54,9 @@ public class ServiceOfArmy {
 
     public void setArmed(String armed) {
         this.armed = armed;
+    }
+
+    public void setServiceDescription(String serviceDescription) {
+        this.serviceDescription = serviceDescription;
     }
 }

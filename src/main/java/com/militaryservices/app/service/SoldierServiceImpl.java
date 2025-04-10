@@ -1,11 +1,9 @@
 package com.militaryservices.app.service;
 
-import com.militaryservices.app.dao.OptionRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
+import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
-import com.militaryservices.app.entity.Option;
-import com.militaryservices.app.entity.OptionId;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
@@ -27,8 +25,6 @@ public class SoldierServiceImpl implements SoldierService {
 
 	@Autowired
 	private CalculateServices service;
-	@Autowired
-	private OptionRepository optionRepository;
 	@Autowired
 	private JwtUtil jwtUtil;
 	@Autowired
@@ -60,19 +56,6 @@ public class SoldierServiceImpl implements SoldierService {
 		}
 
 		return response;
-	}
-
-	@Override
-	public void findSoldier(SoldierDto soldier) {
-
-		OptionId situation = new OptionId("soldiers","situation", soldier.getSituation());
-		Optional<Option> sit = optionRepository.findById(situation);
-
-		OptionId active = new OptionId("soldiers","active", soldier.getActive());
-		Optional<Option> act = optionRepository.findById(active);
-
-		soldier.setSituation(sit.get().getOption());
-		soldier.setActive(act.get().getOption());
 	}
 
 	/*
@@ -121,5 +104,14 @@ public class SoldierServiceImpl implements SoldierService {
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Override
+	public void updateSoldier(SoldDto soldier) {
+		Soldier sold = soldierAccess.findSoldierById(soldier.getId());
+		sold.setActive(soldier.getActive());
+		sold.setSituation(soldier.getSituation());
+
+		soldierAccess.updateSoldier(sold);
+	}
+
 }

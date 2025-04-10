@@ -3,6 +3,7 @@ package com.militaryservices.app.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.service.SerOfUnitService;
@@ -84,14 +85,27 @@ public class SoldiersController {
 
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
-        boolean isIdTampered = jwtUtil.isTokenValid(token) ? false : true;
-        if(jwtUtil.validateRequest(request) && !isIdTampered) {
+        if(jwtUtil.validateRequest(request)) {
             SoldierDto soldier = new SoldierDto(jsonNode.get("name").asText(), jsonNode.get("surname").asText(),
                     jsonNode.get("situation").asText(), jsonNode.get("active").asText());
             soldier.setToken(token);
             soldier.setDate(new Date());
-            soldierService.findSoldier(soldier);
             return ResponseEntity.ok(soldier);
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+    }
+
+    @PostMapping("/changeSoldSituation")
+    public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@RequestBody String sold) {
+
+        JsonNode jsonNode = getJsonNode(sold);
+        String token = jsonNode.get("token").asText();
+        int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
+        if(jwtUtil.validateRequest(request)) {
+            SoldDto soldDto = new SoldDto(soldId,jsonNode.get("name").asText(), jsonNode.get("surname").asText(),
+                    jsonNode.get("situation").asText(), jsonNode.get("active").asText());
+            soldierService.updateSoldier(soldDto);
+            return ResponseEntity.ok("Soldier updated successfully.");
         } else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
     }
