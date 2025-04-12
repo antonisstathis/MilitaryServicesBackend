@@ -1,5 +1,6 @@
 package com.militaryservices.app.dao;
 
+import com.militaryservices.app.dto.Active;
 import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.dto.SoldierServiceDto;
 import com.militaryservices.app.entity.Service;
@@ -170,7 +171,7 @@ public class SoldierAccessImpl {
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit", unit);
 		nativeQuery.setParameter("fired", false);
-		nativeQuery.setParameter("armed", "έξοδος");
+		nativeQuery.setParameter("armed", Active.getFreeOfDuty());
 		nativeQuery.setParameter("calculation",numberOfFirstDayCalculation);
 		historicalData = nativeQuery.getResultList();
 

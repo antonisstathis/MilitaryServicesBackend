@@ -1,5 +1,6 @@
 package com.militaryservices.app.entity;
 
+import com.militaryservices.app.dto.Situation;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -92,7 +93,7 @@ public class Service implements Serializable {
 
 	public Boolean isArmed() {
 
-		if( armed.equals("ένοπλη") )
+		if(Situation.ARMED.name().toLowerCase().equals(armed))
 			return true;
 		else
 			return false;

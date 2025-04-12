@@ -3,7 +3,9 @@ package com.militaryservices.app.service;
 import com.militaryservices.app.dao.SerOfUnitAccessImpl;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
+import com.militaryservices.app.dto.Active;
 import com.militaryservices.app.dto.HistoricalData;
+import com.militaryservices.app.dto.Situation;
 import com.militaryservices.app.dto.SoldierProportion;
 import com.militaryservices.app.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +58,9 @@ public class CalculateServices {
         }
         if(flag && ((armedSoldiers.size() - armedServices.size()) < numberOfOutgoing)) {
             int numOfArmedSoldForOut = armedSoldiers.size() - armedServices.size();
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,"ένοπλος");
+            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false, Situation.ARMED.name().toLowerCase());
             calculateOutgoingInRareCase(armedSoldiers,soldierMap,proportionList,numOfArmedSoldForOut);
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,"άοπλος");
+            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase());
             calculateOutgoingInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfOutgoing - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
@@ -114,12 +116,12 @@ public class CalculateServices {
     }
 
     private void setFreeAndOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers) {
-        // Set the EY soldiers.
+        // Set the free of duty soldiers.
         Soldier sold;
         for (int i = 0; i < allSoldiers.size(); i++) {
             sold = allSoldiers.get(i);
             if (!sold.checkIfActive()) {
-                sold.setService(new Service("ΕΥ", "ΕΥ", new Date(), sold.getUnit()));
+                sold.setService(new Service(Active.getFreeOfDuty(), Active.getFreeOfDuty(), new Date(), sold.getUnit()));
                 if(sold.isArmed())
                     armedSoldiers.remove(sold);
                 else
@@ -154,7 +156,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", "έξοδος", new Date(), soldier.getUnit()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit()));
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
                 numOfOutgoing -= 1;
             }
@@ -172,7 +174,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", "έξοδος", new Date(), soldier.getUnit()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit()));
                 soldiers.remove(soldier);
                 numOfOutgoing -= 1;
             }
@@ -198,7 +200,7 @@ public class CalculateServices {
         Soldier sold;
         for(int i=0;i<allSoldiers.size();i++) {
             sold = allSoldiers.get(i);
-            if(sold.getActive().equals("ενεργός"))
+            if(sold.getActive().equals(Active.ACTIVE.name().toLowerCase()))
                 counter+=1;
         }
 
@@ -232,7 +234,7 @@ public class CalculateServices {
     }
 
     private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices) {
-        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),"ένοπλη");
+        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase());
 
         Map<Integer,Soldier> soldiersMap = new HashMap<>();
         for(Soldier soldier : allSoldiers)

@@ -4,6 +4,7 @@ import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
+import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
@@ -43,6 +44,7 @@ public class SoldierServiceImpl implements SoldierService {
 		List<SoldierDto> response = new ArrayList<>();
 		SoldierDto soldierDto;
 		for(Soldier sold : soldiers) {
+			String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
 			String name = sold.getName();
 			String surname = sold.getSurname();
 			String situation = sold.getSituation();
@@ -50,8 +52,7 @@ public class SoldierServiceImpl implements SoldierService {
 			String service = sold.getService().getServiceName();
 			Date date = sold.getService().getDate();
 			String armed = sold.getService().getArmed();
-			soldierDto = new SoldierDto(name,surname,situation,active,service,date,armed);
-			soldierDto.setToken(jwtUtil.generateToken(Integer.toString(sold.getId())));
+			soldierDto = new SoldierDto(token,name,surname,situation,active,service,date,armed);
 			response.add(soldierDto);
 		}
 
@@ -112,6 +113,15 @@ public class SoldierServiceImpl implements SoldierService {
 		sold.setSituation(soldier.getSituation());
 
 		soldierAccess.updateSoldier(sold);
+	}
+
+	@Override
+	public SoldierUnitDto findSoldier(int id) {
+		Soldier soldier = soldierAccess.findSoldierById(id);
+		SoldierUnitDto sold = new SoldierUnitDto(soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(),
+				soldier.getActive(), soldier.getUnit());
+
+		return sold;
 	}
 
 }

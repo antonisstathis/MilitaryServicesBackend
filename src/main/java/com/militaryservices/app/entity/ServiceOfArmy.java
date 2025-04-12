@@ -1,5 +1,6 @@
 package com.militaryservices.app.entity;
 
+import com.militaryservices.app.dto.Situation;
 import jakarta.persistence.*;
 
 @Entity
@@ -42,7 +43,7 @@ public class ServiceOfArmy {
 
     public Boolean isArmed() {
 
-        if( armed.equals("ένοπλη") )
+        if(armed.equals(Situation.ARMED.name().toLowerCase()))
             return true;
         else
             return false;

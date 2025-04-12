@@ -2,6 +2,7 @@ package com.militaryservices.app.service;
 
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
+import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.entity.Soldier;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface SoldierService {
     void calculateServices(String username);
 
     void updateSoldier(SoldDto soldier);
+
+    SoldierUnitDto findSoldier(int id);
 }

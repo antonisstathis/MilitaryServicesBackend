@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
+import com.militaryservices.app.security.CheckOptions;
 import com.militaryservices.app.security.JwtUtil;
+import com.militaryservices.app.security.SanitizationUtil;
+import com.militaryservices.app.security.UserPermission;
 import com.militaryservices.app.service.SerOfUnitService;
 import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
@@ -19,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class SoldiersController {
@@ -32,6 +37,8 @@ public class SoldiersController {
     private UserService userService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UserPermission userPermission;
 
     public SoldiersController() {
 
@@ -39,8 +46,24 @@ public class SoldiersController {
 
     @GetMapping("/getSoldiers")
     public ResponseEntity<?> getSoldiers(HttpServletRequest request) {
-        if(jwtUtil.validateRequest(request))
-            return ResponseEntity.ok(soldierService.findAll(jwtUtil.extractUsername(request)));
+        if(jwtUtil.validateRequest(request)) {
+            List<SoldierDto> soldiers = soldierService.findAll(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
+            // Sanitize the data which are String.
+            soldiers = soldiers.stream()
+                    .map(soldier -> new SoldierDto(
+                            soldier.getToken(),
+                            SanitizationUtil.sanitize(soldier.getName()),
+                            SanitizationUtil.sanitize(soldier.getSurname()),
+                            SanitizationUtil.sanitize(soldier.getSituation()),
+                            SanitizationUtil.sanitize(soldier.getActive()),
+                            SanitizationUtil.sanitize(soldier.getService()),
+                            soldier.extractDate(),
+                            SanitizationUtil.sanitize(soldier.getArmed())
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(soldiers);
+        }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Token is invalid, expired, or missing. Please authenticate again.");
@@ -49,7 +72,7 @@ public class SoldiersController {
     @GetMapping("/calc")
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {
-            soldierService.calculateServices(jwtUtil.extractUsername(request));
+            soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request))); // Sanitize username
             return ResponseEntity.ok("");
         }
         else
@@ -60,22 +83,20 @@ public class SoldiersController {
     @GetMapping("/getServices")
     public ResponseEntity<?> getServices(HttpServletRequest request) {
 
-        if(jwtUtil.validateRequest(request)) {
+        if(jwtUtil.validateRequest(request))
             return ResponseEntity.ok(serOfUnitService.getAllServices());
-        }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Token is invalid, expired, or missing. Please authenticate again.");
-
     }
 
     @GetMapping("/getNameOfUnit")
     public ResponseEntity<?> getNameOfUnit(HttpServletRequest request) {
 
         if(jwtUtil.validateRequest(request)) {
-            Optional<com.militaryservices.app.entity.User> optionalUser = userService.findUser(jwtUtil.extractUsername(request));
+            Optional<com.militaryservices.app.entity.User> optionalUser = userService.findUser(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
 
-            return ResponseEntity.ok(optionalUser.get().getSoldier().getUnit().getNameOfUnit());
+            return ResponseEntity.ok(SanitizationUtil.sanitize(optionalUser.get().getSoldier().getUnit().getNameOfUnit())); // Sanitize name of unit data
         } else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
     }
@@ -85,9 +106,12 @@ public class SoldiersController {
 
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request);
+        if(!userHasAccess)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
         if(jwtUtil.validateRequest(request)) {
-            SoldierDto soldier = new SoldierDto(jsonNode.get("name").asText(), jsonNode.get("surname").asText(),
-                    jsonNode.get("situation").asText(), jsonNode.get("active").asText());
+            SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText()),
+                    SanitizationUtil.sanitize(jsonNode.get("situation").asText()), SanitizationUtil.sanitize(jsonNode.get("active").asText()));
             soldier.setToken(token);
             soldier.setDate(new Date());
             return ResponseEntity.ok(soldier);
@@ -101,9 +125,18 @@ public class SoldiersController {
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
         int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request);
+        boolean isSit = CheckOptions.checkSituation(jsonNode.get("situation").asText());
+        boolean isActive = CheckOptions.checkActive(jsonNode.get("active").asText());
+        if(!userHasAccess)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
+        if(!isSit)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Data tampered.");
+        if(!isActive)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Data tampered.");
         if(jwtUtil.validateRequest(request)) {
-            SoldDto soldDto = new SoldDto(soldId,jsonNode.get("name").asText(), jsonNode.get("surname").asText(),
-                    jsonNode.get("situation").asText(), jsonNode.get("active").asText());
+            SoldDto soldDto = new SoldDto(soldId,SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText())
+                    , jsonNode.get("situation").asText(), jsonNode.get("active").asText());
             soldierService.updateSoldier(soldDto);
             return ResponseEntity.ok("Soldier updated successfully.");
         } else

@@ -21,7 +21,8 @@ public class SoldierDto {
         this.active = active;
     }
 
-    public SoldierDto(String name, String surname, String situation, String active, String service, Date date,String armed) {
+    public SoldierDto(String token,String name, String surname, String situation, String active, String service, Date date,String armed) {
+        this.token = token;
         this.name = name;
         this.surname = surname;
         this.situation = situation;
@@ -55,11 +56,13 @@ public class SoldierDto {
         return service;
     }
 
-
-
     public String getDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return dateFormat.format(date);
+    }
+
+    public Date extractDate() {
+        return date;
     }
 
     public String getArmed() {

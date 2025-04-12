@@ -1,9 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.SoldierAccessImpl;
-import com.militaryservices.app.dto.CountServices;
-import com.militaryservices.app.dto.HistoricalData;
-import com.militaryservices.app.dto.SoldierProportion;
+import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,9 +39,9 @@ public class CountServicesForEachSold {
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap) {
-        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),"ένοπλη");
-        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),"άοπλη");
-        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),"έξοδος");
+        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase());
+        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase());
+        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Active.getFreeOfDuty());
         if(out.size()<allSoldiers.size())
             addTheRestOnes(out,soldierMap);
         if(unarmedServices.size()<unarmedSoldiers.size())

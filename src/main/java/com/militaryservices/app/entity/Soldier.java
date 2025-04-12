@@ -1,5 +1,7 @@
 package com.militaryservices.app.entity;
 
+import com.militaryservices.app.dto.Active;
+import com.militaryservices.app.dto.Situation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -158,21 +160,14 @@ public class Soldier implements Serializable {
 
 	public boolean checkIfActive() {
 
-		if("ενεργός".equals(active))
+		if(Active.ACTIVE.name().toLowerCase().equals(active))
 			return true;
 		else
 			return false;
 	}
 
 	public boolean isArmed() {
-		if("ένοπλος".equals(situation))
-			return true;
-		else
-			return false;
-	}
-
-	public boolean isUnarmed() {
-		if("άοπλος".equals(situation))
+		if(Situation.ARMED.name().toLowerCase().equals(situation))
 			return true;
 		else
 			return false;
