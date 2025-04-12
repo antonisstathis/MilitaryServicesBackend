@@ -20,12 +20,16 @@ public class UserPermission {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public boolean checkIfUserHasAccess(String token, HttpServletRequest request) {
+    public boolean checkIfUserHasAccess(String token, HttpServletRequest request,String situation,String active) {
         if(!jwtUtil.isTokenValid(token))
             return false;
         int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
         boolean isPermitted = checkIfSoldierBelongsToUser(soldId,jwtUtil.extractUsername(request));
         if(!isPermitted)
+            return false;
+
+        boolean areOptionsValid = CheckOptions.checkOptions(situation,active);
+        if(!areOptionsValid)
             return false;
 
         return true;

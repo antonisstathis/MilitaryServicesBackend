@@ -5,6 +5,13 @@ import com.militaryservices.app.dto.Situation;
 
 public class CheckOptions {
 
+    public static boolean checkOptions(String situation,String active) {
+        if(checkSituation(situation) && checkActive(active))
+            return true;
+
+        return false;
+    }
+
     public static boolean checkSituation(String situation) {
         try {
             if(Situation.ARMED.name().toLowerCase().equals(situation))

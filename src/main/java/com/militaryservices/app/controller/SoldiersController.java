@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
-import com.militaryservices.app.security.CheckOptions;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
 import com.militaryservices.app.security.UserPermission;
@@ -106,7 +105,7 @@ public class SoldiersController {
 
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request);
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
         if(jwtUtil.validateRequest(request)) {
@@ -125,15 +124,9 @@ public class SoldiersController {
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
         int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request);
-        boolean isSit = CheckOptions.checkSituation(jsonNode.get("situation").asText());
-        boolean isActive = CheckOptions.checkActive(jsonNode.get("active").asText());
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
-        if(!isSit)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Data tampered.");
-        if(!isActive)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Data tampered.");
         if(jwtUtil.validateRequest(request)) {
             SoldDto soldDto = new SoldDto(soldId,SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText())
                     , jsonNode.get("situation").asText(), jsonNode.get("active").asText());
