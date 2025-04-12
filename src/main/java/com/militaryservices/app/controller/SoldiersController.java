@@ -123,11 +123,11 @@ public class SoldiersController {
 
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
-        int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
         if(jwtUtil.validateRequest(request)) {
+            int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
             SoldDto soldDto = new SoldDto(soldId,SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText())
                     , jsonNode.get("situation").asText(), jsonNode.get("active").asText());
             soldierService.updateSoldier(soldDto);
