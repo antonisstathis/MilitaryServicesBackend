@@ -2,6 +2,7 @@ package com.militaryservices.app.dao;
 
 import com.militaryservices.app.dto.Active;
 import com.militaryservices.app.dto.HistoricalData;
+import com.militaryservices.app.dto.SoldierPreviousServiceDto;
 import com.militaryservices.app.dto.SoldierServiceDto;
 import com.militaryservices.app.entity.Service;
 import com.militaryservices.app.entity.Soldier;
@@ -73,11 +74,11 @@ public class SoldierAccessImpl {
 	@Transactional
 	public List<Soldier> loadSold(Unit unit) {
 
-		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit) " +
+		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.fired) " +
 				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.fired =:fired and u.calculation =:calculation order by s.id asc";
 		Query nativeQuery;
 
-		int calculations = 0;
+		int calculations;
 		calculations = getCalculations(unit);
 
 		List<Soldier> allSoldiers = new ArrayList<>();
@@ -89,7 +90,7 @@ public class SoldierAccessImpl {
 		Soldier sold;
 		Service service;
 		for(SoldierServiceDto soldierDto : list) {
-			sold = new Soldier(soldierDto.getId(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive());
+			sold = new Soldier(soldierDto.getId(),soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isFired());
 			service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit());
 			sold.setService(service);
 			sold.setUnit(service.getUnit());
@@ -97,6 +98,20 @@ public class SoldierAccessImpl {
 		}
 
 		return allSoldiers;
+	}
+
+	@Transactional
+	public List<SoldierServiceDto> findCalculationByDate(Unit unit, Date date) {
+		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.fired) " +
+				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and u.date =:date order by s.id asc";
+		Query nativeQuery;
+
+		nativeQuery = entityManager.createQuery(query);
+		nativeQuery.setParameter("unit",unit);
+		nativeQuery.setParameter("date",date);
+		List<SoldierServiceDto> list = nativeQuery.getResultList();
+
+		return list;
 	}
 
 	@Transactional

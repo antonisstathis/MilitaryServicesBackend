@@ -19,6 +19,9 @@ public class Soldier implements Serializable {
 	private int id;
 
 	@Column
+	private String soldierRegistrationNumber;
+
+	@Column
 	@NotNull(message="is required")
 	@Size(min=3, max=20, message="enter at least 3 characters")
 	private String name;
@@ -59,13 +62,15 @@ public class Soldier implements Serializable {
 		services = new ArrayList<>();
 	}
 
-	public Soldier(int id,String name,String surname,String situation,String active)  {
+	public Soldier(int id,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean fired)  {
 
 		this.name = name;
 		this.surname = surname;
 		this.situation = situation;
 		this.active = active;
 		this.id = id;
+		this.soldierRegistrationNumber = soldierRegistrationNumber;
+		this.fired = fired;
 		services = new ArrayList<>();
 	}
 	
@@ -98,6 +103,10 @@ public class Soldier implements Serializable {
 		return unit;
 	}
 
+	public String getSoldierRegistrationNumber() {
+		return soldierRegistrationNumber;
+	}
+
 	public List<Service> getAllServices() {
 		return services;
 	}
@@ -108,6 +117,10 @@ public class Soldier implements Serializable {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
+		this.soldierRegistrationNumber = soldierRegistrationNumber;
 	}
 
 	public boolean isFired() {

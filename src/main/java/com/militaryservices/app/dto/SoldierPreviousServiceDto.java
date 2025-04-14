@@ -1,12 +1,10 @@
 package com.militaryservices.app.dto;
 
-import com.militaryservices.app.entity.Unit;
-
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SoldierServiceDto {
-    private int id;
+public class SoldierPreviousServiceDto {
+
+    private String token;
 
     private String soldierRegistrationNumber;
 
@@ -14,30 +12,31 @@ public class SoldierServiceDto {
     private String surname;
     private String situation;
     private String active;
-    private long serviceId;
     private String service;
-    private Date date;
-    private Unit unit;
+    private String date;
     private String armed;
-    private boolean fired;
 
-    public SoldierServiceDto(int id,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean fired) {
-        this.id = id;
+    private String fired;
+
+    public SoldierPreviousServiceDto() {
+
+    }
+
+    public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String name, String surname, String situation, String active, String service, String date, String armed, String fired) {
+        this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.name = name;
         this.surname = surname;
         this.situation = situation;
         this.active = active;
-        this.serviceId = serviceId;
         this.service = service;
         this.date = date;
         this.armed = armed;
-        this.unit = unit;
         this.fired = fired;
     }
 
-    public int getId() {
-        return id;
+    public String getToken() {
+        return token;
     }
 
     public String getSoldierRegistrationNumber() {
@@ -60,37 +59,24 @@ public class SoldierServiceDto {
         return active;
     }
 
-    public long getServiceId() {
-        return serviceId;
-    }
-
     public String getService() {
         return service;
     }
 
     public String getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        return dateFormat.format(date);
+        return date;
     }
 
     public String getArmed() {
         return armed;
     }
 
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public boolean isFired() {
+    public String getFired() {
         return fired;
     }
 
-    public void setArmed(String armed) {
-        this.armed = armed;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
@@ -105,10 +91,6 @@ public class SoldierServiceDto {
         this.surname = surname;
     }
 
-    public void setServiceId(long serviceId) {
-        this.serviceId = serviceId;
-    }
-
     public void setSituation(String situation) {
         this.situation = situation;
     }
@@ -121,15 +103,15 @@ public class SoldierServiceDto {
         this.service = service;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public void setUnit(Unit unit) {
-        this.unit = unit;
+    public void setArmed(String armed) {
+        this.armed = armed;
     }
 
-    public void setFired(boolean fired) {
+    public void setFired(String fired) {
         this.fired = fired;
     }
 }

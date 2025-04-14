@@ -7,14 +7,16 @@ public class ServiceDto {
     private String service;
 
     private String armed;
+    private String description;
 
     public ServiceDto() {
     }
 
-    public ServiceDto(Long id, String service, String armed) {
+    public ServiceDto(Long id, String service, String armed,String description) {
         this.id = id;
         this.service = service;
         this.armed = armed;
+        this.description = description;
     }
 
     public Long getId() {
@@ -29,6 +31,10 @@ public class ServiceDto {
         return armed;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -39,5 +45,9 @@ public class ServiceDto {
 
     public void setArmed(String armed) {
         this.armed = armed;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

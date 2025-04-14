@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
+import com.militaryservices.app.dto.SoldierPreviousServiceDto;
+import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
 import com.militaryservices.app.security.UserPermission;
@@ -13,12 +15,10 @@ import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -68,6 +68,33 @@ public class SoldiersController {
                     .body("Token is invalid, expired, or missing. Please authenticate again.");
     }
 
+    @GetMapping("/getPreviousCalculation")
+    public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate) {
+        if(jwtUtil.validateRequest(request)) {
+            List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),prevDate);
+            // Sanitize the data which are String.
+            soldiers = soldiers.stream()
+                    .map(soldier -> new SoldierPreviousServiceDto(
+                            soldier.getToken(),
+                            SanitizationUtil.sanitize(soldier.getSoldierRegistrationNumber()),
+                            SanitizationUtil.sanitize(soldier.getName()),
+                            SanitizationUtil.sanitize(soldier.getSurname()),
+                            SanitizationUtil.sanitize(soldier.getSituation()),
+                            SanitizationUtil.sanitize(soldier.getActive()),
+                            SanitizationUtil.sanitize(soldier.getService()),
+                            soldier.getDate(),
+                            soldier.getArmed(),
+                            SanitizationUtil.sanitize(soldier.getFired())
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(soldiers);
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+    }
+
     @GetMapping("/calc")
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {
@@ -82,8 +109,10 @@ public class SoldiersController {
     @GetMapping("/getServices")
     public ResponseEntity<?> getServices(HttpServletRequest request) {
 
-        if(jwtUtil.validateRequest(request))
-            return ResponseEntity.ok(serOfUnitService.getAllServices());
+        if(jwtUtil.validateRequest(request)) {
+            Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+            return ResponseEntity.ok(serOfUnitService.getAllServices(user.get().getSoldier().getUnit()));
+        }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Token is invalid, expired, or missing. Please authenticate again.");

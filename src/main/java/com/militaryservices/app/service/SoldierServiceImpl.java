@@ -2,9 +2,7 @@ package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
-import com.militaryservices.app.dto.SoldDto;
-import com.militaryservices.app.dto.SoldierDto;
-import com.militaryservices.app.dto.SoldierUnitDto;
+import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
@@ -57,6 +55,31 @@ public class SoldierServiceImpl implements SoldierService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date) {
+		Optional<User> user = userRepository.findById(username);
+		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date);
+		List<SoldierPreviousServiceDto> resultList = new ArrayList<>();
+
+		SoldierPreviousServiceDto soldier;
+		for(SoldierServiceDto soldDto : soldierPreviousServiceDtoList) {
+			soldier = new SoldierPreviousServiceDto();
+			soldier.setToken(jwtUtil.generateToken(Integer.toString(soldDto.getId())));
+			soldier.setSoldierRegistrationNumber(soldDto.getSoldierRegistrationNumber());
+			soldier.setName(soldDto.getName());
+			soldier.setSurname(soldDto.getSurname());
+			soldier.setActive(soldDto.getActive());
+			soldier.setSituation(soldDto.getSituation());
+			soldier.setFired(Fired.getFired(soldDto.isFired()));
+			soldier.setService(soldDto.getService());
+			soldier.setDate(soldDto.getDate());
+			soldier.setArmed(soldDto.getArmed());
+			resultList.add(soldier);
+		}
+
+		return resultList;
 	}
 
 	/*
@@ -116,8 +139,8 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public SoldierUnitDto findSoldier(int id) {
-		Soldier soldier = soldierAccess.findSoldierById(id);
+	public SoldierUnitDto findSoldier(int soldId) {
+		Soldier soldier = soldierAccess.findSoldierById(soldId);
 		SoldierUnitDto sold = new SoldierUnitDto(soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(),
 				soldier.getActive(), soldier.getUnit());
 
