@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
 import com.militaryservices.app.dto.SoldierPreviousServiceDto;
+import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
@@ -134,12 +135,14 @@ public class SoldiersController {
 
         JsonNode jsonNode = getJsonNode(sold);
         String token = jsonNode.get("token").asText();
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
+        int id = Integer.valueOf(jwtUtil.extractUsername(token));
+        SoldierUnitDto soldierDto = soldierService.findSoldier(id);
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,soldierDto.getSituation(),soldierDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
         if(jwtUtil.validateRequest(request)) {
             SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText()),
-                    SanitizationUtil.sanitize(jsonNode.get("situation").asText()), SanitizationUtil.sanitize(jsonNode.get("active").asText()));
+                    SanitizationUtil.sanitize(soldierDto.getSituation()), SanitizationUtil.sanitize(soldierDto.getActive()));
             soldier.setToken(token);
             soldier.setDate(new Date());
             return ResponseEntity.ok(soldier);
