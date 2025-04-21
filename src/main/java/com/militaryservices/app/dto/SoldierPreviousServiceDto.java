@@ -16,13 +16,13 @@ public class SoldierPreviousServiceDto {
     private String date;
     private String armed;
 
-    private String fired;
+    private String discharged;
 
     public SoldierPreviousServiceDto() {
 
     }
 
-    public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String name, String surname, String situation, String active, String service, String date, String armed, String fired) {
+    public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String name, String surname, String situation, String active, String service, String date, String armed, String discharged) {
         this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.name = name;
@@ -32,7 +32,7 @@ public class SoldierPreviousServiceDto {
         this.service = service;
         this.date = date;
         this.armed = armed;
-        this.fired = fired;
+        this.discharged = discharged;
     }
 
     public String getToken() {
@@ -71,8 +71,8 @@ public class SoldierPreviousServiceDto {
         return armed;
     }
 
-    public String getFired() {
-        return fired;
+    public String getDischarged() {
+        return discharged;
     }
 
     public void setToken(String token) {
@@ -111,7 +111,7 @@ public class SoldierPreviousServiceDto {
         this.armed = armed;
     }
 
-    public void setFired(String fired) {
-        this.fired = fired;
+    public void setDischarged(String discharged) {
+        this.discharged = discharged;
     }
 }

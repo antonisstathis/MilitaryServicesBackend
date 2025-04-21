@@ -38,7 +38,7 @@ public class SoldierAccessImpl {
 	@Transactional
 	public void saveSoldier(Soldier soldier,Date currentDate) {
 
-		String query = "INSERT INTO Soldier (id,name,surname,situation,active,fired) VALUES (:id, :name, :surname, :situation, :active, :fired)";
+		String query = "INSERT INTO Soldier (id,name,surname,situation,active,discharged) VALUES (:id, :name, :surname, :situation, :active, :discharged)";
 		String query1 = "INSERT INTO Service (serviceName,armed,date,soldierId,calculation) VALUES (:serName, :armed, :serDate, :soldId, :calculation)";
 
 		Query nativeQuery = entityManager.createQuery(query);
@@ -46,7 +46,7 @@ public class SoldierAccessImpl {
 		nativeQuery.setParameter("surname",soldier.getSurname());
 		nativeQuery.setParameter("situation",soldier.getSituation());
 		nativeQuery.setParameter("active",soldier.getActive());
-		nativeQuery.setParameter("fired",false);
+		nativeQuery.setParameter("discharged",false);
 		int result = nativeQuery.executeUpdate();
 
 		nativeQuery = entityManager.createQuery(query1);
@@ -74,8 +74,8 @@ public class SoldierAccessImpl {
 	@Transactional
 	public List<Soldier> loadSold(Unit unit) {
 
-		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.fired) " +
-				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.fired =:fired and u.calculation =:calculation order by s.id asc";
+		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.discharged) " +
+				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.discharged =:discharged and u.calculation =:calculation order by s.id asc";
 		Query nativeQuery;
 
 		int calculations;
@@ -84,13 +84,13 @@ public class SoldierAccessImpl {
 		List<Soldier> allSoldiers = new ArrayList<>();
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit",unit);
-		nativeQuery.setParameter("fired", false);
+		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("calculation", calculations);
 		List<SoldierServiceDto> list = nativeQuery.getResultList();
 		Soldier sold;
 		Service service;
 		for(SoldierServiceDto soldierDto : list) {
-			sold = new Soldier(soldierDto.getId(),soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isFired());
+			sold = new Soldier(soldierDto.getId(),soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isDischarged());
 			service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit());
 			sold.setService(service);
 			sold.setUnit(service.getUnit());
@@ -102,7 +102,7 @@ public class SoldierAccessImpl {
 
 	@Transactional
 	public List<SoldierServiceDto> findCalculationByDate(Unit unit, Date date) {
-		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.fired) " +
+		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.discharged) " +
 				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and u.date =:date order by s.id asc";
 		Query nativeQuery;
 
@@ -144,13 +144,13 @@ public class SoldierAccessImpl {
 	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed) {
 
 		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit = :unit and s.fired = :fired and u.armed = :armed and u.calculation >= :calculation group by s.id order by count(*) desc";
+				"(s = u.soldier) where s.unit = :unit and s.discharged = :discharged and u.armed = :armed and u.calculation >= :calculation group by s.id order by count(*) desc";
 
 		Query nativeQuery;
 		List<HistoricalData> historicalData;
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit", unit);
-		nativeQuery.setParameter("fired", false);
+		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("armed", armed);
 		nativeQuery.setParameter("calculation",1);
 		historicalData = nativeQuery.getResultList();
@@ -162,12 +162,12 @@ public class SoldierAccessImpl {
 	public List<HistoricalData> getHistoricalDataAsc(Unit unit,String armed) {
 
 		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit = :unit and s.fired =:fired and u.armed =:armed and u.calculation >= :calculation group by s.id order by count(*) asc";
+				"(s = u.soldier) where s.unit = :unit and s.discharged =:discharged and u.armed =:armed and u.calculation >= :calculation group by s.id order by count(*) asc";
 
 		Query nativeQuery;
 		List<HistoricalData> historicalData;
 		nativeQuery = entityManager.createQuery(query);
-		nativeQuery.setParameter("fired", false);
+		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("armed", armed);
 		nativeQuery.setParameter("calculation",1);
 		historicalData = nativeQuery.getResultList();
@@ -179,13 +179,13 @@ public class SoldierAccessImpl {
 	public List<HistoricalData> countServicesForTheLastNDays(Unit unit,int numberOfFirstDayCalculation) {
 
 		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit =:unit and s.fired =:fired and u.armed <>:armed and u.calculation >= :calculation group by s.id order by count(*) desc";
+				"(s = u.soldier) where s.unit =:unit and s.discharged =:discharged and u.armed <>:armed and u.calculation >= :calculation group by s.id order by count(*) desc";
 
 		Query nativeQuery;
 		List<HistoricalData> historicalData;
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit", unit);
-		nativeQuery.setParameter("fired", false);
+		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("armed", Active.getFreeOfDuty());
 		nativeQuery.setParameter("calculation",numberOfFirstDayCalculation);
 		historicalData = nativeQuery.getResultList();

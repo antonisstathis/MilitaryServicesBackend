@@ -39,7 +39,7 @@ public class Soldier implements Serializable {
 	@OneToMany(mappedBy = "id")
 	private List<Service> services;
 	@Column
-	private boolean fired;
+	private boolean discharged;
 	@Column
 	private String company;
 
@@ -51,18 +51,18 @@ public class Soldier implements Serializable {
 		
 	}
 
-	public Soldier(int id,String name,String surname,String situation,String active,boolean fired)  {
+	public Soldier(int id,String name,String surname,String situation,String active,boolean discharged)  {
 		
 		this.name = name;
 		this.surname = surname;
 		this.situation = situation;
 		this.active = active;
 		this.id = id;
-		this.fired = fired;
+		this.discharged = discharged;
 		services = new ArrayList<>();
 	}
 
-	public Soldier(int id,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean fired)  {
+	public Soldier(int id,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean discharged)  {
 
 		this.name = name;
 		this.surname = surname;
@@ -70,7 +70,7 @@ public class Soldier implements Serializable {
 		this.active = active;
 		this.id = id;
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
-		this.fired = fired;
+		this.discharged = discharged;
 		services = new ArrayList<>();
 	}
 	
@@ -123,8 +123,8 @@ public class Soldier implements Serializable {
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
 	}
 
-	public boolean isFired() {
-		return fired;
+	public boolean isDischarged() {
+		return discharged;
 	}
 
 	public int getId() {
@@ -167,8 +167,8 @@ public class Soldier implements Serializable {
 		this.unit = unit;
 	}
 
-	public void setFired(boolean fired) {
-		this.fired = fired;
+	public void setDischarged(boolean discharged) {
+		this.discharged = discharged;
 	}
 
 	public boolean checkIfActive() {

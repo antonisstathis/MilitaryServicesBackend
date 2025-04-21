@@ -19,9 +19,9 @@ public class SoldierServiceDto {
     private Date date;
     private Unit unit;
     private String armed;
-    private boolean fired;
+    private boolean discharged;
 
-    public SoldierServiceDto(int id,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean fired) {
+    public SoldierServiceDto(int id,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
         this.id = id;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.name = name;
@@ -33,7 +33,7 @@ public class SoldierServiceDto {
         this.date = date;
         this.armed = armed;
         this.unit = unit;
-        this.fired = fired;
+        this.discharged = discharged;
     }
 
     public int getId() {
@@ -81,8 +81,8 @@ public class SoldierServiceDto {
         return unit;
     }
 
-    public boolean isFired() {
-        return fired;
+    public boolean isDischarged() {
+        return discharged;
     }
 
     public void setArmed(String armed) {
@@ -129,7 +129,7 @@ public class SoldierServiceDto {
         this.unit = unit;
     }
 
-    public void setFired(boolean fired) {
-        this.fired = fired;
+    public void setDischarged(boolean discharged) {
+        this.discharged = discharged;
     }
 }

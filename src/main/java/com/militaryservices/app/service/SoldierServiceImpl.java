@@ -72,7 +72,7 @@ public class SoldierServiceImpl implements SoldierService {
 			soldier.setSurname(soldDto.getSurname());
 			soldier.setActive(soldDto.getActive());
 			soldier.setSituation(soldDto.getSituation());
-			soldier.setFired(Fired.getFired(soldDto.isFired()));
+			soldier.setDischarged(Discharged.getDischarged(soldDto.isDischarged()));
 			soldier.setService(soldDto.getService());
 			soldier.setDate(soldDto.getDate());
 			soldier.setArmed(soldDto.getArmed());

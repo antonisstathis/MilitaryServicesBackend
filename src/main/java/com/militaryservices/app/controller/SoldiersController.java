@@ -85,7 +85,7 @@ public class SoldiersController {
                             SanitizationUtil.sanitize(soldier.getService()),
                             soldier.getDate(),
                             soldier.getArmed(),
-                            SanitizationUtil.sanitize(soldier.getFired())
+                            SanitizationUtil.sanitize(soldier.getDischarged())
                     ))
                     .collect(Collectors.toList());
 
