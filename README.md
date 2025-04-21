@@ -6,3 +6,8 @@ to carry a gun due to health problems and they can be assigned services like wat
 Armed and unarmed ones. The front end of the app is in another repository. The backend is in java programming language and the framework is spring boot.
 The user that has the role of a soldier responsible for the calculation of the services of the day can calculate the services for each day with just a click 
 of a button.
+
+## Disclaimer
+
+All data in this application (soldiers, services, units) is fictional and randomly generated for demonstration purposes. No real personal or military data is used.
+
