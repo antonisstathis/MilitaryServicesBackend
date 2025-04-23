@@ -20,7 +20,7 @@ public class JwtUtil {
     //private static final long EXPIRATION_TIME = 1000 * 4; // 4 seconds
 
     public JwtUtil() {
-        //RSAKeyGenerator.produceKeys();
+        RSAKeyGenerator.produceKeys();
         privateKey = RSAKeyGenerator.loadPrivateKey();
         publicKey = RSAKeyGenerator.loadPublicKey();
     }
