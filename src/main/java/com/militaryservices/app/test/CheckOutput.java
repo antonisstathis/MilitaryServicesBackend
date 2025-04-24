@@ -7,10 +7,7 @@ import com.militaryservices.app.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class CheckOutput {
@@ -29,8 +26,8 @@ public class CheckOutput {
     public boolean checkResults(String username) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
-        int calculation = soldierAccess.getCalculations(unit);
-        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,calculation);
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
+        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation);
         List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnit(user.get().getSoldier().getUnit());
         Map<String, Integer> servicesMap = new HashMap<>();
         ServiceOfArmy serviceOfArmy;

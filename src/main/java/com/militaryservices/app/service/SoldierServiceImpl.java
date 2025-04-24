@@ -87,8 +87,8 @@ public class SoldierServiceImpl implements SoldierService {
 	public Date getDateByCalculationNumber(String username,int calculation) {
 
 		Optional<User> user = userRepository.findById(username);
-		List<Soldier> allSoldiers = soldierAccess.loadSold(user.get().getSoldier().getUnit(), calculation);
-		return allSoldiers.get(0).getService().getDate();
+		Unit unit = user.get().getSoldier().getUnit();
+		return soldierAccess.getDateOfCalculation(unit,calculation);
 	}
 
 	/*

@@ -86,8 +86,8 @@ public class CalculateServices {
     private List<Soldier> loadSoldiersAndServices(String username) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
-        int calculation = soldierAccess.getCalculations(unit);
-        return soldierAccess.loadSold(unit,calculation);
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
+        return soldierAccess.loadSold(unit,dateOfLastCalculation);
     }
 
     private Date findNextCalculationDate(Date lastDate) {

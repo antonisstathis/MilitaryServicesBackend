@@ -29,8 +29,6 @@ public class Service implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "sold_id", referencedColumnName = "sold_id")
 	private Soldier soldier;
-	@Column(name = "calculations")
-	private int calculation;
 
 	public Service() {
 
@@ -54,14 +52,6 @@ public class Service implements Serializable {
 	public String getArmed() {
 		
 		return armed;
-	}
-
-	public int getCalculation() {
-		return calculation;
-	}
-
-	public void setCalculation(int calculation) {
-		this.calculation = calculation;
 	}
 
 	public void setArmed(String armed) {
