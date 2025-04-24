@@ -69,6 +69,17 @@ public class SoldiersController {
                     .body("Token is invalid, expired, or missing. Please authenticate again.");
     }
 
+    @GetMapping("/getFirstCalcDate")
+    public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
+        if(jwtUtil.validateRequest(request)) {
+            Date dateOfFirstCalc = soldierService.getDateByCalculationNumber(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),1);
+            return ResponseEntity.ok(dateOfFirstCalc);
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+    }
+
     @GetMapping("/getPreviousCalculation")
     public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate) {
         if(jwtUtil.validateRequest(request)) {

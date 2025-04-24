@@ -4,6 +4,7 @@ import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
+import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
@@ -80,6 +81,14 @@ public class SoldierServiceImpl implements SoldierService {
 		}
 
 		return resultList;
+	}
+
+	@Override
+	public Date getDateByCalculationNumber(String username,int calculation) {
+
+		Optional<User> user = userRepository.findById(username);
+		List<Soldier> allSoldiers = soldierAccess.loadSold(user.get().getSoldier().getUnit(), calculation);
+		return allSoldiers.get(0).getService().getDate();
 	}
 
 	/*
