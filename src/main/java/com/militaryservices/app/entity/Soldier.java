@@ -15,6 +15,7 @@ import java.util.List;
 public class Soldier implements Serializable {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "sold_id")
 	private int id;
 
