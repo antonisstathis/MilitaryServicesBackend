@@ -3,10 +3,7 @@ package com.militaryservices.app.test;
 import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
-import com.militaryservices.app.entity.ServiceOfArmy;
-import com.militaryservices.app.entity.ServiceOfUnit;
-import com.militaryservices.app.entity.Soldier;
-import com.militaryservices.app.entity.User;
+import com.militaryservices.app.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +28,9 @@ public class CheckOutput {
 
     public boolean checkResults(String username) {
         Optional<User> user = userRepository.findById(username);
-        List<Soldier> allSoldiers = soldierAccess.loadSold(user.get().getSoldier().getUnit());
+        Unit unit = user.get().getSoldier().getUnit();
+        int calculation = soldierAccess.getCalculations(unit);
+        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,calculation);
         List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnit(user.get().getSoldier().getUnit());
         Map<String, Integer> servicesMap = new HashMap<>();
         ServiceOfArmy serviceOfArmy;
