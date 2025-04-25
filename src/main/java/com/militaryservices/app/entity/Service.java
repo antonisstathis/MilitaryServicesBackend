@@ -26,6 +26,15 @@ public class Service implements Serializable {
 	@JoinColumn(name = "unit_id")
 	private Unit unit;
 
+	@Column
+	private String company;
+
+	@Column
+	private String description;
+
+	@Column
+	private String shift;
+
 	@ManyToOne
 	@JoinColumn(name = "sold_id", referencedColumnName = "sold_id")
 	private Soldier soldier;
@@ -62,6 +71,18 @@ public class Service implements Serializable {
 		this.soldier = soldier;
 	}
 
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setShift(String shift) {
+		this.shift = shift;
+	}
+
 	public Soldier getSoldier() {
 		return soldier;
 	}
@@ -79,6 +100,18 @@ public class Service implements Serializable {
 	public Long getID() {
 		
 		return id;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getShift() {
+		return shift;
 	}
 
 	public Boolean isArmed() {

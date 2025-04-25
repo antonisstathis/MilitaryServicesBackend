@@ -19,12 +19,23 @@ public class Unit {
     @OneToMany(mappedBy = "unit")
     private List<ServiceOfUnit> servicesOfUnit;
 
+    @Column
+    private String companies;
+
     public Long getId() {
         return id;
     }
 
     public String getNameOfUnit() {
         return nameOfUnit;
+    }
+
+    public String getCompanies() {
+        return companies;
+    }
+
+    public void setCompanies(String companies) {
+        this.companies = companies;
     }
 
     public List<ServiceOfUnit> getServicesOfUnit() {
