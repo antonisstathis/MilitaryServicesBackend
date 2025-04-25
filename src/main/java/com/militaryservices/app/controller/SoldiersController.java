@@ -161,6 +161,16 @@ public class SoldiersController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
     }
 
+    @PostMapping("/saveNewServices")
+    public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload) {
+        JsonNode jsonNode = getJsonNode(payload);
+        if(jwtUtil.validateRequest(request)) {
+            return ResponseEntity.ok("The new services changed successfully.");
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+    }
+
     @PostMapping("/changeSoldSituation")
     public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@RequestBody String sold) {
 

@@ -30,15 +30,13 @@ public class CheckOutput {
         List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation);
         List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnit(user.get().getSoldier().getUnit());
         Map<String, Integer> servicesMap = new HashMap<>();
-        ServiceOfArmy serviceOfArmy;
         int freq;
         for (ServiceOfUnit serviceOfUnit : servicesOfUnit) {
-            serviceOfArmy = serviceOfUnit.getServiceOfArmy();
-            if (servicesMap.containsKey(serviceOfArmy.getServiceName())) {
-                freq = servicesMap.get(serviceOfArmy.getServiceName());
-                servicesMap.put(serviceOfArmy.getServiceName(), freq + 1);
+            if (servicesMap.containsKey(serviceOfUnit.getServiceName())) {
+                freq = servicesMap.get(serviceOfUnit.getServiceName());
+                servicesMap.put(serviceOfUnit.getServiceName(), freq + 1);
             } else
-                servicesMap.put(serviceOfArmy.getServiceName(), 1);
+                servicesMap.put(serviceOfUnit.getServiceName(), 1);
         }
 
         String serviceName;

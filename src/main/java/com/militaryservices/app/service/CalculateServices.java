@@ -105,13 +105,11 @@ public class CalculateServices {
         unarmedServices.clear();
         Unit unit = allSoldiers.get(0).getUnit();
 
-        ServiceOfArmy serviceOfArmy;
         for(ServiceOfUnit serviceOfUnit : servicesOfUnit) {
-            serviceOfArmy = serviceOfUnit.getServiceOfArmy();
-            if(serviceOfArmy.isArmed())
-                armedServices.add(new Service(serviceOfArmy.getServiceName(),serviceOfArmy.getArmed(),new Date(),unit));
+            if(serviceOfUnit.isArmed())
+                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit));
             else
-                unarmedServices.add(new Service(serviceOfArmy.getServiceName(),serviceOfArmy.getArmed(),new Date(),unit));
+                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit));
         }
 
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);

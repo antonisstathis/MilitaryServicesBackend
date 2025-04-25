@@ -24,8 +24,8 @@ public class SerOfUnitService {
         List<ServiceDto> response = new ArrayList<>();
         ServiceDto serviceDto;
         for(ServiceOfUnit service : allServices) {
-            String serName = service.getServiceOfArmy().getServiceName();
-            String armed = service.getServiceOfArmy().getArmed();
+            String serName = service.getServiceName();
+            String armed = service.getArmed();
             serviceDto = new ServiceDto(service.getId(),serName,armed, service.getDescription());
             response.add(serviceDto);
         }

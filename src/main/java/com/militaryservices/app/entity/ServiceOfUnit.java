@@ -1,5 +1,6 @@
 package com.militaryservices.app.entity;
 
+import com.militaryservices.app.dto.Situation;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,19 +12,24 @@ public class ServiceOfUnit {
     @Column(name = "ser_id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "ser_of_army_id")
-    private ServiceOfArmy serviceOfArmy;
+    @Column
+    private String serviceName;
 
-    @ManyToOne
-    @JoinColumn(name = "unit_id")
-    private Unit unit;
+    @Column
+    private String armed;
+
+    @Column
+    private String company;
 
     @Column
     private String description;
 
     @Column
     private String shift;
+
+    @ManyToOne
+    @JoinColumn(name = "unit_id")
+    private Unit unit;
 
     public Long getId() {
         return id;
@@ -35,6 +41,38 @@ public class ServiceOfUnit {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public String getArmed() {
+        return armed;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public void setArmed(String armed) {
+        this.armed = armed;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public Boolean isArmed() {
+
+        if(Situation.ARMED.name().toLowerCase().equals(armed))
+            return true;
+        else
+            return false;
     }
 
     public void setDescription(String description) {
@@ -52,16 +90,8 @@ public class ServiceOfUnit {
     public ServiceOfUnit() {
     }
 
-    public ServiceOfArmy getServiceOfArmy() {
-        return serviceOfArmy;
-    }
-
     public Unit getUnit() {
         return unit;
-    }
-
-    public void setServiceOfArmy(ServiceOfArmy serviceOfArmy) {
-        this.serviceOfArmy = serviceOfArmy;
     }
 
     public void setUnit(Unit unit) {
