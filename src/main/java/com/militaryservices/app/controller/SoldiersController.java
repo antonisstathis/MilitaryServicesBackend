@@ -52,6 +52,7 @@ public class SoldiersController {
             soldiers = soldiers.stream()
                     .map(soldier -> new SoldierDto(
                             soldier.getToken(),
+                            SanitizationUtil.sanitize(soldier.getCompany()),
                             SanitizationUtil.sanitize(soldier.getName()),
                             SanitizationUtil.sanitize(soldier.getSurname()),
                             SanitizationUtil.sanitize(soldier.getSituation()),
@@ -89,6 +90,7 @@ public class SoldiersController {
                     .map(soldier -> new SoldierPreviousServiceDto(
                             soldier.getToken(),
                             SanitizationUtil.sanitize(soldier.getSoldierRegistrationNumber()),
+                            SanitizationUtil.sanitize(soldier.getCompany()),
                             SanitizationUtil.sanitize(soldier.getName()),
                             SanitizationUtil.sanitize(soldier.getSurname()),
                             SanitizationUtil.sanitize(soldier.getSituation()),

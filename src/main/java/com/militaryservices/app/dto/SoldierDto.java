@@ -6,6 +6,8 @@ import java.util.Date;
 public class SoldierDto {
     private String token;
 
+    private String company;
+
     private String name;
     private String surname;
     private String situation;
@@ -21,8 +23,9 @@ public class SoldierDto {
         this.active = active;
     }
 
-    public SoldierDto(String token,String name, String surname, String situation, String active, String service, Date date,String armed) {
+    public SoldierDto(String token,String company,String name, String surname, String situation, String active, String service, Date date,String armed) {
         this.token = token;
+        this.company = company;
         this.name = name;
         this.surname = surname;
         this.situation = situation;
@@ -34,6 +37,10 @@ public class SoldierDto {
 
     public String getToken() {
         return token;
+    }
+
+    public String getCompany() {
+        return company;
     }
 
     public String getName() {
@@ -67,6 +74,10 @@ public class SoldierDto {
 
     public String getArmed() {
         return armed;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public void setArmed(String armed) {

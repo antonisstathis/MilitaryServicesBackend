@@ -7,6 +7,7 @@ public class SoldierPreviousServiceDto {
     private String token;
 
     private String soldierRegistrationNumber;
+    private String company;
 
     private String name;
     private String surname;
@@ -22,9 +23,10 @@ public class SoldierPreviousServiceDto {
 
     }
 
-    public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String name, String surname, String situation, String active, String service, String date, String armed, String discharged) {
+    public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String company,String name, String surname, String situation, String active, String service, String date, String armed, String discharged) {
         this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
+        this.company = company;
         this.name = name;
         this.surname = surname;
         this.situation = situation;
@@ -41,6 +43,10 @@ public class SoldierPreviousServiceDto {
 
     public String getSoldierRegistrationNumber() {
         return soldierRegistrationNumber;
+    }
+
+    public String getCompany() {
+        return company;
     }
 
     public String getName() {
@@ -81,6 +87,10 @@ public class SoldierPreviousServiceDto {
 
     public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
         this.soldierRegistrationNumber = soldierRegistrationNumber;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public void setName(String name) {

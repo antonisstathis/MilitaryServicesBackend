@@ -12,7 +12,7 @@ public class ServiceOfUnit {
     @Column(name = "ser_id")
     private Long id;
 
-    @Column
+    @Column(name = "ser_name")
     private String serviceName;
 
     @Column

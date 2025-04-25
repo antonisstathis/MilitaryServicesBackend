@@ -44,6 +44,7 @@ public class SoldierServiceImpl implements SoldierService {
 		SoldierDto soldierDto;
 		for(Soldier sold : soldiers) {
 			String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
+			String company = sold.getCompany();
 			String name = sold.getName();
 			String surname = sold.getSurname();
 			String situation = sold.getSituation();
@@ -51,7 +52,7 @@ public class SoldierServiceImpl implements SoldierService {
 			String service = sold.getService().getServiceName();
 			Date date = sold.getService().getDate();
 			String armed = sold.getService().getArmed();
-			soldierDto = new SoldierDto(token,name,surname,situation,active,service,date,armed);
+			soldierDto = new SoldierDto(token,company,name,surname,situation,active,service,date,armed);
 			response.add(soldierDto);
 		}
 
@@ -69,6 +70,7 @@ public class SoldierServiceImpl implements SoldierService {
 			soldier = new SoldierPreviousServiceDto();
 			soldier.setToken(jwtUtil.generateToken(Integer.toString(soldDto.getId())));
 			soldier.setSoldierRegistrationNumber(soldDto.getSoldierRegistrationNumber());
+			soldier.setCompany(soldDto.getCompany());
 			soldier.setName(soldDto.getName());
 			soldier.setSurname(soldDto.getSurname());
 			soldier.setActive(soldDto.getActive());

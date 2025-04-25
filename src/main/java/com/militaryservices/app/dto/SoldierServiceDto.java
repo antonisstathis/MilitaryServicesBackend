@@ -10,6 +10,8 @@ public class SoldierServiceDto {
 
     private String soldierRegistrationNumber;
 
+    private String company;
+
     private String name;
     private String surname;
     private String situation;
@@ -21,8 +23,9 @@ public class SoldierServiceDto {
     private String armed;
     private boolean discharged;
 
-    public SoldierServiceDto(int id,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
         this.id = id;
+        this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.name = name;
         this.surname = surname;
@@ -38,6 +41,10 @@ public class SoldierServiceDto {
 
     public int getId() {
         return id;
+    }
+
+    public String getCompany() {
+        return company;
     }
 
     public String getSoldierRegistrationNumber() {
@@ -91,6 +98,10 @@ public class SoldierServiceDto {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
