@@ -31,6 +31,15 @@ public class ServiceOfUnit {
     @JoinColumn(name = "unit_id")
     private Unit unit;
 
+    public ServiceOfUnit(String serviceName, String armed, String company, String description, String shift, Unit unit) {
+        this.serviceName = serviceName;
+        this.armed = armed;
+        this.company = company;
+        this.description = description;
+        this.shift = shift;
+        this.unit = unit;
+    }
+
     public Long getId() {
         return id;
     }

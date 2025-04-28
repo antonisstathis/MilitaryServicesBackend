@@ -7,6 +7,9 @@ import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
 import com.militaryservices.app.dto.SoldierPreviousServiceDto;
 import com.militaryservices.app.dto.SoldierUnitDto;
+import com.militaryservices.app.entity.ServiceOfUnit;
+import com.militaryservices.app.entity.Soldier;
+import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
@@ -25,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RestController
 public class SoldiersController {
@@ -166,8 +170,38 @@ public class SoldiersController {
     @PostMapping("/saveNewServices")
     public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
+        Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
         if(jwtUtil.validateRequest(request)) {
+            int numberOfGuards = jsonNode.get("selectedNumberOfGuards").asInt();
+            String nameOfService = jsonNode.get("nameOfService").asText();
+            String armedStatus = jsonNode.get("armed").asText();
+            String description = jsonNode.get("description").asText();
+            String shift = jsonNode.get("shift").asText();
+            Soldier soldier = user.get().getSoldier();
+            Unit unit = soldier.getUnit();
+            ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
+            if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit))
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not enough soldiers available to add these services.");
+
+            IntStream.range(0, numberOfGuards)
+                    .mapToObj(i -> {
+                        // Create a new instance of ServiceOfUnit if you want separate instances
+                        ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
+                        newService.setId(null);
+                        return newService;
+                    })
+                    .forEach(serOfUnitService::saveService);
             return ResponseEntity.ok("The new services changed successfully.");
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+    }
+
+    @PostMapping("/deleteServices")
+    public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
+        JsonNode jsonNode = getJsonNode(payload);
+        if(jwtUtil.validateRequest(request)) {
+            return ResponseEntity.ok("The services were deleted successfully.");
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
