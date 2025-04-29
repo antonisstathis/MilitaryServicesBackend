@@ -27,6 +27,22 @@ public class SoldierServiceDto {
 
     private String shift;
 
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
+        this.id = id;
+        this.company = company;
+        this.soldierRegistrationNumber = soldierRegistrationNumber;
+        this.name = name;
+        this.surname = surname;
+        this.situation = situation;
+        this.active = active;
+        this.serviceId = serviceId;
+        this.service = service;
+        this.date = date;
+        this.armed = armed;
+        this.unit = unit;
+        this.discharged = discharged;
+    }
+
     public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
