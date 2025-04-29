@@ -143,7 +143,6 @@ public class SoldiersController {
 
         if(jwtUtil.validateRequest(request)) {
             Optional<com.militaryservices.app.entity.User> optionalUser = userService.findUser(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
-
             return ResponseEntity.ok(SanitizationUtil.sanitize(optionalUser.get().getSoldier().getUnit().getNameOfUnit())); // Sanitize name of unit data
         } else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));

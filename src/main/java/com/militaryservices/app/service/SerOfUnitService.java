@@ -10,7 +10,6 @@ import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
