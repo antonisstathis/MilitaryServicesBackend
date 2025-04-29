@@ -23,7 +23,11 @@ public class SoldierServiceDto {
     private String armed;
     private boolean discharged;
 
-    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
+    private String description;
+
+    private String shift;
+
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -37,6 +41,8 @@ public class SoldierServiceDto {
         this.armed = armed;
         this.unit = unit;
         this.discharged = discharged;
+        this.description = description;
+        this.shift = shift;
     }
 
     public int getId() {
@@ -73,6 +79,22 @@ public class SoldierServiceDto {
 
     public String getService() {
         return service;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getShift() {
+        return shift;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setShift(String shift) {
+        this.shift = shift;
     }
 
     public String getDate() {

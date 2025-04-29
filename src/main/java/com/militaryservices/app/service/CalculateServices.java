@@ -107,9 +107,9 @@ public class CalculateServices {
 
         for(ServiceOfUnit serviceOfUnit : servicesOfUnit) {
             if(serviceOfUnit.isArmed())
-                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit));
+                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift()));
             else
-                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit));
+                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift()));
         }
 
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);
@@ -156,7 +156,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00"));
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
                 numOfOutgoing -= 1;
             }
@@ -174,7 +174,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00"));
                 soldiers.remove(soldier);
                 numOfOutgoing -= 1;
             }
