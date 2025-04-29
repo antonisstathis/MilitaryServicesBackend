@@ -10,5 +10,6 @@ import java.util.List;
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     List<Service> findByUnitAndDateAndArmed(Unit unit, Date date,String armed);
+    List<Service> findByUnitAndDate(Unit unit,Date date);
 
 }

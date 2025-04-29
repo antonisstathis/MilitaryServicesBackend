@@ -127,11 +127,11 @@ public class SoldiersController {
     }
 
     @GetMapping("/getServices")
-    public ResponseEntity<?> getServices(HttpServletRequest request) {
+    public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate) {
 
         if(jwtUtil.validateRequest(request)) {
             Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
-            return ResponseEntity.ok(serOfUnitService.getAllServices(user.get().getSoldier().getUnit()));
+            return ResponseEntity.ok(serOfUnitService.getAllServices(user.get().getSoldier().getUnit(),prevDate));
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

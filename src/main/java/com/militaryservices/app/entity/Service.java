@@ -107,7 +107,7 @@ public class Service implements Serializable {
 		this.date = date;
 	}
 	
-	public Long getID() {
+	public Long getId() {
 		
 		return id;
 	}

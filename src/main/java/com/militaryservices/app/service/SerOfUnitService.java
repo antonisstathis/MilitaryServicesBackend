@@ -29,18 +29,35 @@ public class SerOfUnitService {
         this.serviceRepository = serviceRepository;
     }
 
-    public List<ServiceDto> getAllServices(Unit unit) {
+    public List<ServiceDto> getAllServices(Unit unit,Date prevDate) {
+        if(prevDate != null)
+            return getPrevServices(unit,prevDate);
+
         List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnit(unit);
+        List<ServiceDto> response = allServices.stream()
+                .map(service -> new ServiceDto(
+                        service.getId(),
+                        service.getServiceName(),
+                        service.getArmed(),
+                        service.getDescription(),
+                        service.getShift()
+                ))
+                .collect(Collectors.toList());
 
-        List<ServiceDto> response = new ArrayList<>();
-        ServiceDto serviceDto;
-        for(ServiceOfUnit service : allServices) {
-            String serName = service.getServiceName();
-            String armed = service.getArmed();
-            serviceDto = new ServiceDto(service.getId(),serName,armed, service.getDescription(),service.getShift());
-            response.add(serviceDto);
-        }
+        return response;
+    }
 
+    private List<ServiceDto> getPrevServices(Unit unit,Date prevDate) {
+        List<com.militaryservices.app.entity.Service> services = serviceRepository.findByUnitAndDate(unit,prevDate);
+        List<ServiceDto> response = services.stream()
+                .map(service -> new ServiceDto(
+                        service.getId(),
+                        service.getServiceName(),
+                        service.getArmed(),
+                        service.getDescription(),
+                        service.getShift()
+                ))
+                .collect(Collectors.toList());
         return response;
     }
 
