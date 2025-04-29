@@ -1,7 +1,7 @@
 package com.militaryservices.app.entity;
 
-import com.militaryservices.app.dto.Active;
-import com.militaryservices.app.dto.Situation;
+import com.militaryservices.app.enums.Active;
+import com.militaryservices.app.enums.Situation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

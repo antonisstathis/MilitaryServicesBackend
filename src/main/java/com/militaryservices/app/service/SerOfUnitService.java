@@ -4,7 +4,7 @@ import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.ServiceRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.ServiceDto;
-import com.militaryservices.app.dto.Situation;
+import com.militaryservices.app.enums.Situation;
 import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;

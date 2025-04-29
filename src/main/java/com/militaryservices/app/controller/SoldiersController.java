@@ -11,9 +11,11 @@ import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
+import com.militaryservices.app.enums.MessageKey;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
 import com.militaryservices.app.security.UserPermission;
+import com.militaryservices.app.service.MessageService;
 import com.militaryservices.app.service.SerOfUnitService;
 import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,6 +46,8 @@ public class SoldiersController {
     private JwtUtil jwtUtil;
     @Autowired
     private UserPermission userPermission;
+    @Autowired
+    private MessageService messageService;
 
     public SoldiersController() {
 
@@ -71,7 +76,7 @@ public class SoldiersController {
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @GetMapping("/getFirstCalcDate")
@@ -82,7 +87,7 @@ public class SoldiersController {
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @GetMapping("/getPreviousCalculation")
@@ -110,7 +115,7 @@ public class SoldiersController {
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @GetMapping("/calc")
@@ -121,7 +126,7 @@ public class SoldiersController {
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @GetMapping("/getServices")
@@ -133,7 +138,7 @@ public class SoldiersController {
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid, expired, or missing. Please authenticate again.");
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @GetMapping("/getNameOfUnit")
@@ -144,7 +149,7 @@ public class SoldiersController {
 
             return ResponseEntity.ok(SanitizationUtil.sanitize(optionalUser.get().getSoldier().getUnit().getNameOfUnit())); // Sanitize name of unit data
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/getSoldier")
@@ -156,7 +161,7 @@ public class SoldiersController {
         SoldierUnitDto soldierDto = soldierService.findSoldier(id);
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,soldierDto.getSituation(),soldierDto.getActive());
         if(!userHasAccess)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         if(jwtUtil.validateRequest(request)) {
             SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText()),
                     SanitizationUtil.sanitize(soldierDto.getSituation()), SanitizationUtil.sanitize(soldierDto.getActive()));
@@ -164,7 +169,7 @@ public class SoldiersController {
             soldier.setDate(new Date());
             return ResponseEntity.ok(soldier);
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/saveNewServices")
@@ -181,7 +186,7 @@ public class SoldiersController {
             Unit unit = soldier.getUnit();
             ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
             if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit))
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not enough soldiers available to add these services.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(),Locale.ENGLISH));
 
             IntStream.range(0, numberOfGuards)
                     .mapToObj(i -> {
@@ -191,20 +196,20 @@ public class SoldiersController {
                         return newService;
                     })
                     .forEach(serOfUnitService::saveService);
-            return ResponseEntity.ok("The new services changed successfully.");
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.ADD_SERVICES.key(),Locale.ENGLISH));
         }
         else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/deleteServices")
     public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         if(jwtUtil.validateRequest(request)) {
-            return ResponseEntity.ok("The services were deleted successfully.");
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(),Locale.ENGLISH));
         }
         else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/changeSoldSituation")
@@ -214,15 +219,15 @@ public class SoldiersController {
         String token = jsonNode.get("token").asText();
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
         if(!userHasAccess)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You have no rights to access this data.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         if(jwtUtil.validateRequest(request)) {
             int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
             SoldDto soldDto = new SoldDto(soldId,SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText())
                     , jsonNode.get("situation").asText(), jsonNode.get("active").asText());
             soldierService.updateSoldier(soldDto);
-            return ResponseEntity.ok("Soldier updated successfully.");
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_UPDATED.key(),Locale.ENGLISH));
         } else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid, expired, or missing. Please authenticate again.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
     private JsonNode getJsonNode(String json) {

@@ -1,4 +1,4 @@
-package com.militaryservices.app.dto;
+package com.militaryservices.app.enums;
 
 public enum Situation {
     ARMED,UNARMED

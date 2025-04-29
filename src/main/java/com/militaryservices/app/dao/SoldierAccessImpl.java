@@ -1,6 +1,6 @@
 package com.militaryservices.app.dao;
 
-import com.militaryservices.app.dto.Active;
+import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.dto.SoldierServiceDto;
 import com.militaryservices.app.entity.Service;

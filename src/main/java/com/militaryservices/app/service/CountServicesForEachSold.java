@@ -3,6 +3,8 @@ package com.militaryservices.app.service;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
+import com.militaryservices.app.enums.Active;
+import com.militaryservices.app.enums.Situation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

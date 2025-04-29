@@ -1,7 +1,7 @@
 package com.militaryservices.app.security;
 
-import com.militaryservices.app.dto.Active;
-import com.militaryservices.app.dto.Situation;
+import com.militaryservices.app.enums.Active;
+import com.militaryservices.app.enums.Situation;
 
 public class CheckOptions {
 

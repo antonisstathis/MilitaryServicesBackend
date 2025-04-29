@@ -1,6 +1,6 @@
 package com.militaryservices.app.entity;
 
-import com.militaryservices.app.dto.Situation;
+import com.militaryservices.app.enums.Situation;
 import jakarta.persistence.*;
 
 @Entity
