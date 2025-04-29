@@ -5,7 +5,7 @@ public enum MessageKey {
     SOLDIER_UPDATED("soldierupdated"),
     UNAUTHORIZED("unauthorized"),
     SERVICES_DELETED("servicesdeleted"),
-    ADD_SERVICES("The new services added successfully."),
+    ADD_SERVICES("addservices"),
     ADD_SERVICES_REJECTED("addservicesrejected");
 
     private final String key;
