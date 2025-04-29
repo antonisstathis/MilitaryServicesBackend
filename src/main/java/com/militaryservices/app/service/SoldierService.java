@@ -1,5 +1,6 @@
 package com.militaryservices.app.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.militaryservices.app.dto.SoldDto;
 import com.militaryservices.app.dto.SoldierDto;
 import com.militaryservices.app.dto.SoldierPreviousServiceDto;
@@ -24,4 +25,6 @@ public interface SoldierService {
     void updateSoldier(SoldDto soldier);
 
     SoldierUnitDto findSoldier(int id);
+
+    void deleteServices(JsonNode services);
 }

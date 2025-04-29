@@ -1,5 +1,7 @@
 package com.militaryservices.app.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.dto.*;
@@ -29,6 +31,8 @@ public class SoldierServiceImpl implements SoldierService {
 	private JwtUtil jwtUtil;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private SerOfUnitRepository serOfUnitRepository;
 	@Autowired
 	CheckOutput checkOutput;
 
@@ -156,6 +160,13 @@ public class SoldierServiceImpl implements SoldierService {
 				soldier.getActive(), soldier.getUnit());
 
 		return sold;
+	}
+
+	@Override
+	public void deleteServices(JsonNode services) {
+		List<Long> ids = new ArrayList<>();
+		services.forEach(node -> ids.add(node.asLong()));
+		serOfUnitRepository.deleteAllById(ids);
 	}
 
 }

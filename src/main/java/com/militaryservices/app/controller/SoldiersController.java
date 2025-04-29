@@ -26,10 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -206,6 +203,7 @@ public class SoldiersController {
     public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         if(jwtUtil.validateRequest(request)) {
+            soldierService.deleteServices(jsonNode.get("ids"));
             return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(),Locale.ENGLISH));
         }
         else
