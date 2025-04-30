@@ -8,6 +8,7 @@ import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
+import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
 import org.springframework.beans.factory.annotation.Autowired;
