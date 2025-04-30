@@ -119,7 +119,7 @@ public class SoldiersController {
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {
             soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request))); // Sanitize username
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

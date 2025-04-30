@@ -6,7 +6,9 @@ public enum MessageKey {
     UNAUTHORIZED("unauthorized"),
     SERVICES_DELETED("servicesdeleted"),
     ADD_SERVICES("addservices"),
-    ADD_SERVICES_REJECTED("addservicesrejected");
+    ADD_SERVICES_REJECTED("addservicesrejected"),
+    NEW_SERVICES_CALCULATED("newservicescalculated");
+
 
     private final String key;
 
