@@ -1,10 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.militaryservices.app.dto.SoldDto;
-import com.militaryservices.app.dto.SoldierDto;
-import com.militaryservices.app.dto.SoldierPreviousServiceDto;
-import com.militaryservices.app.dto.SoldierUnitDto;
+import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 
@@ -13,6 +10,8 @@ import java.util.List;
 
 public interface SoldierService {
     List<SoldierDto> findAll(String username);
+
+    List<SoldierPersonalDataDto> loadSoldiers(String username);
 
     List<SoldierPreviousServiceDto> findPreviousCalculation(String username, Date date);
 

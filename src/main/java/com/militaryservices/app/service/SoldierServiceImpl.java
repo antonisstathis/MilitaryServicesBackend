@@ -3,6 +3,7 @@ package com.militaryservices.app.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
+import com.militaryservices.app.dao.SoldierRepository;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SoldierServiceImpl implements SoldierService {
@@ -32,6 +34,8 @@ public class SoldierServiceImpl implements SoldierService {
 	private JwtUtil jwtUtil;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private SoldierRepository soldierRepository;
 	@Autowired
 	private SerOfUnitRepository serOfUnitRepository;
 	@Autowired
@@ -62,6 +66,30 @@ public class SoldierServiceImpl implements SoldierService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public List<SoldierPersonalDataDto> loadSoldiers(String username) {
+		Optional<User> user = userRepository.findById(username);
+		Unit unit = user.get().getSoldier().getUnit();
+		List<Soldier> allSoldiers = soldierRepository.findByUnitAndDischarged(unit,false);
+
+		List<SoldierPersonalDataDto> soldierDataList = allSoldiers.stream()
+				.map(soldier -> {
+					SoldierPersonalDataDto soldierDto = new SoldierPersonalDataDto();
+					soldierDto.setToken(jwtUtil.generateToken(Integer.toString(soldier.getId())));
+					soldierDto.setSoldierRegistrationNumber(soldier.getSoldierRegistrationNumber());
+					soldierDto.setCompany(soldier.getCompany());
+					soldierDto.setName(soldier.getName());
+					soldierDto.setSurname(soldier.getSurname());
+					soldierDto.setActive(soldier.getActive());
+					soldierDto.setSituation(soldier.getSituation());
+					soldierDto.setDischarged(Discharged.getDischarged(soldier.isDischarged()));
+					return soldierDto;
+				})
+				.collect(Collectors.toList());
+
+		return soldierDataList;
 	}
 
 	@Override

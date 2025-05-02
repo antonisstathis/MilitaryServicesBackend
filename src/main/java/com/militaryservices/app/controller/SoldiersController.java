@@ -3,10 +3,7 @@ package com.militaryservices.app.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.militaryservices.app.dto.SoldDto;
-import com.militaryservices.app.dto.SoldierDto;
-import com.militaryservices.app.dto.SoldierPreviousServiceDto;
-import com.militaryservices.app.dto.SoldierUnitDto;
+import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
@@ -66,6 +63,31 @@ public class SoldiersController {
                             SanitizationUtil.sanitize(soldier.getService()),
                             soldier.extractDate(),
                             SanitizationUtil.sanitize(soldier.getArmed())
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(soldiers);
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
+    }
+
+    @GetMapping("/getSoldiersOfUnit")
+    public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request) {
+        if(jwtUtil.validateRequest(request)) {
+            List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
+            // Sanitize the data.
+            soldiers = soldiers.stream()
+                    .map(soldier -> new SoldierPersonalDataDto(
+                            soldier.getToken(),
+                            soldier.getSoldierRegistrationNumber(),
+                            SanitizationUtil.sanitize(soldier.getCompany()),
+                            SanitizationUtil.sanitize(soldier.getName()),
+                            SanitizationUtil.sanitize(soldier.getSurname()),
+                            SanitizationUtil.sanitize(soldier.getSituation()),
+                            SanitizationUtil.sanitize(soldier.getActive()),
+                            SanitizationUtil.sanitize(soldier.getDischarged())
                     ))
                     .collect(Collectors.toList());
 
