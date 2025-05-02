@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SoldierAccessImpl {
@@ -59,13 +59,14 @@ public class SoldierAccessImpl {
 	@Transactional
 	public void saveSoldiers(List<Soldier> allSoldiers) throws IOException, SQLException {
 
-		Service service;
-		for(Soldier sold : allSoldiers) {
-			service = sold.getService();
-			service.setSoldier(sold);
-			service.setUnit(sold.getUnit());
-			entityManager.persist(sold.getService());
-		}
+		allSoldiers.stream()
+				.map(sold -> {
+					Service service = sold.getService();
+					service.setSoldier(sold);
+					service.setUnit(sold.getUnit());
+					return service;
+				})
+				.forEach(entityManager::persist);
 	}
 
 	@Transactional
@@ -75,21 +76,21 @@ public class SoldierAccessImpl {
 				" u.description, u.shift) from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.discharged =:discharged and u.date =:date order by s.id asc";
 		Query nativeQuery;
 
-		List<Soldier> allSoldiers = new ArrayList<>();
+		//List<Soldier> allSoldiers = new ArrayList<>();
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit",unit);
 		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("date", dateOfLastCalc);
 		List<SoldierServiceDto> list = nativeQuery.getResultList();
-		Soldier sold;
-		Service service;
-		for(SoldierServiceDto soldierDto : list) {
-			sold = new Soldier(soldierDto.getId(), soldierDto.getCompany(), soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isDischarged());
-			service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getCompany(), soldierDto.getDescription(), soldierDto.getShift());
-			sold.setService(service);
-			sold.setUnit(service.getUnit());
-			allSoldiers.add(sold);
-		}
+
+		List<Soldier> allSoldiers = list.stream()
+				.map(soldierDto -> {
+					Soldier sold = new Soldier(soldierDto.getId(), soldierDto.getCompany(), soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isDischarged());
+					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getCompany(), soldierDto.getDescription(), soldierDto.getShift());
+					sold.setService(service);
+					sold.setUnit(service.getUnit());
+					return sold;
+				}).collect(Collectors.toList());
 
 		return allSoldiers;
 	}

@@ -49,21 +49,21 @@ public class SoldierServiceImpl implements SoldierService {
 
 		Optional<User> user = userRepository.findById(username);
 		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier());
-		List<SoldierDto> response = new ArrayList<>();
 		SoldierDto soldierDto;
-		for(Soldier sold : soldiers) {
-			String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
-			String company = sold.getCompany();
-			String name = sold.getName();
-			String surname = sold.getSurname();
-			String situation = sold.getSituation();
-			String active = sold.getActive();
-			String service = sold.getService().getServiceName();
-			Date date = sold.getService().getDate();
-			String armed = sold.getService().getArmed();
-			soldierDto = new SoldierDto(token,company,name,surname,situation,active,service,date,armed);
-			response.add(soldierDto);
-		}
+		List<SoldierDto> response = soldiers.stream()
+				.map(sold -> {
+					String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
+					String company = sold.getCompany();
+					String name = sold.getName();
+					String surname = sold.getSurname();
+					String situation = sold.getSituation();
+					String active = sold.getActive();
+					String service = sold.getService().getServiceName();
+					Date date = sold.getService().getDate();
+					String armed = sold.getService().getArmed();
+					return new SoldierDto(token, company, name, surname, situation, active, service, date, armed);
+				})
+				.collect(Collectors.toList());
 
 		return response;
 	}
@@ -96,24 +96,24 @@ public class SoldierServiceImpl implements SoldierService {
 	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date) {
 		Optional<User> user = userRepository.findById(username);
 		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date);
-		List<SoldierPreviousServiceDto> resultList = new ArrayList<>();
 
-		SoldierPreviousServiceDto soldier;
-		for(SoldierServiceDto soldDto : soldierPreviousServiceDtoList) {
-			soldier = new SoldierPreviousServiceDto();
-			soldier.setToken(jwtUtil.generateToken(Integer.toString(soldDto.getId())));
-			soldier.setSoldierRegistrationNumber(soldDto.getSoldierRegistrationNumber());
-			soldier.setCompany(soldDto.getCompany());
-			soldier.setName(soldDto.getName());
-			soldier.setSurname(soldDto.getSurname());
-			soldier.setActive(soldDto.getActive());
-			soldier.setSituation(soldDto.getSituation());
-			soldier.setDischarged(Discharged.getDischarged(soldDto.isDischarged()));
-			soldier.setService(soldDto.getService());
-			soldier.setDate(soldDto.getDate());
-			soldier.setArmed(soldDto.getArmed());
-			resultList.add(soldier);
-		}
+		List<SoldierPreviousServiceDto> resultList = soldierPreviousServiceDtoList.stream()
+				.map(soldDto -> {
+					SoldierPreviousServiceDto soldier = new SoldierPreviousServiceDto();
+					soldier.setToken(jwtUtil.generateToken(Integer.toString(soldDto.getId())));
+					soldier.setSoldierRegistrationNumber(soldDto.getSoldierRegistrationNumber());
+					soldier.setCompany(soldDto.getCompany());
+					soldier.setName(soldDto.getName());
+					soldier.setSurname(soldDto.getSurname());
+					soldier.setActive(soldDto.getActive());
+					soldier.setSituation(soldDto.getSituation());
+					soldier.setDischarged(Discharged.getDischarged(soldDto.isDischarged()));
+					soldier.setService(soldDto.getService());
+					soldier.setDate(soldDto.getDate());
+					soldier.setArmed(soldDto.getArmed());
+					return soldier;
+				})
+				.collect(Collectors.toList());
 
 		return resultList;
 	}

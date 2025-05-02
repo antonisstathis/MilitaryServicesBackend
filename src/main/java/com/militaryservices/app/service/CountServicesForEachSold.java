@@ -98,30 +98,3 @@ public class CountServicesForEachSold {
     }
 
 }
-
- /*
-    public void addTheRestArmedOnes(List<HistoricalData> historicalData,List<Soldier> allSoldiers) {
-        Map<Integer,Soldier> allArmedSoldiers = new HashMap();
-        Map<Integer,Soldier> allWithHistoricalData = new HashMap<>();
-
-        for(Soldier sold : allSoldiers) {
-            if(sold.isArmed())
-                allArmedSoldiers.put(sold.getID(), sold);
-        }
-
-        Soldier sold;
-        for(HistoricalData hd : historicalData){
-            sold = allArmedSoldiers.get(hd.getSoldierId());
-            allWithHistoricalData.put(sold.getID(),sold);
-        }
-
-        HistoricalData hd;
-        for (Integer soldId : allArmedSoldiers.keySet()) {
-            sold = allArmedSoldiers.get(soldId);
-            if(allWithHistoricalData.get(sold.getID()) == null){
-                hd = new HistoricalData(soldId,0);
-                historicalData.add(hd);
-            }
-        }
-    }
-    */

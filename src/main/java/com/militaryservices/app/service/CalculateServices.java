@@ -128,14 +128,6 @@ public class CalculateServices {
                     unarmedSoldiers.remove(sold);
             }
         }
-
-        // Set as available the outgoing soldiers of the previous day
-        for (int i = 0; i < allSoldiers.size(); i++) {
-            sold = allSoldiers.get(i);
-            if (sold.checkIfActive() && sold.isOut()) {
-                sold.setService(new Service("available", "", new Date(),sold.getUnit()));
-            }
-        }
     }
 
     private void calculateOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList) {
@@ -196,15 +188,11 @@ public class CalculateServices {
     }
 
     private int totalSolForCalc(List<Soldier> allSoldiers) {
-        int counter = 0;
-        Soldier sold;
-        for(int i=0;i<allSoldiers.size();i++) {
-            sold = allSoldiers.get(i);
-            if(sold.getActive().equals(Active.ACTIVE.name().toLowerCase()))
-                counter+=1;
-        }
+        long counter = allSoldiers.stream()
+                .filter(s -> Active.ACTIVE.name().toLowerCase().equals(s.getActive()))
+                .count();
 
-        return counter;
+        return (int) counter;
     }
 
     private void addSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap) {
