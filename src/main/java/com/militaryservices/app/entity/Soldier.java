@@ -44,6 +44,21 @@ public class Soldier implements Serializable {
 	@Column
 	private String company;
 
+	@Column
+	private String patronymic;
+
+	@Column
+	private String matronymic;
+
+	@Column(name = "mobile_phone")
+	private String mobilePhone;
+
+	@Column
+	private String city;
+
+	@Column
+	private String address;
+
 	@ManyToOne
 	@JoinColumn(name = "unit_id")
 	private Unit unit;
@@ -75,7 +90,25 @@ public class Soldier implements Serializable {
 		this.discharged = discharged;
 		services = new ArrayList<>();
 	}
-	
+
+	public Soldier(int id, String soldierRegistrationNumber, String name, String surname, String situation, String active, List<Service> services, boolean discharged, String company, String patronymic, String matronymic, String mobilePhone, String city, String address, Unit unit) {
+		this.id = id;
+		this.soldierRegistrationNumber = soldierRegistrationNumber;
+		this.name = name;
+		this.surname = surname;
+		this.situation = situation;
+		this.active = active;
+		this.services = services;
+		this.discharged = discharged;
+		this.company = company;
+		this.patronymic = patronymic;
+		this.matronymic = matronymic;
+		this.mobilePhone = mobilePhone;
+		this.city = city;
+		this.address = address;
+		this.unit = unit;
+	}
+
 	public String getName() {
 		
 		return name;
@@ -129,6 +162,30 @@ public class Soldier implements Serializable {
 		return discharged;
 	}
 
+	public List<Service> getServices() {
+		return services;
+	}
+
+	public String getPatronymic() {
+		return patronymic;
+	}
+
+	public String getMatronymic() {
+		return matronymic;
+	}
+
+	public String getMobilePhone() {
+		return mobilePhone;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
 	public int getId() {
 		
 		return id;
@@ -163,6 +220,34 @@ public class Soldier implements Serializable {
 	public void setActive(String active) {
 		
 		this.active = active;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setServices(List<Service> services) {
+		this.services = services;
+	}
+
+	public void setPatronymic(String patronymic) {
+		this.patronymic = patronymic;
+	}
+
+	public void setMatronymic(String matronymic) {
+		this.matronymic = matronymic;
+	}
+
+	public void setMobilePhone(String mobilePhone) {
+		this.mobilePhone = mobilePhone;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public void setUnit(Unit unit) {

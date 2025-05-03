@@ -87,7 +87,12 @@ public class SoldiersController {
                             SanitizationUtil.sanitize(soldier.getSurname()),
                             SanitizationUtil.sanitize(soldier.getSituation()),
                             SanitizationUtil.sanitize(soldier.getActive()),
-                            SanitizationUtil.sanitize(soldier.getDischarged())
+                            SanitizationUtil.sanitize(soldier.getDischarged()),
+                            SanitizationUtil.sanitize(soldier.getPatronymic()),
+                            SanitizationUtil.sanitize(soldier.getMatronymic()),
+                            SanitizationUtil.sanitize(soldier.getMobilePhone()),
+                            SanitizationUtil.sanitize(soldier.getCity()),
+                            SanitizationUtil.sanitize(soldier.getAddress())
                     ))
                     .collect(Collectors.toList());
 

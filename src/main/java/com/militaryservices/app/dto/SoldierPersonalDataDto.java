@@ -1,5 +1,7 @@
 package com.militaryservices.app.dto;
 
+import jakarta.persistence.Column;
+
 public class SoldierPersonalDataDto {
 
     private String token;
@@ -15,10 +17,20 @@ public class SoldierPersonalDataDto {
 
     private String discharged;
 
+    private String patronymic;
+
+    private String matronymic;
+
+    private String mobilePhone;
+
+    private String city;
+
+    private String address;
+
     public SoldierPersonalDataDto() {
     }
 
-    public SoldierPersonalDataDto(String token,String soldierRegistrationNumber, String company, String name, String surname, String situation, String active,String discharged) {
+    public SoldierPersonalDataDto(String token, String soldierRegistrationNumber, String company, String name, String surname, String situation, String active, String discharged, String patronymic, String matronymic, String mobilePhone, String city, String address) {
         this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.company = company;
@@ -27,6 +39,11 @@ public class SoldierPersonalDataDto {
         this.situation = situation;
         this.active = active;
         this.discharged = discharged;
+        this.patronymic = patronymic;
+        this.matronymic = matronymic;
+        this.mobilePhone = mobilePhone;
+        this.city = city;
+        this.address = address;
     }
 
     public String getToken() {
@@ -61,6 +78,26 @@ public class SoldierPersonalDataDto {
         return discharged;
     }
 
+    public String getPatronymic() {
+        return patronymic;
+    }
+
+    public String getMatronymic() {
+        return matronymic;
+    }
+
+    public String getMobilePhone() {
+        return mobilePhone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -91,5 +128,25 @@ public class SoldierPersonalDataDto {
 
     public void setDischarged(String discharged) {
         this.discharged = discharged;
+    }
+
+    public void setPatronymic(String patronymic) {
+        this.patronymic = patronymic;
+    }
+
+    public void setMatronymic(String matronymic) {
+        this.matronymic = matronymic;
+    }
+
+    public void setMobilePhone(String mobilePhone) {
+        this.mobilePhone = mobilePhone;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

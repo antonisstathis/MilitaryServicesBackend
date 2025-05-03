@@ -85,6 +85,11 @@ public class SoldierServiceImpl implements SoldierService {
 					soldierDto.setActive(soldier.getActive());
 					soldierDto.setSituation(soldier.getSituation());
 					soldierDto.setDischarged(Discharged.getDischarged(soldier.isDischarged()));
+					soldierDto.setPatronymic(soldier.getPatronymic());
+					soldierDto.setMatronymic(soldier.getMatronymic());
+					soldierDto.setMobilePhone(soldier.getMobilePhone());
+					soldierDto.setCity(soldier.getCity());
+					soldierDto.setAddress(soldier.getAddress());
 					return soldierDto;
 				})
 				.collect(Collectors.toList());
