@@ -13,6 +13,8 @@ public interface SoldierService {
 
     List<SoldierPersonalDataDto> loadSoldiers(String username);
 
+    List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber);
+
     List<SoldierPreviousServiceDto> findPreviousCalculation(String username, Date date);
 
     Date getDateByCalculationNumber(String username,int calculation);

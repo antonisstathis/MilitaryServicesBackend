@@ -98,6 +98,33 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
+	public List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber) {
+		List<Soldier> result = soldierRepository.findBySoldierRegistrationNumberContainingIgnoreCase(registrationNumber);
+
+		List<SoldierPersonalDataDto> allSoldiers = result.stream()
+				.map(soldier -> {
+					SoldierPersonalDataDto dto = new SoldierPersonalDataDto();
+					dto.setToken(jwtUtil.generateToken(Integer.toString(soldier.getId())));
+					dto.setSoldierRegistrationNumber(soldier.getSoldierRegistrationNumber());
+					dto.setCompany(soldier.getCompany());
+					dto.setName(soldier.getName());
+					dto.setSurname(soldier.getSurname());
+					dto.setActive(soldier.getActive());
+					dto.setSituation(soldier.getSituation());
+					dto.setDischarged(Discharged.getDischarged(soldier.isDischarged()));
+					dto.setPatronymic(soldier.getPatronymic());
+					dto.setMatronymic(soldier.getMatronymic());
+					dto.setMobilePhone(soldier.getMobilePhone());
+					dto.setCity(soldier.getCity());
+					dto.setAddress(soldier.getAddress());
+					return dto;
+				})
+				.collect(Collectors.toList());
+
+		return allSoldiers;
+	}
+
+	@Override
 	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date) {
 		Optional<User> user = userRepository.findById(username);
 		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date);

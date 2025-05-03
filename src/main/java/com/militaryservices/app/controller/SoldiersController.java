@@ -103,6 +103,36 @@ public class SoldiersController {
                     .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
+    @GetMapping("/getSoldierByRegistrationNumber")
+    public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
+
+        if(jwtUtil.validateRequest(request)) {
+            List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber);
+            // Sanitize the data.
+            soldiers = soldiers.stream()
+                    .map(soldier -> new SoldierPersonalDataDto(
+                            soldier.getToken(),
+                            soldier.getSoldierRegistrationNumber(),
+                            SanitizationUtil.sanitize(soldier.getCompany()),
+                            SanitizationUtil.sanitize(soldier.getName()),
+                            SanitizationUtil.sanitize(soldier.getSurname()),
+                            SanitizationUtil.sanitize(soldier.getSituation()),
+                            SanitizationUtil.sanitize(soldier.getActive()),
+                            SanitizationUtil.sanitize(soldier.getDischarged()),
+                            SanitizationUtil.sanitize(soldier.getPatronymic()),
+                            SanitizationUtil.sanitize(soldier.getMatronymic()),
+                            SanitizationUtil.sanitize(soldier.getMobilePhone()),
+                            SanitizationUtil.sanitize(soldier.getCity()),
+                            SanitizationUtil.sanitize(soldier.getAddress())
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(soldiers);
+        }
+        else return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
+    }
+
     @GetMapping("/getFirstCalcDate")
     public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {
