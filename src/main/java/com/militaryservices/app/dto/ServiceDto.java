@@ -16,6 +16,15 @@ public class ServiceDto {
     public ServiceDto() {
     }
 
+    public ServiceDto(long id, String service, Date serviceDate, String armed, String description, String shift) {
+        this.id = id;
+        this.service = service;
+        this.serviceDate = serviceDate;
+        this.armed = armed;
+        this.description = description;
+        this.shift = shift;
+    }
+
     public long getId() {
         return id;
     }

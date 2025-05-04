@@ -138,7 +138,19 @@ public class SoldiersController {
         if(jwtUtil.validateRequest(request)) {
             Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
             String soldierId = jwtUtil.extractUsername(soldierToken);
-            return ResponseEntity.ok(soldierService.findServicesOfSoldier(user.get().getSoldier().getUnit(),Integer.parseInt(soldierId)));
+            List<ServiceDto> services = soldierService.findServicesOfSoldier(user.get().getSoldier().getUnit(),Integer.parseInt(soldierId));
+            // Sanitize the data
+            services = services.stream()
+                    .map(service -> new ServiceDto(
+                            service.getId(),
+                            SanitizationUtil.sanitize(service.getService()),
+                            service.getServiceDate(),
+                            SanitizationUtil.sanitize(service.getArmed()),
+                            SanitizationUtil.sanitize(service.getDescription()),
+                            SanitizationUtil.sanitize(service.getShift())
+                    )).collect(Collectors.toList());
+
+            return ResponseEntity.ok(services);
         }
         else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
