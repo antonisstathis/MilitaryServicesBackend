@@ -67,6 +67,10 @@ public class Soldier implements Serializable {
 		
 	}
 
+	public Soldier(int soldId) {
+		this.id = soldId;
+	}
+
 	public Soldier(int id,String name,String surname,String situation,String active,boolean discharged)  {
 		
 		this.name = name;

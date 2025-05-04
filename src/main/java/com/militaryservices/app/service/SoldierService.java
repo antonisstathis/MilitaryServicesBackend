@@ -27,5 +27,7 @@ public interface SoldierService {
 
     SoldierUnitDto findSoldier(int id);
 
+    List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId);
+
     void deleteServices(JsonNode services);
 }

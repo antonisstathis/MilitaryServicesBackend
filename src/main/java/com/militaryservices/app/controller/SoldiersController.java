@@ -133,6 +133,18 @@ public class SoldiersController {
                 .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
+    @GetMapping("/getServicesOfSoldier")
+    public  ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
+        if(jwtUtil.validateRequest(request)) {
+            Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+            String soldierId = jwtUtil.extractUsername(soldierToken);
+            return ResponseEntity.ok(soldierService.findServicesOfSoldier(user.get().getSoldier().getUnit(),Integer.parseInt(soldierId)));
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
+    }
+
     @GetMapping("/getFirstCalcDate")
     public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {

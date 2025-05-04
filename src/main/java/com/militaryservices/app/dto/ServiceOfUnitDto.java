@@ -1,31 +1,32 @@
 package com.militaryservices.app.dto;
 
-import java.util.Date;
+public class ServiceOfUnitDto {
 
-public class ServiceDto {
-
-    private long id;
+    private Long id;
 
     private String service;
-    private Date serviceDate;
 
     private String armed;
     private String description;
     private String shift;
 
-    public ServiceDto() {
+    public ServiceOfUnitDto() {
     }
 
-    public long getId() {
+    public ServiceOfUnitDto(Long id, String service, String armed, String description, String shift) {
+        this.id = id;
+        this.service = service;
+        this.armed = armed;
+        this.description = description;
+        this.shift = shift;
+    }
+
+    public Long getId() {
         return id;
     }
 
     public String getService() {
         return service;
-    }
-
-    public Date getServiceDate() {
-        return serviceDate;
     }
 
     public String getArmed() {
@@ -40,16 +41,12 @@ public class ServiceDto {
         return shift;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     public void setService(String service) {
         this.service = service;
-    }
-
-    public void setServiceDate(Date serviceDate) {
-        this.serviceDate = serviceDate;
     }
 
     public void setArmed(String armed) {

@@ -3,7 +3,7 @@ package com.militaryservices.app.service;
 import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.ServiceRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
-import com.militaryservices.app.dto.ServiceDto;
+import com.militaryservices.app.dto.ServiceOfUnitDto;
 import com.militaryservices.app.enums.Situation;
 import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
@@ -28,13 +28,13 @@ public class SerOfUnitService {
         this.serviceRepository = serviceRepository;
     }
 
-    public List<ServiceDto> getAllServices(Unit unit,Date prevDate) {
+    public List<ServiceOfUnitDto> getAllServices(Unit unit, Date prevDate) {
         if(prevDate != null)
             return getPrevServices(unit,prevDate);
 
         List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnit(unit);
-        List<ServiceDto> response = allServices.stream()
-                .map(service -> new ServiceDto(
+        List<ServiceOfUnitDto> response = allServices.stream()
+                .map(service -> new ServiceOfUnitDto(
                         service.getId(),
                         service.getServiceName(),
                         service.getArmed(),
@@ -46,10 +46,10 @@ public class SerOfUnitService {
         return response;
     }
 
-    private List<ServiceDto> getPrevServices(Unit unit,Date prevDate) {
+    private List<ServiceOfUnitDto> getPrevServices(Unit unit, Date prevDate) {
         List<com.militaryservices.app.entity.Service> services = serviceRepository.findByUnitAndDate(unit,prevDate);
-        List<ServiceDto> response = services.stream()
-                .map(service -> new ServiceDto(
+        List<ServiceOfUnitDto> response = services.stream()
+                .map(service -> new ServiceOfUnitDto(
                         service.getId(),
                         service.getServiceName(),
                         service.getArmed(),

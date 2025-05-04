@@ -1,10 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.militaryservices.app.dao.SerOfUnitRepository;
-import com.militaryservices.app.dao.SoldierAccessImpl;
-import com.militaryservices.app.dao.SoldierRepository;
-import com.militaryservices.app.dao.UserRepository;
+import com.militaryservices.app.dao.*;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
@@ -36,6 +33,8 @@ public class SoldierServiceImpl implements SoldierService {
 	private UserRepository userRepository;
 	@Autowired
 	private SoldierRepository soldierRepository;
+	@Autowired
+	private ServiceRepository serviceRepository;
 	@Autowired
 	private SerOfUnitRepository serOfUnitRepository;
 	@Autowired
@@ -221,6 +220,27 @@ public class SoldierServiceImpl implements SoldierService {
 				soldier.getActive(), soldier.getUnit());
 
 		return sold;
+	}
+
+	@Override
+	public List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId) {
+
+		List<com.militaryservices.app.entity.Service> result = serviceRepository.findBySoldier(new Soldier(soldierId));
+
+		List<ServiceDto> servicesOfSoldier = new ArrayList<>();
+		ServiceDto serviceDto;
+		for(com.militaryservices.app.entity.Service service : result) {
+			serviceDto = new ServiceDto();
+			serviceDto.setId(service.getId());
+			serviceDto.setService(service.getServiceName());
+			serviceDto.setServiceDate(service.getDate());
+			serviceDto.setArmed(service.getArmed());
+			serviceDto.setDescription(service.getDescription());
+			serviceDto.setShift(service.getShift());
+			servicesOfSoldier.add(serviceDto);
+		}
+
+		return servicesOfSoldier;
 	}
 
 	@Override
