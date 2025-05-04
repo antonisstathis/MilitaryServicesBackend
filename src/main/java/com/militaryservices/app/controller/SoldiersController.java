@@ -135,7 +135,7 @@ public class SoldiersController {
 
     @GetMapping("/getServicesOfSoldier")
     public  ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
-        if(jwtUtil.validateRequest(request)) {
+        if(jwtUtil.validateRequest(request) && jwtUtil.isTokenValid(soldierToken)) {
             Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
             String soldierId = jwtUtil.extractUsername(soldierToken);
             List<ServiceDto> services = soldierService.findServicesOfSoldier(user.get().getSoldier().getUnit(),Integer.parseInt(soldierId));
