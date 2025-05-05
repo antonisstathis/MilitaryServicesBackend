@@ -244,6 +244,15 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
+	public boolean dischargeSoldier(int soldierId,Unit unit) {
+		Soldier soldier = soldierAccess.findSoldierById(soldierId);
+		if(soldier.getUnit().getId() != unit.getId())
+			return false;
+		soldierRepository.updateDischargedStatusById(soldierId,true);
+		return true;
+	}
+
+	@Override
 	public void deleteServices(JsonNode services) {
 		List<Long> ids = new ArrayList<>();
 		services.forEach(node -> ids.add(node.asLong()));

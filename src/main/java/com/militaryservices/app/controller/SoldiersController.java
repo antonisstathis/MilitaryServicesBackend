@@ -157,6 +157,21 @@ public class SoldiersController {
                     .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
 
+    @GetMapping("/dischargeSoldier")
+    public ResponseEntity<?> dischargeSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
+        if(jwtUtil.validateRequest(request) && jwtUtil.isTokenValid(soldierToken)) {
+            Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+            Unit unit = user.get().getSoldier().getUnit();
+            String soldierId = jwtUtil.extractUsername(soldierToken);
+            boolean result = soldierService.dischargeSoldier(Integer.parseInt(soldierId),unit);
+            return result ? ResponseEntity.ok(messageService.getMessage(MessageKey.DISCHARGE_SOLDIER_SUCCESSFUL.key(), Locale.ENGLISH)) :
+                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.DISCHARGE_SOLDIER_NOT_PERMITTED.key(), Locale.ENGLISH));
+        }
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
+    }
+
     @GetMapping("/getFirstCalcDate")
     public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
         if(jwtUtil.validateRequest(request)) {

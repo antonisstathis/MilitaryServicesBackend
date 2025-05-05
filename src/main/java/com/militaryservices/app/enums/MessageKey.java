@@ -7,7 +7,9 @@ public enum MessageKey {
     SERVICES_DELETED("servicesdeleted"),
     ADD_SERVICES("addservices"),
     ADD_SERVICES_REJECTED("addservicesrejected"),
-    NEW_SERVICES_CALCULATED("newservicescalculated");
+    NEW_SERVICES_CALCULATED("newservicescalculated"),
+    DISCHARGE_SOLDIER_SUCCESSFUL("dischargesoldier"),
+    DISCHARGE_SOLDIER_NOT_PERMITTED("dischargesoldienotpermitted");
 
 
     private final String key;
