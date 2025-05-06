@@ -6,6 +6,7 @@ import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
+import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
@@ -160,6 +161,7 @@ public class SoldierServiceImpl implements SoldierService {
 	@Override
 	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,Unit unit) {
 		Soldier soldier = new Soldier();
+		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit);
 		soldier.setCompany(soldierDto.getCompany());
 		soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
 		soldier.setName(soldierDto.getName());
@@ -173,7 +175,11 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setMatronymic(soldierDto.getMatronymic());
 		soldier.setMobilePhone(soldierDto.getMobilePhone());
 		soldier.setDischarged(false);
+		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00");
+		service.setSoldier(soldier);
+		soldier.setService(service);
 		soldierRepository.save(soldier);
+		serviceRepository.save(service);
 	}
 
 	@Override

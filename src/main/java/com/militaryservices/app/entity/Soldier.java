@@ -64,7 +64,7 @@ public class Soldier implements Serializable {
 	private Unit unit;
 	
 	public Soldier() {
-		
+		services = new ArrayList<>();
 	}
 
 	public Soldier(int soldId) {
