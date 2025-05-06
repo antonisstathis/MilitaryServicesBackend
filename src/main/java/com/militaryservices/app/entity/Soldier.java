@@ -195,11 +195,6 @@ public class Soldier implements Serializable {
 		return id;
 	}
 	
-	public void setID(int id) {
-		
-		this.id = id;
-	}
-	
 	public void setName(String name) {
 		
 		this.name = name;

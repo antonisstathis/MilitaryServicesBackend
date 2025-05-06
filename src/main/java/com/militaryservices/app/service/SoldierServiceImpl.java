@@ -157,29 +157,24 @@ public class SoldierServiceImpl implements SoldierService {
 		return soldierAccess.getDateOfCalculation(unit,calculation);
 	}
 
-	/*
 	@Override
-	public void save(Soldier soldier) {
-
-		Optional<Option> situation = optionRepository.findByTableNameAndColumnNameAndOption("soldiers","situation", soldier.getSituation());
-		Optional<Option> active = optionRepository.findByTableNameAndColumnNameAndOption("soldiers","active", soldier.getActive());
-		soldier.setActive(active.get().getValue());
-		soldier.setSituation(situation.get().getValue());
-
-		if(soldier.getID() == -1) {
-			try {
-				int id = store.produceID();
-				soldier.setID(id);
-				store.saveSoldier(soldier);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			store.updateSoldier(soldier);
-		}
+	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,Unit unit) {
+		Soldier soldier = new Soldier();
+		soldier.setCompany(soldierDto.getCompany());
+		soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
+		soldier.setName(soldierDto.getName());
+		soldier.setSurname(soldierDto.getSurname());
+		soldier.setActive(soldierDto.getActive());
+		soldier.setSituation(soldierDto.getSituation());
+		soldier.setAddress(soldierDto.getAddress());
+		soldier.setCity(soldierDto.getCity());
+		soldier.setUnit(unit);
+		soldier.setPatronymic(soldierDto.getPatronymic());
+		soldier.setMatronymic(soldierDto.getMatronymic());
+		soldier.setMobilePhone(soldierDto.getMobilePhone());
+		soldier.setDischarged(false);
+		soldierRepository.save(soldier);
 	}
-	*/
 
 	@Override
 	public void deleteById(Soldier soldier) {
@@ -246,7 +241,7 @@ public class SoldierServiceImpl implements SoldierService {
 	@Override
 	public boolean dischargeSoldier(int soldierId,Unit unit) {
 		Soldier soldier = soldierAccess.findSoldierById(soldierId);
-		if(soldier.getUnit().getId() != unit.getId())
+		if(soldier.getUnit().getId() != unit.getId()) // An extra check if the user has the permission to discharge the selected soldier.
 			return false;
 		soldierRepository.updateDischargedStatusById(soldierId,true);
 		return true;

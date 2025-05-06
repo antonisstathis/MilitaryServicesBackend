@@ -9,7 +9,8 @@ public enum MessageKey {
     ADD_SERVICES_REJECTED("addservicesrejected"),
     NEW_SERVICES_CALCULATED("newservicescalculated"),
     DISCHARGE_SOLDIER_SUCCESSFUL("dischargesoldier"),
-    DISCHARGE_SOLDIER_NOT_PERMITTED("dischargesoldienotpermitted");
+    DISCHARGE_SOLDIER_NOT_PERMITTED("dischargesoldienotpermitted"),
+    SOLDIER_SAVED("soldiersaved");
 
 
     private final String key;

@@ -33,4 +33,5 @@ public interface SoldierService {
     boolean dischargeSoldier(int soldierId, Unit unit);
 
     void deleteServices(JsonNode services);
+    void saveNewSoldier(SoldierPersonalDataDto soldier,Unit unit);
 }

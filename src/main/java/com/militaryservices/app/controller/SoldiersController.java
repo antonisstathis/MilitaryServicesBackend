@@ -8,6 +8,7 @@ import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
+import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.enums.MessageKey;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.SanitizationUtil;
@@ -17,6 +18,7 @@ import com.militaryservices.app.service.SerOfUnitService;
 import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -260,6 +262,30 @@ public class SoldiersController {
             soldier.setToken(token);
             soldier.setDate(new Date());
             return ResponseEntity.ok(soldier);
+        } else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
+    }
+
+    @PostMapping("/saveNewSoldier")
+    public ResponseEntity<?> saveNewSoldier(HttpServletRequest request,@Valid @RequestBody SoldierPersonalDataDto soldierDto) {
+        if(jwtUtil.validateRequest(request)) {
+            Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+            Unit unit = user.get().getSoldier().getUnit();
+            SoldierPersonalDataDto soldier = new SoldierPersonalDataDto();
+            soldier.setSoldierRegistrationNumber(SanitizationUtil.sanitize(soldierDto.getSoldierRegistrationNumber()));
+            soldier.setCompany(SanitizationUtil.sanitize(soldierDto.getCompany()));
+            soldier.setName(SanitizationUtil.sanitize(soldierDto.getName()));
+            soldier.setSurname(SanitizationUtil.sanitize(soldierDto.getSurname()));
+            soldier.setDischarged(Discharged.getDischarged(false));
+            soldier.setSituation(SanitizationUtil.sanitize(soldierDto.getSituation()));
+            soldier.setActive(SanitizationUtil.sanitize(soldierDto.getActive()));
+            soldier.setPatronymic(SanitizationUtil.sanitize(soldierDto.getPatronymic()));
+            soldier.setMatronymic(SanitizationUtil.sanitize(soldierDto.getMatronymic()));
+            soldier.setMobilePhone(SanitizationUtil.sanitize(soldierDto.getMobilePhone()));
+            soldier.setCity(SanitizationUtil.sanitize(soldierDto.getCity()));
+            soldier.setAddress(SanitizationUtil.sanitize(soldierDto.getAddress()));
+            soldierService.saveNewSoldier(soldier,unit);
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
         } else
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
     }
