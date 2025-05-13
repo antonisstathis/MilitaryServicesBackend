@@ -20,8 +20,6 @@ public interface SoldierService {
 
     Date getDateByCalculationNumber(String username,int calculation);
 
-    void deleteById(Soldier soldier);
-
     void calculateServices(String username);
 
     void updateSoldier(SoldDto soldier);

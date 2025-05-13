@@ -49,7 +49,6 @@ public class SoldierServiceImpl implements SoldierService {
 
 		Optional<User> user = userRepository.findById(username);
 		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier());
-		SoldierDto soldierDto;
 		List<SoldierDto> response = soldiers.stream()
 				.map(sold -> {
 					String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
@@ -180,17 +179,6 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setService(service);
 		soldierRepository.save(soldier);
 		serviceRepository.save(service);
-	}
-
-	@Override
-	public void deleteById(Soldier soldier) {
-		/*
-		try {
-			store.deleteSoldier(soldier);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		 */
 	}
 
 	@Override

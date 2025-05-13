@@ -54,17 +54,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                     user.get().getUserId(),
                     user.get().getPassword(),
                     authorities
             );
-
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, authorities
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
         } else {
             ResponseEntity<String> entity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.TOKEN_TAMPERED.key(), Locale.ENGLISH));
             response.setStatus(entity.getStatusCodeValue());
@@ -72,9 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String responseBody = String.format("{\"message\": \"%s\"}", entity.getBody().replace("\"", "\\\""));
             response.getWriter().write(responseBody);
-            return;
         }
-
-        filterChain.doFilter(request, response);
     }
 }
