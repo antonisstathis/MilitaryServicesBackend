@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -20,7 +21,7 @@ public class JwtUtil {
     //private static final long EXPIRATION_TIME = 1000 * 4; // 4 seconds
 
     public JwtUtil() {
-        RSAKeyGenerator.produceKeys();
+        //RSAKeyGenerator.produceKeys();
         privateKey = RSAKeyGenerator.loadPrivateKey();
         publicKey = RSAKeyGenerator.loadPublicKey();
     }
@@ -41,9 +42,19 @@ public class JwtUtil {
         String token = extractToken(request);
         return extractUsername(token);
     }
+
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.RS256, privateKey)
+                .compact();
+    }
+    public String generateToken(String username, List<String> roles) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.RS256, privateKey)
