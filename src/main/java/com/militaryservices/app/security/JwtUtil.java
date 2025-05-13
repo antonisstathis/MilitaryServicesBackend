@@ -17,8 +17,8 @@ import java.util.function.Function;
 public class JwtUtil {
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 5; // 5 hours
-    //private static final long EXPIRATION_TIME = 1000 * 4; // 4 seconds
+    //private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 5; // 5 hours
+    private static final long EXPIRATION_TIME = 1000 * 4; // 4 seconds
 
     public JwtUtil() {
         RSAKeyGenerator.produceKeys();
