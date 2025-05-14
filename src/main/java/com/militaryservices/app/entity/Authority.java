@@ -11,8 +11,8 @@ public class Authority {
     @Column(name = "auth_id")
     private Long authId;
 
-    @OneToOne
-    @JoinColumn(name = "username")
+    @ManyToOne
+    @JoinColumn(name = "username", nullable = false)
     private User user;
 
     @Column

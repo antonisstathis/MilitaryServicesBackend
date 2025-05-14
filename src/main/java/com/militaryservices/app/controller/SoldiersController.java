@@ -11,6 +11,7 @@ import com.militaryservices.app.entity.User;
 import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.enums.MessageKey;
 import com.militaryservices.app.security.JwtUtil;
+import com.militaryservices.app.security.RoleExpressions;
 import com.militaryservices.app.security.SanitizationUtil;
 import com.militaryservices.app.security.UserPermission;
 import com.militaryservices.app.service.MessageService;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
-@PreAuthorize("hasRole('SOLDIER')")
+@PreAuthorize(RoleExpressions.SOLDIER)
 public class SoldiersController {
 
     @Autowired
@@ -239,7 +240,7 @@ public class SoldiersController {
     }
 
     @PostMapping("/saveNewServices")
-    @PreAuthorize("hasRole('COMMANDER')")
+    @PreAuthorize(RoleExpressions.COMMANDER)
     public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));

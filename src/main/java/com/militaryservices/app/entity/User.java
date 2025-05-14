@@ -2,6 +2,8 @@ package com.militaryservices.app.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user",schema = "ms")
 public class User {
@@ -19,6 +21,9 @@ public class User {
     @OneToOne
     @JoinColumn(name = "soldier_id")
     private Soldier soldier;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Authority> authorities;
 
     public User() {
 
@@ -46,6 +51,10 @@ public class User {
         this.soldier = soldier;
     }
 
+    public void setAuthorities(List<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
     public String getUserId() {
         return username;
     }
@@ -60,5 +69,9 @@ public class User {
 
     public Soldier getSoldier() {
         return soldier;
+    }
+
+    public List<Authority> getAuthorities() {
+        return authorities;
     }
 }
