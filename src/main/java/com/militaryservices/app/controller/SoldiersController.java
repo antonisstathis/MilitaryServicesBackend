@@ -267,7 +267,7 @@ public class SoldiersController {
     }
 
     @PostMapping("/deleteServices")
-    @PreAuthorize("hasRole('COMMANDER')")
+    @PreAuthorize(RoleExpressions.COMMANDER)
     public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         soldierService.deleteServices(jsonNode.get("ids"));
