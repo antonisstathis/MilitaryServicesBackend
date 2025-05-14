@@ -257,7 +257,7 @@ public class SoldiersController {
 
         IntStream.range(0, numberOfGuards)
                 .mapToObj(i -> {
-                    // Create a new instance of ServiceOfUnit if you want separate instances
+                    // Create a new instance of ServiceOfUnit to set the id to null in order to insert it in the database.
                     ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
                     newService.setId(null);
                     return newService;
