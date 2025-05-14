@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
+@PreAuthorize("hasRole('SOLDIER')")
 public class SoldiersController {
 
     @Autowired
@@ -237,6 +239,7 @@ public class SoldiersController {
     }
 
     @PostMapping("/saveNewServices")
+    @PreAuthorize("hasRole('COMMANDER')")
     public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
@@ -263,6 +266,7 @@ public class SoldiersController {
     }
 
     @PostMapping("/deleteServices")
+    @PreAuthorize("hasRole('COMMANDER')")
     public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
         JsonNode jsonNode = getJsonNode(payload);
         soldierService.deleteServices(jsonNode.get("ids"));
