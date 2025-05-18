@@ -8,8 +8,13 @@ import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Discharged;
+import com.militaryservices.app.enums.StatisticalData;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +43,8 @@ public class SoldierServiceImpl implements SoldierService {
 	private ServiceRepository serviceRepository;
 	@Autowired
 	private SerOfUnitRepository serOfUnitRepository;
+	@PersistenceContext
+	private EntityManager entityManager;
 	@Autowired
 	CheckOutput checkOutput;
 
@@ -239,6 +246,40 @@ public class SoldierServiceImpl implements SoldierService {
 			return false;
 		soldierRepository.updateDischargedStatusById(soldierId,true);
 		return true;
+	}
+
+	@Override
+	public List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+		Root<Soldier> soldier = cq.from(Soldier.class);
+		Join<Soldier, com.militaryservices.app.entity.Service> service = soldier.join("services");
+
+		List<Predicate> predicates = new ArrayList<>();
+
+		predicates.add(cb.isFalse(soldier.get("discharged")));
+
+		switch (caseType) {
+			case ARMED_SERVICES_ARMED_SOLDIERS:
+				predicates.add(cb.equal(service.get("armed"), "armed"));
+				break;
+
+			case UNARMED_SERVICES_ARMED_SOLDIERS:
+				predicates.add(cb.equal(service.get("armed"), "unarmed"));
+				predicates.add(cb.equal(soldier.get("situation"), "armed"));
+				break;
+
+			case UNARMED_SERVICES_UNARMED_SOLDIERS:
+				predicates.add(cb.equal(service.get("armed"), "unarmed"));
+				predicates.add(cb.equal(soldier.get("situation"), "unarmed"));
+				break;
+
+			case FREE_OF_DUTY_SERVICES_ALL_SOLDIERS:
+				predicates.add(cb.equal(service.get("armed"), "free of duty"));
+				break;
+		}
+
+		return soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
 	}
 
 	@Override

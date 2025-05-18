@@ -1,15 +1,14 @@
 package com.militaryservices.app.dao;
 
+import com.militaryservices.app.dto.SoldierServiceStatDto;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.dto.SoldierServiceDto;
 import com.militaryservices.app.entity.Service;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
+import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -211,6 +210,38 @@ public class SoldierAccessImpl {
 		historicalData = nativeQuery.getResultList();
 
 		return historicalData;
+	}
+
+	@Transactional
+	public List<SoldierServiceStatDto> getSoldierServiceStatisticalData(CriteriaQuery<Tuple> cq,List<Predicate> predicates,Root<Soldier> soldier,Join<Soldier, Service> service,CriteriaBuilder cb) {
+
+		Expression<Long> countExpr = cb.count(service);
+		cq.multiselect(
+						soldier.get("soldierRegistrationNumber").alias("soldierRegNumber"),
+						soldier.get("company").alias("company"),
+						soldier.get("name").alias("name"),
+						soldier.get("surname").alias("surname"),
+						soldier.get("active").alias("active"),
+						soldier.get("situation").alias("situation"),
+						countExpr.alias("numberOfServices")
+				)
+				.where(predicates.toArray(new Predicate[0]))
+				.groupBy(soldier.get("id"))
+				.orderBy(cb.desc(countExpr));
+
+		List<Tuple> results = entityManager.createQuery(cq).getResultList();
+
+		return results.stream()
+				.map(t -> new SoldierServiceStatDto(
+						t.get("soldierRegNumber", String.class),
+						t.get("company", String.class),
+						t.get("name", String.class),
+						t.get("surname", String.class),
+						t.get("active", String.class),
+						t.get("situation", String.class),
+						((Number) t.get("numberOfServices")).intValue()
+				))
+				.collect(Collectors.toList());
 	}
 
 	@Transactional

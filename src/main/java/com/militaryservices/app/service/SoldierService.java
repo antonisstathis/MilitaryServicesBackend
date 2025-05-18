@@ -2,9 +2,8 @@ package com.militaryservices.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.militaryservices.app.dto.*;
-import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
-import com.militaryservices.app.entity.User;
+import com.militaryservices.app.enums.StatisticalData;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +28,8 @@ public interface SoldierService {
     List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId);
 
     boolean dischargeSoldier(int soldierId, Unit unit);
+
+    List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType);
 
     void deleteServices(JsonNode services);
     void saveNewSoldier(SoldierPersonalDataDto soldier,Unit unit);

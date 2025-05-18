@@ -37,7 +37,7 @@ public class Soldier implements Serializable {
 	@Column
 	private String active;
 
-	@OneToMany(mappedBy = "id")
+	@OneToMany(mappedBy = "soldier")
 	private List<Service> services;
 	@Column
 	private boolean discharged;
