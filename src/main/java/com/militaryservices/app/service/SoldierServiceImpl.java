@@ -258,7 +258,7 @@ public class SoldierServiceImpl implements SoldierService {
 		List<Predicate> predicates = new ArrayList<>();
 
 		predicates.add(cb.isFalse(soldier.get("discharged")));
-
+		predicates.add(cb.equal(soldier.get("unit"), unit));
 		switch (caseType) {
 			case ARMED_SERVICES_ARMED_SOLDIERS:
 				predicates.add(cb.equal(service.get("armed"), "armed"));
