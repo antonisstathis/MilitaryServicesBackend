@@ -8,6 +8,7 @@ import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Discharged;
+import com.militaryservices.app.enums.Situation;
 import com.militaryservices.app.enums.StatisticalData;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
@@ -257,25 +258,25 @@ public class SoldierServiceImpl implements SoldierService {
 
 		List<Predicate> predicates = new ArrayList<>();
 
-		predicates.add(cb.isFalse(soldier.get("discharged")));
+		predicates.add(cb.isFalse(soldier.get(Discharged.getDischarged())));
 		predicates.add(cb.equal(soldier.get("unit"), unit));
 		switch (caseType) {
 			case ARMED_SERVICES_ARMED_SOLDIERS:
-				predicates.add(cb.equal(service.get("armed"), "armed"));
+				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.ARMED.name().toLowerCase()));
 				break;
 
 			case UNARMED_SERVICES_ARMED_SOLDIERS:
-				predicates.add(cb.equal(service.get("armed"), "unarmed"));
-				predicates.add(cb.equal(soldier.get("situation"), "armed"));
+				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.UNARMED.name().toLowerCase()));
+				predicates.add(cb.equal(soldier.get(Situation.getNameOfColumn()), Situation.ARMED.name().toLowerCase()));
 				break;
 
 			case UNARMED_SERVICES_UNARMED_SOLDIERS:
-				predicates.add(cb.equal(service.get("armed"), "unarmed"));
-				predicates.add(cb.equal(soldier.get("situation"), "unarmed"));
+				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.UNARMED.name().toLowerCase()));
+				predicates.add(cb.equal(soldier.get(Situation.getNameOfColumn()), Situation.UNARMED.name().toLowerCase()));
 				break;
 
 			case FREE_OF_DUTY_SERVICES_ALL_SOLDIERS:
-				predicates.add(cb.equal(service.get("armed"), "free of duty"));
+				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Active.getFreeOfDuty()));
 				break;
 		}
 
