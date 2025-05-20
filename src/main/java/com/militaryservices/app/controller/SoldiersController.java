@@ -10,6 +10,7 @@ import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.enums.MessageKey;
+import com.militaryservices.app.enums.StatisticalData;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.RoleExpressions;
 import com.militaryservices.app.security.SanitizationUtil;
@@ -198,6 +199,13 @@ public class SoldiersController {
     public ResponseEntity<?> getNameOfUnit(HttpServletRequest request) {
         Optional<com.militaryservices.app.entity.User> optionalUser = userService.findUser(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
         return ResponseEntity.ok(SanitizationUtil.sanitize(optionalUser.get().getSoldier().getUnit().getNameOfUnit())); // Sanitize name of unit data
+    }
+
+    @GetMapping("/getSoldiersStatistics")
+    public ResponseEntity<?> getStatistics(HttpServletRequest request,@RequestParam StatisticalData statisticalDataOption) {
+        Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+        List<SoldierServiceStatDto> soldierServiceStatDtos = soldierService.getSoldierServiceStats(user.get().getSoldier().getUnit(), statisticalDataOption);
+        return ResponseEntity.ok(soldierServiceStatDtos);
     }
 
     @PostMapping("/getSoldier")
