@@ -195,24 +195,6 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<HistoricalData> countServicesForTheLastNDays(Unit unit,int numberOfFirstDayCalculation) {
-
-		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit =:unit and s.discharged =:discharged and u.armed <>:armed and u.calculation >= :calculation group by s.id order by count(*) desc";
-
-		Query nativeQuery;
-		List<HistoricalData> historicalData;
-		nativeQuery = entityManager.createQuery(query);
-		nativeQuery.setParameter("unit", unit);
-		nativeQuery.setParameter("discharged", false);
-		nativeQuery.setParameter("armed", Active.getFreeOfDuty());
-		nativeQuery.setParameter("calculation",numberOfFirstDayCalculation);
-		historicalData = nativeQuery.getResultList();
-
-		return historicalData;
-	}
-
-	@Transactional
 	public List<SoldierServiceStatDto> getSoldierServiceStatisticalData(CriteriaQuery<Tuple> cq,List<Predicate> predicates,Root<Soldier> soldier,Join<Soldier, Service> service,CriteriaBuilder cb) {
 
 		Expression<Long> countExpr = cb.count(service);
