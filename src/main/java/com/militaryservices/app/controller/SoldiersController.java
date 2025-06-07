@@ -219,7 +219,7 @@ public class SoldiersController {
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
 
-        SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText()),
+        SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(soldierDto.getName()), SanitizationUtil.sanitize(soldierDto.getSurname()),
                 SanitizationUtil.sanitize(soldierDto.getSituation()), SanitizationUtil.sanitize(soldierDto.getActive()));
         soldier.setToken(token);
         soldier.setDate(new Date());
