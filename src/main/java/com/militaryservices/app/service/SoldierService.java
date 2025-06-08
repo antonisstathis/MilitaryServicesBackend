@@ -19,7 +19,7 @@ public interface SoldierService {
 
     Date getDateByCalculationNumber(String username,int calculation);
 
-    void calculateServices(String username);
+    void calculateServices(String username,Date lastDate);
 
     void updateSoldier(SoldDto soldier);
 

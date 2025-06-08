@@ -190,12 +190,17 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void calculateServices(String username) {
+	public void calculateServices(String username,Date lastDate) {
 		
 		try {
-			List<Soldier> allSoldiers = service.calculateServices(username);
-			service.saveNewServices(allSoldiers);
-			boolean results = checkOutput.checkResults(username);
+			Optional<User> user = userRepository.findById(username);
+			Unit unit = user.get().getSoldier().getUnit();
+			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
+			if(dateOfLastCalculation.compareTo(lastDate) == 0) {
+				List<Soldier> allSoldiers = service.calculateServices(username);
+				service.saveNewServices(allSoldiers);
+				boolean results = checkOutput.checkResults(username);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

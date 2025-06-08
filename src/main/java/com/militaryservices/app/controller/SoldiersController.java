@@ -184,8 +184,8 @@ public class SoldiersController {
     }
 
     @GetMapping("/calc")
-    public ResponseEntity<?> calculateNewServices(HttpServletRequest request) {
-        soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request))); // Sanitize username
+    public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date lastDate) {
+        soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),lastDate); // Sanitize username
         return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
     }
 
