@@ -1,6 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.SerOfUnitRepository;
+import com.militaryservices.app.dao.ServiceAccessImpl;
 import com.militaryservices.app.dao.ServiceRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.ServiceOfUnitDto;
@@ -21,18 +22,22 @@ public class SerOfUnitService {
     private final SerOfUnitRepository serOfUnitRepository;
     private final SoldierAccessImpl soldierAccess;
     private final ServiceRepository serviceRepository;
+    private final ServiceAccessImpl serviceAccess;
 
-    public SerOfUnitService(SerOfUnitRepository repository, SoldierAccessImpl soldierAccess, ServiceRepository serviceRepository) {
+    public SerOfUnitService(SerOfUnitRepository repository, SoldierAccessImpl soldierAccess, ServiceRepository serviceRepository,ServiceAccessImpl serviceAccess) {
         this.serOfUnitRepository = repository;
         this.soldierAccess = soldierAccess;
         this.serviceRepository = serviceRepository;
+        this.serviceAccess = serviceAccess;
     }
 
-    public List<ServiceOfUnitDto> getAllServices(Unit unit, Date prevDate) {
-        if(prevDate != null)
-            return getPrevServices(unit,prevDate);
+    public List<ServiceOfUnitDto> getAllServices(Unit unit, Date prevDate,boolean isPersonnel) {
 
-        List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnit(unit);
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit, isPersonnel);
+        if(prevDate != null && dateOfLastCalculation.compareTo(prevDate) != 0)
+            return getPrevServices(unit,prevDate,isPersonnel);
+
+        List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnitAndIsPersonnel(unit,isPersonnel);
         List<ServiceOfUnitDto> response = allServices.stream()
                 .map(service -> new ServiceOfUnitDto(
                         service.getId(),
@@ -46,8 +51,8 @@ public class SerOfUnitService {
         return response;
     }
 
-    private List<ServiceOfUnitDto> getPrevServices(Unit unit, Date prevDate) {
-        List<com.militaryservices.app.entity.Service> services = serviceRepository.findByUnitAndDate(unit,prevDate);
+    private List<ServiceOfUnitDto> getPrevServices(Unit unit, Date prevDate,boolean isPersonnel) {
+        List<com.militaryservices.app.entity.Service> services = serviceAccess.getServicesByDate(unit,prevDate,isPersonnel);
         List<ServiceOfUnitDto> response = services.stream()
                 .map(service -> new ServiceOfUnitDto(
                         service.getId(),
@@ -60,18 +65,18 @@ public class SerOfUnitService {
         return response;
     }
 
-    public boolean checkIfAllowed(Unit unit,int numberOfGuards,ServiceOfUnit serviceOfUnit) {
+    public boolean checkIfAllowed(Unit unit,int numberOfGuards,ServiceOfUnit serviceOfUnit,boolean isPersonnel) {
         // Load all Soldiers
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
-        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation);
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,isPersonnel);
         Map<Boolean, List<Soldier>> partitioned = allSoldiers.stream()
                 .collect(Collectors.partitioningBy(Soldier::isArmed));
         List<Soldier> armedSoldiers = partitioned.get(true);
         List<Soldier> unarmedSoldiers = partitioned.get(false);
 
         // Load all Services
-        List<ServiceOfUnit> armedServices = serOfUnitRepository.findByUnitAndArmed(unit, Situation.ARMED.name().toLowerCase());
-        List<ServiceOfUnit> unarmedServices = serOfUnitRepository.findByUnitAndArmed(unit, Situation.UNARMED.name().toLowerCase());
+        List<ServiceOfUnit> armedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnel(unit, Situation.ARMED.name().toLowerCase(),isPersonnel);
+        List<ServiceOfUnit> unarmedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnel(unit, Situation.UNARMED.name().toLowerCase(),isPersonnel);
         int allServices = armedServices.size() + unarmedServices.size();
 
         boolean canProceed = allSoldiers.size() >= (allServices + numberOfGuards)

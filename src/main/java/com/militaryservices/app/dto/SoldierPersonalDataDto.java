@@ -53,10 +53,13 @@ public class SoldierPersonalDataDto {
     @Pattern(regexp = "^[a-zA-Z\u0370-\u03FF0-9]+$", message = "The address must only contain letters (a-z, A-Z) and numbers (0-9).")
     private String address;
 
+    private boolean isPersonnel;
+
     public SoldierPersonalDataDto() {
     }
 
-    public SoldierPersonalDataDto(String token, String soldierRegistrationNumber, String company, String name, String surname, String situation, String active, String discharged, String patronymic, String matronymic, String mobilePhone, String city, String address) {
+    public SoldierPersonalDataDto(String token, String soldierRegistrationNumber, String company, String name, String surname, String situation, String active, String discharged,
+                                  String patronymic, String matronymic, String mobilePhone, String city, String address,boolean isPersonnel) {
         this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.company = company;
@@ -70,6 +73,7 @@ public class SoldierPersonalDataDto {
         this.mobilePhone = mobilePhone;
         this.city = city;
         this.address = address;
+        this.isPersonnel = isPersonnel;
     }
 
     public String getToken() {
@@ -102,6 +106,10 @@ public class SoldierPersonalDataDto {
 
     public String getDischarged() {
         return discharged;
+    }
+
+    public boolean isPersonnel() {
+        return isPersonnel;
     }
 
     public String getPatronymic() {
@@ -150,6 +158,10 @@ public class SoldierPersonalDataDto {
 
     public void setActive(String active) {
         this.active = active;
+    }
+
+    public void setPersonnel(boolean personnel) {
+        isPersonnel = personnel;
     }
 
     public void setDischarged(String discharged) {

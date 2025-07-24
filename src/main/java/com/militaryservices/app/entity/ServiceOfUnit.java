@@ -27,17 +27,21 @@ public class ServiceOfUnit {
     @Column
     private String shift;
 
+    @Column(name = "is_personnel")
+    private boolean isPersonnel;
+
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
 
-    public ServiceOfUnit(String serviceName, String armed, String company, String description, String shift, Unit unit) {
+    public ServiceOfUnit(String serviceName, String armed, String company, String description, String shift, Unit unit,boolean isPersonnel) {
         this.serviceName = serviceName;
         this.armed = armed;
         this.company = company;
         this.description = description;
         this.shift = shift;
         this.unit = unit;
+        this.isPersonnel = isPersonnel;
     }
 
     public Long getId() {
@@ -62,6 +66,10 @@ public class ServiceOfUnit {
 
     public String getCompany() {
         return company;
+    }
+
+    public boolean isPersonnel() {
+        return isPersonnel;
     }
 
     public void setServiceName(String serviceName) {
@@ -105,5 +113,9 @@ public class ServiceOfUnit {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    public void setPersonnel(boolean personnel) {
+        isPersonnel = personnel;
     }
 }

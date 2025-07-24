@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface SoldierRepository extends JpaRepository<Soldier, String> {
 
-    List<Soldier> findByUnitAndDischarged(Unit unit,boolean discharged);
+    List<Soldier> findByUnitAndDischargedAndIsPersonnel(Unit unit,boolean discharged,boolean isPersonnel);
 
     List<Soldier> findBySoldierRegistrationNumberContainingIgnoreCase(String registrationFragment);
 

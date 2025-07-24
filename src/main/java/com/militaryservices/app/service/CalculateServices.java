@@ -1,6 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.SerOfUnitAccessImpl;
+import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.enums.Active;
@@ -25,6 +26,8 @@ public class CalculateServices {
     @Autowired
     SerOfUnitAccessImpl serOfUnitAccess;
     @Autowired
+    SerOfUnitRepository serOfUnitRepository;
+    @Autowired
     UserRepository userRepository;
     @Autowired
     CountServicesForEachSold countServicesForEachSold;
@@ -32,9 +35,9 @@ public class CalculateServices {
     public CalculateServices() {
     }
 
-    public List<Soldier> calculateServices(String username) throws IOException {
+    public List<Soldier> calculateServices(String username,boolean isPersonnel) throws IOException {
         // Data structures for Soldiers
-        List<Soldier> allSoldiers = loadSoldiersAndServices(username);
+        List<Soldier> allSoldiers = loadSoldiersAndServices(username,isPersonnel);
         Set<Soldier> armedSoldiers = new HashSet<>();
         Set<Soldier> unarmedSoldiers = new HashSet<>();
         Map<Integer,Soldier> soldierMap = new HashMap<>();
@@ -42,7 +45,7 @@ public class CalculateServices {
         Date nextDate = findNextCalculationDate(allSoldiers.get(0).getService().getDate());
         // Data structures for services of the unit
         Unit unit = allSoldiers.get(0).getUnit();
-        List<ServiceOfUnit> servicesOfUnit = serOfUnitAccess.findByUnit(unit);
+        List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnitAndIsPersonnel(unit,isPersonnel);
         List<Service> armedServices = new ArrayList<>();
         List<Service> unarmedServices = new ArrayList<>();
         List<SoldierProportion> proportionList;
@@ -50,24 +53,24 @@ public class CalculateServices {
         // 1. Calculate next outgoing soldiers
         addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
         setFreeAndOutgoingSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers);
-        int numberOfOutgoing = calculateNumberOfOutgoing(allSoldiers);
+        int numberOfOutgoing = calculateNumberOfOutgoing(allSoldiers,isPersonnel);
         if((armedSoldiers.size() - armedServices.size()) >= numberOfOutgoing) {
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,true,"");
-            calculateOutgoingSoldiers(allSoldiers, armedSoldiers, unarmedSoldiers, soldierMap, proportionList);
+            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,true,"",isPersonnel);
+            calculateOutgoingSoldiers(allSoldiers, armedSoldiers, unarmedSoldiers, soldierMap, proportionList,isPersonnel);
             flag = false;
         }
         if(flag && ((armedSoldiers.size() - armedServices.size()) < numberOfOutgoing)) {
             int numOfArmedSoldForOut = armedSoldiers.size() - armedServices.size();
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false, Situation.ARMED.name().toLowerCase());
+            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false, Situation.ARMED.name().toLowerCase(),isPersonnel);
             calculateOutgoingInRareCase(armedSoldiers,soldierMap,proportionList,numOfArmedSoldForOut);
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase());
+            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase(),isPersonnel);
             calculateOutgoingInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfOutgoing - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
         calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
         // 3. Calculate services for armed soldiers
         if(unarmedServices.size()!=0)
-            setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices);
+            setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel);
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         // 4. Set dates and units
         setCalculationDateAndUnit(nextDate,allSoldiers);
@@ -83,11 +86,11 @@ public class CalculateServices {
         }
     }
 
-    private List<Soldier> loadSoldiersAndServices(String username) {
+    private List<Soldier> loadSoldiersAndServices(String username,boolean isPersonnel) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
-        return soldierAccess.loadSold(unit,dateOfLastCalculation);
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+        return soldierAccess.loadSold(unit,dateOfLastCalculation,isPersonnel);
     }
 
     private Date findNextCalculationDate(Date lastDate) {
@@ -107,9 +110,9 @@ public class CalculateServices {
 
         for(ServiceOfUnit serviceOfUnit : servicesOfUnit) {
             if(serviceOfUnit.isArmed())
-                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift()));
+                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
             else
-                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift()));
+                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
         }
 
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);
@@ -130,9 +133,9 @@ public class CalculateServices {
         }
     }
 
-    private void calculateOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList) {
+    private void calculateOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel) {
 
-        int numOfOutgoing = calculateNumberOfOutgoing(allSoldiers);
+        int numOfOutgoing = calculateNumberOfOutgoing(allSoldiers,isPersonnel);
         assignAsOutgoingBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numOfOutgoing);
     }
 
@@ -148,7 +151,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00"));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
                 numOfOutgoing -= 1;
             }
@@ -166,7 +169,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00"));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 soldiers.remove(soldier);
                 numOfOutgoing -= 1;
             }
@@ -180,9 +183,9 @@ public class CalculateServices {
             unarmedSoldiers.remove(soldier);
     }
 
-    private int calculateNumberOfOutgoing(List<Soldier> allSoldiers) {
+    private int calculateNumberOfOutgoing(List<Soldier> allSoldiers,boolean isPersonnel) {
 
-        List<Long> countServices = serOfUnitAccess.countServicesOfUnit(allSoldiers.get(0).getUnit());
+        List<Long> countServices = serOfUnitAccess.countServicesOfUnit(allSoldiers.get(0).getUnit(),isPersonnel);
         int totalNumberOfServices = countServices != null ? countServices.get(0).intValue() : 0;
         return totalSolForCalc(allSoldiers) - totalNumberOfServices;
     }
@@ -221,8 +224,8 @@ public class CalculateServices {
         }
     }
 
-    private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices) {
-        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase());
+    private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel) {
+        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel);
 
         Map<Integer,Soldier> soldiersMap = new HashMap<>();
         for(Soldier soldier : allSoldiers)

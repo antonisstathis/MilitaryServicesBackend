@@ -26,9 +26,9 @@ public class CheckOutput {
     public boolean checkResults(String username) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
-        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation);
-        List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnit(user.get().getSoldier().getUnit());
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,false);
+        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,false);
+        List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnitAndIsPersonnel(user.get().getSoldier().getUnit(),false);
         Map<String, Integer> servicesMap = new HashMap<>();
         int freq;
         for (ServiceOfUnit serviceOfUnit : servicesOfUnit) {

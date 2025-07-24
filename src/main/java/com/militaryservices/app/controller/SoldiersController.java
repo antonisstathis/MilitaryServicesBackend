@@ -54,8 +54,8 @@ public class SoldiersController {
     }
 
     @GetMapping("/getSoldiers")
-    public ResponseEntity<?> getSoldiers(HttpServletRequest request) {
-        List<SoldierDto> soldiers = soldierService.findAll(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
+    public ResponseEntity<?> getSoldiers(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
+        List<SoldierDto> soldiers = soldierService.findAll(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)), isPersonnel);
         // Sanitize the data which are String.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierDto(
@@ -75,8 +75,8 @@ public class SoldiersController {
     }
 
     @GetMapping("/getSoldiersOfUnit")
-    public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request) {
-        List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
+    public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
+        List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),isPersonnel);
         // Sanitize the data.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
@@ -92,7 +92,8 @@ public class SoldiersController {
                         SanitizationUtil.sanitize(soldier.getMatronymic()),
                         SanitizationUtil.sanitize(soldier.getMobilePhone()),
                         SanitizationUtil.sanitize(soldier.getCity()),
-                        SanitizationUtil.sanitize(soldier.getAddress())
+                        SanitizationUtil.sanitize(soldier.getAddress()),
+                        soldier.isPersonnel()
                 ))
                 .collect(Collectors.toList());
 
@@ -118,7 +119,8 @@ public class SoldiersController {
                         SanitizationUtil.sanitize(soldier.getMatronymic()),
                         SanitizationUtil.sanitize(soldier.getMobilePhone()),
                         SanitizationUtil.sanitize(soldier.getCity()),
-                        SanitizationUtil.sanitize(soldier.getAddress())
+                        SanitizationUtil.sanitize(soldier.getAddress()),
+                        soldier.isPersonnel()
                 ))
                 .collect(Collectors.toList());
 
@@ -160,9 +162,17 @@ public class SoldiersController {
         return ResponseEntity.ok(dateOfFirstCalc);
     }
 
+    @GetMapping("/getLastCalcDate")
+    public ResponseEntity<?> getLastCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
+        Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+        Unit unit = user.get().getSoldier().getUnit();
+        Date dateOfLastCalculation = soldierService.getDateOfLastCalculation(unit,isPersonnel);
+        return ResponseEntity.ok(dateOfLastCalculation);
+    }
+
     @GetMapping("/getPreviousCalculation")
-    public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate) {
-        List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),prevDate);
+    public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
+        List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),prevDate,isPersonnel);
         // Sanitize the data which are String.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPreviousServiceDto(
@@ -184,15 +194,17 @@ public class SoldiersController {
     }
 
     @GetMapping("/calc")
-    public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date lastDate) {
-        soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),lastDate); // Sanitize username
+    public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date lastDate,
+                                                  @RequestParam("isPersonnel") boolean isPersonnel){
+        soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),lastDate,isPersonnel); // Sanitize username
         return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
     }
 
     @GetMapping("/getServices")
-    public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate) {
+    public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,
+                                         @RequestParam("isPersonnel") boolean isPersonnel) {
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
-        return ResponseEntity.ok(serOfUnitService.getAllServices(user.get().getSoldier().getUnit(),prevDate));
+        return ResponseEntity.ok(serOfUnitService.getAllServices(user.get().getSoldier().getUnit(),prevDate,isPersonnel));
     }
 
     @GetMapping("/getNameOfUnit")
@@ -202,9 +214,9 @@ public class SoldiersController {
     }
 
     @GetMapping("/getSoldiersStatistics")
-    public ResponseEntity<?> getStatistics(HttpServletRequest request,@RequestParam StatisticalData statisticalDataOption) {
+    public ResponseEntity<?> getStatistics(HttpServletRequest request,@RequestParam StatisticalData statisticalDataOption, @RequestParam("isPersonnel") boolean isPersonnel) {
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
-        List<SoldierServiceStatDto> soldierServiceStatDtos = soldierService.getSoldierServiceStats(user.get().getSoldier().getUnit(), statisticalDataOption);
+        List<SoldierServiceStatDto> soldierServiceStatDtos = soldierService.getSoldierServiceStats(user.get().getSoldier().getUnit(), statisticalDataOption,isPersonnel);
         return ResponseEntity.ok(soldierServiceStatDtos);
     }
 
@@ -249,7 +261,7 @@ public class SoldiersController {
 
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
-    public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload) {
+    public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload, @RequestParam("isPersonnel") boolean isPersonnel) {
         JsonNode jsonNode = getJsonNode(payload);
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
         int numberOfGuards = jsonNode.get("selectedNumberOfGuards").asInt();
@@ -259,14 +271,14 @@ public class SoldiersController {
         String shift = jsonNode.get("shift").asText();
         Soldier soldier = user.get().getSoldier();
         Unit unit = soldier.getUnit();
-        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
-        if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit))
+        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel);
+        if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit,isPersonnel))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(),Locale.ENGLISH));
 
         IntStream.range(0, numberOfGuards)
                 .mapToObj(i -> {
                     // Create a new instance of ServiceOfUnit to set the id to null in order to insert it in the database.
-                    ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit);
+                    ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel);
                     newService.setId(null);
                     return newService;
                 })

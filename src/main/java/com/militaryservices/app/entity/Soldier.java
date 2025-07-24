@@ -39,6 +39,10 @@ public class Soldier implements Serializable {
 
 	@OneToMany(mappedBy = "soldier")
 	private List<Service> services;
+
+	@Column(name = "is_personnel")
+	private boolean isPersonnel;
+
 	@Column
 	private boolean discharged;
 	@Column
@@ -82,13 +86,14 @@ public class Soldier implements Serializable {
 		services = new ArrayList<>();
 	}
 
-	public Soldier(int id,String company,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean discharged)  {
+	public Soldier(int id,String company,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean isPersonnel,boolean discharged)  {
 
 		this.name = name;
 		this.company = company;
 		this.surname = surname;
 		this.situation = situation;
 		this.active = active;
+		this.isPersonnel = isPersonnel;
 		this.id = id;
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
 		this.discharged = discharged;
@@ -160,6 +165,10 @@ public class Soldier implements Serializable {
 
 	public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
+	}
+
+	public boolean isPersonnel() {
+		return isPersonnel;
 	}
 
 	public boolean isDischarged() {
@@ -251,6 +260,10 @@ public class Soldier implements Serializable {
 
 	public void setUnit(Unit unit) {
 		this.unit = unit;
+	}
+
+	public void setPersonnel(boolean personnel) {
+		isPersonnel = personnel;
 	}
 
 	public void setDischarged(boolean discharged) {

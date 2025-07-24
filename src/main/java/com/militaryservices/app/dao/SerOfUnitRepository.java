@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface SerOfUnitRepository extends JpaRepository<ServiceOfUnit, Long> {
 
-    List<ServiceOfUnit> findByUnit(Unit unit);
+    List<ServiceOfUnit> findByUnitAndIsPersonnel(Unit unit, boolean isPersonnel);
 
-    List<ServiceOfUnit> findByUnitAndArmed(Unit unit, String armed);
+    List<ServiceOfUnit> findByUnitAndArmedAndIsPersonnel(Unit unit, String armed,boolean isPersonnel);
 }

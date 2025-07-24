@@ -9,17 +9,17 @@ import java.util.Date;
 import java.util.List;
 
 public interface SoldierService {
-    List<SoldierDto> findAll(String username);
+    List<SoldierDto> findAll(String username,boolean isPersonnel);
 
-    List<SoldierPersonalDataDto> loadSoldiers(String username);
+    List<SoldierPersonalDataDto> loadSoldiers(String username,boolean isPersonnel);
 
     List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber);
 
-    List<SoldierPreviousServiceDto> findPreviousCalculation(String username, Date date);
+    List<SoldierPreviousServiceDto> findPreviousCalculation(String username, Date date,boolean isPersonnel);
 
     Date getDateByCalculationNumber(String username,int calculation);
 
-    void calculateServices(String username,Date lastDate);
+    void calculateServices(String username,Date lastDate,boolean isPersonnel);
 
     void updateSoldier(SoldDto soldier);
 
@@ -29,8 +29,11 @@ public interface SoldierService {
 
     boolean dischargeSoldier(int soldierId, Unit unit);
 
-    List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType);
+    List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType, boolean isPersonnel);
 
     void deleteServices(JsonNode services);
-    void saveNewSoldier(SoldierPersonalDataDto soldier,Unit unit);
+
+    Date getDateOfLastCalculation(Unit unit,boolean isPersonnel);
+
+    void saveNewSoldier(SoldierPersonalDataDto soldier, Unit unit);
 }

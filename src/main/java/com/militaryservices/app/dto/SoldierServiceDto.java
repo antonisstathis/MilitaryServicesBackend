@@ -16,6 +16,7 @@ public class SoldierServiceDto {
     private String surname;
     private String situation;
     private String active;
+    private boolean isPersonnel;
     private long serviceId;
     private String service;
     private Date date;
@@ -43,7 +44,7 @@ public class SoldierServiceDto {
         this.discharged = discharged;
     }
 
-    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -51,6 +52,7 @@ public class SoldierServiceDto {
         this.surname = surname;
         this.situation = situation;
         this.active = active;
+        this.isPersonnel = isPersonnel;
         this.serviceId = serviceId;
         this.service = service;
         this.date = date;
@@ -87,6 +89,10 @@ public class SoldierServiceDto {
 
     public String getActive() {
         return active;
+    }
+
+    public boolean isPersonnel() {
+        return isPersonnel;
     }
 
     public long getServiceId() {
@@ -164,6 +170,10 @@ public class SoldierServiceDto {
 
     public void setActive(String active) {
         this.active = active;
+    }
+
+    public void setPersonnel(boolean personnel) {
+        isPersonnel = personnel;
     }
 
     public void setService(String service) {

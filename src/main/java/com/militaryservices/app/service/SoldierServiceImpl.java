@@ -53,10 +53,10 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 	
 	@Override
-	public List<SoldierDto> findAll(String username) {
+	public List<SoldierDto> findAll(String username,boolean isPersonnel) {
 
 		Optional<User> user = userRepository.findById(username);
-		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier());
+		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier(),isPersonnel);
 		List<SoldierDto> response = soldiers.stream()
 				.map(sold -> {
 					String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
@@ -76,10 +76,10 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPersonalDataDto> loadSoldiers(String username) {
+	public List<SoldierPersonalDataDto> loadSoldiers(String username,boolean isPersonnel) {
 		Optional<User> user = userRepository.findById(username);
 		Unit unit = user.get().getSoldier().getUnit();
-		List<Soldier> allSoldiers = soldierRepository.findByUnitAndDischarged(unit,false);
+		List<Soldier> allSoldiers = soldierRepository.findByUnitAndDischargedAndIsPersonnel(unit,false,isPersonnel);
 
 		List<SoldierPersonalDataDto> soldierDataList = allSoldiers.stream()
 				.map(soldier -> {
@@ -132,9 +132,9 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date) {
+	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date,boolean isPersonnel) {
 		Optional<User> user = userRepository.findById(username);
-		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date);
+		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date, isPersonnel);
 
 		List<SoldierPreviousServiceDto> resultList = soldierPreviousServiceDtoList.stream()
 				.map(soldDto -> {
@@ -166,9 +166,16 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
+	public Date getDateOfLastCalculation(Unit unit, boolean isPersonnel) {
+		Date dateOfLastCalculationCalc = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+
+		return dateOfLastCalculationCalc;
+	}
+
+	@Override
 	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,Unit unit) {
 		Soldier soldier = new Soldier();
-		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit);
+		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit,soldierDto.isPersonnel());
 		soldier.setCompany(soldierDto.getCompany());
 		soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
 		soldier.setName(soldierDto.getName());
@@ -182,7 +189,7 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setMatronymic(soldierDto.getMatronymic());
 		soldier.setMobilePhone(soldierDto.getMobilePhone());
 		soldier.setDischarged(false);
-		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00");
+		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldierDto.isPersonnel());
 		service.setSoldier(soldier);
 		soldier.setService(service);
 		soldierRepository.save(soldier);
@@ -190,14 +197,14 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void calculateServices(String username,Date lastDate) {
+	public void calculateServices(String username,Date lastDate,boolean isPersonnel) {
 		
 		try {
 			Optional<User> user = userRepository.findById(username);
 			Unit unit = user.get().getSoldier().getUnit();
-			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit);
+			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
 			if(dateOfLastCalculation.compareTo(lastDate) == 0) {
-				List<Soldier> allSoldiers = service.calculateServices(username);
+				List<Soldier> allSoldiers = service.calculateServices(username,isPersonnel);
 				service.saveNewServices(allSoldiers);
 				boolean results = checkOutput.checkResults(username);
 			}
@@ -255,7 +262,7 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType) {
+	public List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType,boolean isPersonnel) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Tuple> cq = cb.createTupleQuery();
 		Root<Soldier> soldier = cq.from(Soldier.class);
@@ -284,6 +291,8 @@ public class SoldierServiceImpl implements SoldierService {
 				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Active.getFreeOfDuty()));
 				break;
 		}
+		predicates.add(cb.equal(soldier.get("isPersonnel"), isPersonnel));
+
 
 		return soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
 	}

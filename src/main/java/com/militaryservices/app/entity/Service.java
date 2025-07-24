@@ -39,6 +39,9 @@ public class Service implements Serializable {
 	@JoinColumn(name = "sold_id", referencedColumnName = "sold_id")
 	private Soldier soldier;
 
+	@Column(name = "is_personnel")
+	private boolean isPersonnel;
+
 	public Service() {
 
 	}
@@ -50,7 +53,7 @@ public class Service implements Serializable {
 		this.unit = unit;
 	}
 
-	public Service(String serviceName, String armed, Date date, Unit unit, String company, String description, String shift) {
+	public Service(String serviceName, String armed, Date date, Unit unit, String company, String description, String shift,boolean isPersonnel) {
 		this.serviceName = serviceName;
 		this.armed = armed;
 		this.date = date;
@@ -58,6 +61,7 @@ public class Service implements Serializable {
 		this.company = company;
 		this.description = description;
 		this.shift = shift;
+		this.isPersonnel = isPersonnel;
 	}
 
 	public String getServiceName() {
@@ -73,12 +77,20 @@ public class Service implements Serializable {
 		return armed;
 	}
 
+	public boolean isPersonnel() {
+		return isPersonnel;
+	}
+
 	public void setArmed(String armed) {
 		this.armed = armed;
 	}
 
 	public void setSoldier(Soldier soldier) {
 		this.soldier = soldier;
+	}
+
+	public void setPersonnel(boolean personnel) {
+		isPersonnel = personnel;
 	}
 
 	public void setCompany(String company) {
