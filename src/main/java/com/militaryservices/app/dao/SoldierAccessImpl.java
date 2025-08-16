@@ -95,6 +95,35 @@ public class SoldierAccessImpl {
 		return allSoldiers;
 	}
 
+	@Transactional
+	public List<Soldier> loadSoldByGroup(Unit unit,Date dateOfLastCalc,boolean isPersonnel, String group) {
+
+		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.company,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,s.isPersonnel,s.group,u.id,u.serviceName, " +
+				"u.date,u.armed,s.unit,s.discharged, u.description, u.shift) from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.discharged =:discharged " +
+				"and s.isPersonnel =:isPersonnel and u.date =:date and s.group =:group order by s.id asc";
+		Query nativeQuery;
+
+		//List<Soldier> allSoldiers = new ArrayList<>();
+		nativeQuery = entityManager.createQuery(query);
+		nativeQuery.setParameter("unit",unit);
+		nativeQuery.setParameter("discharged", false);
+		nativeQuery.setParameter("isPersonnel", isPersonnel);
+		nativeQuery.setParameter("date", dateOfLastCalc);
+		nativeQuery.setParameter("group", group);
+		List<SoldierServiceDto> list = nativeQuery.getResultList();
+
+		List<Soldier> allSoldiers = list.stream()
+				.map(soldierDto -> {
+					Soldier sold = new Soldier(soldierDto.getId(), soldierDto.getCompany(), soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.getGroup(), soldierDto.isPersonnel(), soldierDto.isDischarged());
+					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getCompany(), soldierDto.getDescription(), soldierDto.getShift(), isPersonnel);
+					sold.setService(service);
+					sold.setUnit(service.getUnit());
+					return sold;
+				}).collect(Collectors.toList());
+
+		return allSoldiers;
+	}
+
 	public Date getDateOfCalculation(Unit unit,int calculations) {
 
 		Date dateOfFirstCalculation = getDateOfFirstCalculation(unit);
@@ -166,10 +195,11 @@ public class SoldierAccessImpl {
 	*/
 
 	@Transactional
-	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed,boolean isPersonnel) {
+	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed,boolean isPersonnel, String group) {
 
 		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit = :unit and s.isPersonnel =:isPersonnel and s.discharged = :discharged and u.armed = :armed group by s.id order by count(*) desc";
+				"(s = u.soldier) where s.unit = :unit and s.isPersonnel =:isPersonnel and s.discharged = :discharged and s.group =:group " +
+				"and u.armed = :armed group by s.id order by count(*) desc";
 
 		Query nativeQuery;
 		List<HistoricalData> historicalData;
@@ -178,6 +208,7 @@ public class SoldierAccessImpl {
 		nativeQuery.setParameter("isPersonnel", isPersonnel);
 		nativeQuery.setParameter("discharged", false);
 		nativeQuery.setParameter("armed", armed);
+		nativeQuery.setParameter("group", group);
 		historicalData = nativeQuery.getResultList();
 
 		return historicalData;

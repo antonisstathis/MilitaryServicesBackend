@@ -63,6 +63,9 @@ public class Soldier implements Serializable {
 	@Column
 	private String address;
 
+	@Column(name = "sold_group")
+	private String group;
+
 	@ManyToOne
 	@JoinColumn(name = "unit_id")
 	private Unit unit;
@@ -94,6 +97,21 @@ public class Soldier implements Serializable {
 		this.situation = situation;
 		this.active = active;
 		this.isPersonnel = isPersonnel;
+		this.id = id;
+		this.soldierRegistrationNumber = soldierRegistrationNumber;
+		this.discharged = discharged;
+		services = new ArrayList<>();
+	}
+
+	public Soldier(int id,String company,String soldierRegistrationNumber,String name,String surname,String situation,String active,String group,boolean isPersonnel,boolean discharged)  {
+
+		this.name = name;
+		this.company = company;
+		this.surname = surname;
+		this.situation = situation;
+		this.active = active;
+		this.isPersonnel = isPersonnel;
+		this.group = group;
 		this.id = id;
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
 		this.discharged = discharged;
@@ -145,6 +163,10 @@ public class Soldier implements Serializable {
 
 	public Unit getUnit() {
 		return unit;
+	}
+
+	public String getGroup() {
+		return group;
 	}
 
 	public String getSoldierRegistrationNumber() {
@@ -268,6 +290,10 @@ public class Soldier implements Serializable {
 
 	public void setDischarged(boolean discharged) {
 		this.discharged = discharged;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
 	public boolean checkIfActive() {

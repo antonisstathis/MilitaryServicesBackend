@@ -28,7 +28,8 @@ public class SoldierPersonalDataDto {
     private String situation;
     @Pattern(regexp = "active|inactive", message = "Status must be 'active' or 'inactive'")
     private String active;
-
+    private String group;
+    @Pattern(regexp = "A|B|C|D|E", message = "Group must be A or B or C or D or E'")
     private String discharged;
 
     @NotBlank(message = "Patronymic is required")
@@ -59,7 +60,7 @@ public class SoldierPersonalDataDto {
     }
 
     public SoldierPersonalDataDto(String token, String soldierRegistrationNumber, String company, String name, String surname, String situation, String active, String discharged,
-                                  String patronymic, String matronymic, String mobilePhone, String city, String address,boolean isPersonnel) {
+                                  String patronymic, String matronymic, String mobilePhone, String city, String address,boolean isPersonnel,String group) {
         this.token = token;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
         this.company = company;
@@ -74,6 +75,7 @@ public class SoldierPersonalDataDto {
         this.city = city;
         this.address = address;
         this.isPersonnel = isPersonnel;
+        this.group = group;
     }
 
     public String getToken() {
@@ -132,6 +134,10 @@ public class SoldierPersonalDataDto {
         return address;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -186,5 +192,9 @@ public class SoldierPersonalDataDto {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

@@ -28,6 +28,8 @@ public class SoldierServiceDto {
 
     private String shift;
 
+    private String group;
+
     public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
         this.id = id;
         this.company = company;
@@ -44,7 +46,8 @@ public class SoldierServiceDto {
         this.discharged = discharged;
     }
 
-    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,
+                             long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -53,6 +56,27 @@ public class SoldierServiceDto {
         this.situation = situation;
         this.active = active;
         this.isPersonnel = isPersonnel;
+        this.serviceId = serviceId;
+        this.service = service;
+        this.date = date;
+        this.armed = armed;
+        this.unit = unit;
+        this.discharged = discharged;
+        this.description = description;
+        this.shift = shift;
+    }
+
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,
+                             String group, long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
+        this.id = id;
+        this.company = company;
+        this.soldierRegistrationNumber = soldierRegistrationNumber;
+        this.name = name;
+        this.surname = surname;
+        this.situation = situation;
+        this.active = active;
+        this.isPersonnel = isPersonnel;
+        this.group = group;
         this.serviceId = serviceId;
         this.service = service;
         this.date = date;
@@ -93,6 +117,10 @@ public class SoldierServiceDto {
 
     public boolean isPersonnel() {
         return isPersonnel;
+    }
+
+    public String getGroup() {
+        return group;
     }
 
     public long getServiceId() {
@@ -190,5 +218,9 @@ public class SoldierServiceDto {
 
     public void setDischarged(boolean discharged) {
         this.discharged = discharged;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

@@ -37,14 +37,15 @@ public class SerOfUnitAccessImpl {
     }
 
     @Transactional
-    public List<Long> countServicesOfUnit(Unit unit,boolean isPersonnel) {
+    public List<Long> countServicesOfUnit(Unit unit,boolean isPersonnel, String group) {
 
-        String query = "SELECT COUNT(s) FROM ServiceOfUnit s WHERE s.isPersonnel =:isPersonnel and s.unit = :unit GROUP BY s.unit";
+        String query = "SELECT COUNT(s) FROM ServiceOfUnit s WHERE s.isPersonnel =:isPersonnel and s.unit = :unit and s.group =:group GROUP BY s.unit";
 
         Query nativeQuery;
         nativeQuery = entityManager.createQuery(query);
         nativeQuery.setParameter("isPersonnel", isPersonnel);
         nativeQuery.setParameter("unit", unit);
+        nativeQuery.setParameter("group", group);
         List<Long> countServices = nativeQuery.getResultList();
 
         return countServices;

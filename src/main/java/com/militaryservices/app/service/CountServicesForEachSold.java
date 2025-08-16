@@ -16,10 +16,10 @@ public class CountServicesForEachSold {
     @Autowired
     SoldierAccessImpl soldierAccess;
 
-    public List<SoldierProportion> getProportions(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers,
-                                                  Map<Integer,Soldier> soldierMap,boolean mode,String armed,boolean isPersonnel) {
+    public List<SoldierProportion> getProportions(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,
+                                                  boolean mode,String armed,boolean isPersonnel, String group) {
 
-        CountServices datas = getHistoricalData(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,isPersonnel);
+        CountServices datas = getHistoricalData(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,isPersonnel, group);
         List<SoldierProportion> proportions = new ArrayList<>();
 
         int countServices = 0;
@@ -41,10 +41,10 @@ public class CountServicesForEachSold {
         return proportions;
     }
 
-    private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel) {
-        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase(),isPersonnel);
-        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase(),isPersonnel);
-        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Active.getFreeOfDuty(),isPersonnel);
+    private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
+        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase(),isPersonnel, group);
+        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
+        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Active.getFreeOfDuty(),isPersonnel, group);
         if(out.size()<allSoldiers.size())
             addTheRestOnes(out,soldierMap);
         if(unarmedServices.size()<unarmedSoldiers.size())

@@ -93,7 +93,8 @@ public class SoldiersController {
                         SanitizationUtil.sanitize(soldier.getMobilePhone()),
                         SanitizationUtil.sanitize(soldier.getCity()),
                         SanitizationUtil.sanitize(soldier.getAddress()),
-                        soldier.isPersonnel()
+                        soldier.isPersonnel(),
+                        SanitizationUtil.sanitize(soldier.getGroup())
                 ))
                 .collect(Collectors.toList());
 
@@ -120,7 +121,8 @@ public class SoldiersController {
                         SanitizationUtil.sanitize(soldier.getMobilePhone()),
                         SanitizationUtil.sanitize(soldier.getCity()),
                         SanitizationUtil.sanitize(soldier.getAddress()),
-                        soldier.isPersonnel()
+                        soldier.isPersonnel(),
+                        SanitizationUtil.sanitize(soldier.getGroup())
                 ))
                 .collect(Collectors.toList());
 
@@ -255,6 +257,7 @@ public class SoldiersController {
         soldier.setMobilePhone(SanitizationUtil.sanitize(soldierDto.getMobilePhone()));
         soldier.setCity(SanitizationUtil.sanitize(soldierDto.getCity()));
         soldier.setAddress(SanitizationUtil.sanitize(soldierDto.getAddress()));
+        soldier.setGroup(SanitizationUtil.sanitize(soldierDto.getGroup()));
         soldierService.saveNewSoldier(soldier,unit);
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
     }
@@ -269,16 +272,17 @@ public class SoldiersController {
         String armedStatus = jsonNode.get("armed").asText();
         String description = jsonNode.get("description").asText();
         String shift = jsonNode.get("shift").asText();
+        String group = jsonNode.get("group").asText();
         Soldier soldier = user.get().getSoldier();
         Unit unit = soldier.getUnit();
-        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel);
+        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel,group);
         if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit,isPersonnel))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(),Locale.ENGLISH));
 
         IntStream.range(0, numberOfGuards)
                 .mapToObj(i -> {
                     // Create a new instance of ServiceOfUnit to set the id to null in order to insert it in the database.
-                    ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel);
+                    ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel, group);
                     newService.setId(null);
                     return newService;
                 })

@@ -97,6 +97,7 @@ public class SoldierServiceImpl implements SoldierService {
 					soldierDto.setMobilePhone(soldier.getMobilePhone());
 					soldierDto.setCity(soldier.getCity());
 					soldierDto.setAddress(soldier.getAddress());
+					soldierDto.setGroup(soldier.getGroup());
 					return soldierDto;
 				})
 				.collect(Collectors.toList());
@@ -189,6 +190,7 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setMatronymic(soldierDto.getMatronymic());
 		soldier.setMobilePhone(soldierDto.getMobilePhone());
 		soldier.setDischarged(false);
+		soldier.setGroup(soldierDto.getGroup());
 		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldierDto.isPersonnel());
 		service.setSoldier(soldier);
 		soldier.setService(service);
@@ -203,14 +205,26 @@ public class SoldierServiceImpl implements SoldierService {
 			Optional<User> user = userRepository.findById(username);
 			Unit unit = user.get().getSoldier().getUnit();
 			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+			List<String> groups = serOfUnitRepository.findDistinctGroups(unit,isPersonnel);
 			if(dateOfLastCalculation.compareTo(lastDate) == 0) {
-				List<Soldier> allSoldiers = service.calculateServices(username,isPersonnel);
+				List<Soldier> allSoldiers = calculateServicesForAllGroups(username,isPersonnel,groups);
 				service.saveNewServices(allSoldiers);
 				boolean results = checkOutput.checkResults(username);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private List<Soldier> calculateServicesForAllGroups(String username, boolean isPersonnel,List<String> groups) throws IOException {
+		List<Soldier> allSoldiers = new ArrayList<>();
+		List<Soldier> soldiers;
+		for(String group : groups) {
+			soldiers = service.calculateServices(username,isPersonnel,group);
+			allSoldiers.addAll(soldiers);
+		}
+
+		return allSoldiers;
 	}
 
 	@Override
