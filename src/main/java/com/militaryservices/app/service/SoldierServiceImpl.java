@@ -311,7 +311,6 @@ public class SoldierServiceImpl implements SoldierService {
 		}
 		predicates.add(cb.equal(soldier.get("isPersonnel"), isPersonnel));
 
-
 		List<SoldierServiceStatDto> statDtoList = soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
 
 		if(statDtoList.size() == 0)
