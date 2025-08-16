@@ -286,17 +286,21 @@ public class SoldierServiceImpl implements SoldierService {
 
 		predicates.add(cb.isFalse(soldier.get(Discharged.getDischarged())));
 		predicates.add(cb.equal(soldier.get("unit"), unit));
+		String situation = "";
 		switch (caseType) {
 			case ARMED_SERVICES_ARMED_SOLDIERS:
+				situation = Situation.ARMED.name().toLowerCase();
 				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.ARMED.name().toLowerCase()));
 				break;
 
 			case UNARMED_SERVICES_ARMED_SOLDIERS:
+				situation = Situation.ARMED.name().toLowerCase();
 				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.UNARMED.name().toLowerCase()));
 				predicates.add(cb.equal(soldier.get(Situation.getNameOfColumn()), Situation.ARMED.name().toLowerCase()));
 				break;
 
 			case UNARMED_SERVICES_UNARMED_SOLDIERS:
+				situation = Situation.UNARMED.name().toLowerCase();
 				predicates.add(cb.equal(service.get(Situation.ARMED.name().toLowerCase()), Situation.UNARMED.name().toLowerCase()));
 				predicates.add(cb.equal(soldier.get(Situation.getNameOfColumn()), Situation.UNARMED.name().toLowerCase()));
 				break;
@@ -308,7 +312,32 @@ public class SoldierServiceImpl implements SoldierService {
 		predicates.add(cb.equal(soldier.get("isPersonnel"), isPersonnel));
 
 
-		return soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
+		List<SoldierServiceStatDto> statDtoList = soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
+
+		if(statDtoList.size() == 0)
+			return createListInCaseOfZeroServices(unit,isPersonnel,situation);
+
+		return statDtoList;
+	}
+
+	private List<SoldierServiceStatDto> createListInCaseOfZeroServices(Unit unit, boolean isPersonnel, String situation) {
+		List<Soldier> statData = soldierRepository.findByUnitAndDischargedAndIsPersonnelAndSituation(unit,false,isPersonnel,situation);
+		List<SoldierServiceStatDto> statDtoList = new ArrayList<>();
+
+		SoldierServiceStatDto soldierServiceStatDto;
+		for(Soldier soldier : statData) {
+			soldierServiceStatDto = new SoldierServiceStatDto();
+			soldierServiceStatDto.setCompany(soldier.getCompany());
+			soldierServiceStatDto.setSoldierRegNumber(soldier.getSoldierRegistrationNumber());
+			soldierServiceStatDto.setName(soldier.getName());
+			soldierServiceStatDto.setSurname(soldier.getSurname());
+			soldierServiceStatDto.setActive(soldier.getActive());
+			soldierServiceStatDto.setSituation(soldier.getSituation());
+			soldierServiceStatDto.setNumberOfServices(0);
+			statDtoList.add(soldierServiceStatDto);
+		}
+
+		return statDtoList;
 	}
 
 	@Override
