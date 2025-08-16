@@ -44,7 +44,8 @@ public class SerOfUnitService {
                         service.getServiceName(),
                         service.getArmed(),
                         service.getDescription(),
-                        service.getShift()
+                        service.getShift(),
+                        service.getGroup()
                 ))
                 .collect(Collectors.toList());
 
@@ -59,7 +60,8 @@ public class SerOfUnitService {
                         service.getServiceName(),
                         service.getArmed(),
                         service.getDescription(),
-                        service.getShift()
+                        service.getShift(),
+                        service.getGroup()
                 ))
                 .collect(Collectors.toList());
         return response;

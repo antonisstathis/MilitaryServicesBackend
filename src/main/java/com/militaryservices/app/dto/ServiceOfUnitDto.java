@@ -9,16 +9,18 @@ public class ServiceOfUnitDto {
     private String armed;
     private String description;
     private String shift;
+    private String group;
 
     public ServiceOfUnitDto() {
     }
 
-    public ServiceOfUnitDto(Long id, String service, String armed, String description, String shift) {
+    public ServiceOfUnitDto(Long id, String service, String armed, String description, String shift, String group) {
         this.id = id;
         this.service = service;
         this.armed = armed;
         this.description = description;
         this.shift = shift;
+        this.group = group;
     }
 
     public Long getId() {
@@ -41,6 +43,10 @@ public class ServiceOfUnitDto {
         return shift;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -59,5 +65,9 @@ public class ServiceOfUnitDto {
 
     public void setShift(String shift) {
         this.shift = shift;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

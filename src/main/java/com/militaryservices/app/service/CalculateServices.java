@@ -265,6 +265,7 @@ public class CalculateServices {
         for(Soldier sold : allSoldiers) {
             sold.getService().setDate(nextDate);
             sold.getService().setUnit(sold.getUnit());
+            sold.getService().setGroup(sold.getGroup());
         }
     }
 

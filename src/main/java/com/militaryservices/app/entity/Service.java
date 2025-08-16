@@ -42,6 +42,9 @@ public class Service implements Serializable {
 	@Column(name = "is_personnel")
 	private boolean isPersonnel;
 
+	@Column(name = "ser_group")
+	private String group;
+
 	public Service() {
 
 	}
@@ -70,6 +73,14 @@ public class Service implements Serializable {
 
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
 	public String getArmed() {
