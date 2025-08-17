@@ -1,7 +1,5 @@
 package com.militaryservices.app.dto;
 
-import java.util.Date;
-
 public class SoldierPreviousServiceDto {
 
     private String token;

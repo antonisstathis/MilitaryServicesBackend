@@ -237,7 +237,16 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public SoldierUnitDto findSoldier(int soldId) {
+	public SoldierSelectDto findSoldier(int soldId) {
+		Soldier soldier = soldierAccess.findSoldierById(soldId);
+		SoldierSelectDto sold = new SoldierSelectDto(jwtUtil.generateToken(Integer.toString(soldier.getId())), soldier.getName(),
+				soldier.getSurname(), soldier.getSituation(), soldier.getActive(), soldier.getGroup());
+
+		return sold;
+	}
+
+	@Override
+	public SoldierUnitDto findSoldierUnit(int soldId) {
 		Soldier soldier = soldierAccess.findSoldierById(soldId);
 		SoldierUnitDto sold = new SoldierUnitDto(soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(),
 				soldier.getActive(), soldier.getUnit());

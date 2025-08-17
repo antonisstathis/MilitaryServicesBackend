@@ -23,7 +23,9 @@ public interface SoldierService {
 
     void updateSoldier(SoldDto soldier);
 
-    SoldierUnitDto findSoldier(int id);
+    SoldierSelectDto findSoldier(int id);
+
+    SoldierUnitDto findSoldierUnit(int id);
 
     List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId);
 

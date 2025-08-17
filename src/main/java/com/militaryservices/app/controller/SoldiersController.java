@@ -227,21 +227,16 @@ public class SoldiersController {
     }
 
     @PostMapping("/getSoldier")
-    public ResponseEntity<?> getSoldier(HttpServletRequest request,@RequestBody String sold) {
+    public ResponseEntity<?> getSoldier(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
 
-        JsonNode jsonNode = getJsonNode(sold);
-        String token = jsonNode.get("token").asText();
+        String token = soldDto.getToken();
         int id = Integer.valueOf(jwtUtil.extractUsername(token));
-        SoldierUnitDto soldierDto = soldierService.findSoldier(id);
+        SoldierSelectDto soldierDto = soldierService.findSoldier(id);
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,soldierDto.getSituation(),soldierDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
 
-        SoldierDto soldier = new SoldierDto(SanitizationUtil.sanitize(soldierDto.getName()), SanitizationUtil.sanitize(soldierDto.getSurname()),
-                SanitizationUtil.sanitize(soldierDto.getSituation()), SanitizationUtil.sanitize(soldierDto.getActive()));
-        soldier.setToken(token);
-        soldier.setDate(new Date());
-        return ResponseEntity.ok(soldier);
+        return ResponseEntity.ok(soldierDto);
     }
 
     @PostMapping("/saveNewSoldier")

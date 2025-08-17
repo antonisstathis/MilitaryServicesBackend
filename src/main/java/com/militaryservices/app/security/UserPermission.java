@@ -1,5 +1,6 @@
 package com.militaryservices.app.security;
 
+import com.militaryservices.app.dto.SoldierSelectDto;
 import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.service.SoldierService;
@@ -36,9 +37,9 @@ public class UserPermission {
     }
 
     public boolean checkIfSoldierBelongsToUser(int soldId,String username) {
-        SoldierUnitDto soldierToUpdate = soldierService.findSoldier(soldId);
+        SoldierUnitDto soldierToUpdate = soldierService.findSoldierUnit(soldId);
         Optional<User> optionalUser = userService.findUser(username);
-        SoldierUnitDto user = soldierService.findSoldier(optionalUser.get().getSoldier().getId());
+        SoldierUnitDto user = soldierService.findSoldierUnit(optionalUser.get().getSoldier().getId());
 
         return soldierToUpdate.getUnit().getId() == user.getUnit().getId() ? true : false;
     }
