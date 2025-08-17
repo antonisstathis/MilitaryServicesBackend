@@ -21,11 +21,14 @@ import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
+@Validated
 @PreAuthorize(RoleExpressions.SOLDIER)
 public class SoldiersController {
 
@@ -264,7 +268,9 @@ public class SoldiersController {
 
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
-    public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel,@RequestParam("numberOfGuards") int numberOfGuards) {
+    public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel,
+                                             @RequestParam("numberOfGuards") @Min(value = 1, message = "The number of guards must be at least 1")
+                                             @Max(value = 5, message = "The number of guards can not exceed 5") int numberOfGuards) {
 
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
         if (user.isEmpty())

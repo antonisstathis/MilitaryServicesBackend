@@ -7,10 +7,15 @@ public class ServiceOfUnitDto {
 
     private Long id;
 
+    @NotBlank(message = "Service name is required.")
     private String service;
-
+    @NotBlank(message = "Armed is required.")
+    @Pattern(regexp = "armed|unarmed", message = "Please select a valid option in the armed field.")
     private String armed;
+    @NotBlank(message = "Description is required.")
     private String description;
+
+    @NotBlank(message = "Shift is required.")
     private String shift;
 
     @NotBlank(message = "Group is required.")
