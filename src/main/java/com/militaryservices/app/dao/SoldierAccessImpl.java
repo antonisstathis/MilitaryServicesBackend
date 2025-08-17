@@ -86,7 +86,7 @@ public class SoldierAccessImpl {
 		List<Soldier> allSoldiers = list.stream()
 				.map(soldierDto -> {
 					Soldier sold = new Soldier(soldierDto.getId(), soldierDto.getCompany(), soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.isPersonnel(), soldierDto.isDischarged());
-					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getCompany(), soldierDto.getDescription(), soldierDto.getShift(), isPersonnel);
+					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getDescription(), soldierDto.getShift(), isPersonnel);
 					sold.setService(service);
 					sold.setUnit(service.getUnit());
 					return sold;
@@ -115,7 +115,7 @@ public class SoldierAccessImpl {
 		List<Soldier> allSoldiers = list.stream()
 				.map(soldierDto -> {
 					Soldier sold = new Soldier(soldierDto.getId(), soldierDto.getCompany(), soldierDto.getSoldierRegistrationNumber(),soldierDto.getName(),soldierDto.getSurname(),soldierDto.getSituation(),soldierDto.getActive(), soldierDto.getGroup(), soldierDto.isPersonnel(), soldierDto.isDischarged());
-					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getCompany(), soldierDto.getDescription(), soldierDto.getShift(), isPersonnel);
+					Service service = new Service(soldierDto.getService(),soldierDto.getArmed(),convertStringToDate(soldierDto.getDate()),soldierDto.getUnit(), soldierDto.getDescription(), soldierDto.getShift(), isPersonnel);
 					sold.setService(service);
 					sold.setUnit(service.getUnit());
 					return sold;

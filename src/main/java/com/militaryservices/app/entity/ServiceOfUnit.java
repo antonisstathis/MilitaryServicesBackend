@@ -2,6 +2,7 @@ package com.militaryservices.app.entity;
 
 import com.militaryservices.app.enums.Situation;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "ser_of_unit",schema = "ms")
@@ -19,9 +20,6 @@ public class ServiceOfUnit {
     private String armed;
 
     @Column
-    private String company;
-
-    @Column
     private String description;
 
     @Column
@@ -31,26 +29,25 @@ public class ServiceOfUnit {
     private boolean isPersonnel;
 
     @Column(name = "ser_group")
+    @Pattern(regexp = "A|B|C|D|E", message = "Please select a group.")
     private String group;
 
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
 
-    public ServiceOfUnit(String serviceName, String armed, String company, String description, String shift, Unit unit,boolean isPersonnel) {
+    public ServiceOfUnit(String serviceName, String armed, String description, String shift, Unit unit,boolean isPersonnel) {
         this.serviceName = serviceName;
         this.armed = armed;
-        this.company = company;
         this.description = description;
         this.shift = shift;
         this.unit = unit;
         this.isPersonnel = isPersonnel;
     }
 
-    public ServiceOfUnit(String serviceName, String armed, String company, String description, String shift, Unit unit,boolean isPersonnel,String group) {
+    public ServiceOfUnit(String serviceName, String armed, String description, String shift, Unit unit,boolean isPersonnel,String group) {
         this.serviceName = serviceName;
         this.armed = armed;
-        this.company = company;
         this.description = description;
         this.shift = shift;
         this.unit = unit;
@@ -78,10 +75,6 @@ public class ServiceOfUnit {
         return armed;
     }
 
-    public String getCompany() {
-        return company;
-    }
-
     public boolean isPersonnel() {
         return isPersonnel;
     }
@@ -96,10 +89,6 @@ public class ServiceOfUnit {
 
     public void setArmed(String armed) {
         this.armed = armed;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
     }
 
     public Boolean isArmed() {

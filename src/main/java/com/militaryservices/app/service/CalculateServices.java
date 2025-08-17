@@ -110,9 +110,9 @@ public class CalculateServices {
 
         for(ServiceOfUnit serviceOfUnit : servicesOfUnit) {
             if(serviceOfUnit.isArmed())
-                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
+                armedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
             else
-                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getCompany(),serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
+                unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),new Date(),unit,serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
         }
 
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);
@@ -151,7 +151,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
                 numOfOutgoing -= 1;
             }
@@ -169,7 +169,7 @@ public class CalculateServices {
                 return;
             if(numOfOutgoing>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
+                soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 soldiers.remove(soldier);
                 numOfOutgoing -= 1;
             }

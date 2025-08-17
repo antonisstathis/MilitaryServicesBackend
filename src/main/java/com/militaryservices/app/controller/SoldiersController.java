@@ -264,30 +264,36 @@ public class SoldiersController {
 
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
-    public  ResponseEntity<?> saveNewServices(HttpServletRequest request,@RequestBody String payload, @RequestParam("isPersonnel") boolean isPersonnel) {
-        JsonNode jsonNode = getJsonNode(payload);
+    public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel,@RequestParam("numberOfGuards") int numberOfGuards) {
+
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
-        int numberOfGuards = jsonNode.get("selectedNumberOfGuards").asInt();
-        String nameOfService = jsonNode.get("nameOfService").asText();
-        String armedStatus = jsonNode.get("armed").asText();
-        String description = jsonNode.get("description").asText();
-        String shift = jsonNode.get("shift").asText();
-        String group = jsonNode.get("group").asText();
+        if (user.isEmpty())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
         Soldier soldier = user.get().getSoldier();
         Unit unit = soldier.getUnit();
-        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel,group);
-        if(!serOfUnitService.checkIfAllowed(unit,numberOfGuards,serviceOfUnit,isPersonnel))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(),Locale.ENGLISH));
+        ServiceOfUnit serviceOfUnit = new ServiceOfUnit(dto.getService(), dto.getArmed(), dto.getDescription(), dto.getShift(), unit, isPersonnel, dto.getGroup());
+
+        if (!serOfUnitService.checkIfAllowed(unit, numberOfGuards, serviceOfUnit, isPersonnel))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(), Locale.ENGLISH));
 
         IntStream.range(0, numberOfGuards)
                 .mapToObj(i -> {
-                    // Create a new instance of ServiceOfUnit to set the id to null in order to insert it in the database.
-                    ServiceOfUnit newService = new ServiceOfUnit(nameOfService, armedStatus, soldier.getCompany(), description, shift, unit, isPersonnel, group);
+                    ServiceOfUnit newService = new ServiceOfUnit(
+                            SanitizationUtil.sanitize(dto.getService()),
+                            SanitizationUtil.sanitize(dto.getArmed()),
+                            SanitizationUtil.sanitize(dto.getDescription()),
+                            SanitizationUtil.sanitize(dto.getShift()),
+                            unit,
+                            isPersonnel,
+                            SanitizationUtil.sanitize(dto.getGroup())
+                    );
                     newService.setId(null);
                     return newService;
                 })
                 .forEach(serOfUnitService::saveService);
-        return ResponseEntity.ok(messageService.getMessage(MessageKey.ADD_SERVICES.key(),Locale.ENGLISH));
+
+        return ResponseEntity.ok(messageService.getMessage(MessageKey.ADD_SERVICES.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/deleteServices")

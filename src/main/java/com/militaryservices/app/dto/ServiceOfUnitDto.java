@@ -1,5 +1,8 @@
 package com.militaryservices.app.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class ServiceOfUnitDto {
 
     private Long id;
@@ -9,6 +12,9 @@ public class ServiceOfUnitDto {
     private String armed;
     private String description;
     private String shift;
+
+    @NotBlank(message = "Group is required.")
+    @Pattern(regexp = "A|B|C|D|E", message = "Please select a valid group (A, B, C, D, E).")
     private String group;
 
     public ServiceOfUnitDto() {

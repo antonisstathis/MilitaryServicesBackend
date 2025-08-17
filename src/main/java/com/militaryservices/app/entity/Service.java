@@ -27,9 +27,6 @@ public class Service implements Serializable {
 	private Unit unit;
 
 	@Column
-	private String company;
-
-	@Column
 	private String description;
 
 	@Column
@@ -56,12 +53,11 @@ public class Service implements Serializable {
 		this.unit = unit;
 	}
 
-	public Service(String serviceName, String armed, Date date, Unit unit, String company, String description, String shift,boolean isPersonnel) {
+	public Service(String serviceName, String armed, Date date, Unit unit, String description, String shift,boolean isPersonnel) {
 		this.serviceName = serviceName;
 		this.armed = armed;
 		this.date = date;
 		this.unit = unit;
-		this.company = company;
 		this.description = description;
 		this.shift = shift;
 		this.isPersonnel = isPersonnel;
@@ -104,10 +100,6 @@ public class Service implements Serializable {
 		isPersonnel = personnel;
 	}
 
-	public void setCompany(String company) {
-		this.company = company;
-	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -133,10 +125,6 @@ public class Service implements Serializable {
 	public Long getId() {
 		
 		return id;
-	}
-
-	public String getCompany() {
-		return company;
 	}
 
 	public String getDescription() {

@@ -191,7 +191,7 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setMobilePhone(soldierDto.getMobilePhone());
 		soldier.setDischarged(false);
 		soldier.setGroup(soldierDto.getGroup());
-		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), soldier.getCompany(), Active.getFreeOfDuty(),"06:00-06:00", soldierDto.isPersonnel());
+		com.militaryservices.app.entity.Service service = new com.militaryservices.app.entity.Service("out", Active.getFreeOfDuty(), dateOfCalc, soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldierDto.isPersonnel());
 		service.setSoldier(soldier);
 		soldier.setService(service);
 		soldierRepository.save(soldier);
