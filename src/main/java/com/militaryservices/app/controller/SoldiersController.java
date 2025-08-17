@@ -21,8 +21,6 @@ import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -246,7 +244,6 @@ public class SoldiersController {
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token, request, soldDto.getSituation(), soldDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
-        int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
         SoldierSelectDto soldierDto = new SoldierSelectDto(soldDto.getToken(), SanitizationUtil.sanitize(soldDto.getName()), SanitizationUtil.sanitize(soldDto.getSurname())
                 , SanitizationUtil.sanitize(soldDto.getSituation()), SanitizationUtil.sanitize(soldDto.getActive()), SanitizationUtil.sanitize(soldDto.getGroup()));
         soldierService.updateSoldier(soldierDto);
