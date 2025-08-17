@@ -11,8 +11,10 @@ public class SoldierSelectDto {
     @NotBlank(message = "Surname is required.")
     private String surname;
     @NotBlank(message = "Situation is required.")
+    @Pattern(regexp = "armed|unarmed", message = "Please select a valid option in the armed-unarmed field.")
     private String situation;
     @NotBlank(message = "Active is required.")
+    @Pattern(regexp = "active|free of duty", message = "Please select a valid option in the active field.")
     private String active;
     @NotBlank(message = "Group is required.")
     @Pattern(regexp = "A|B|C|D|E", message = "Group must be A or B or C or D or E'")
