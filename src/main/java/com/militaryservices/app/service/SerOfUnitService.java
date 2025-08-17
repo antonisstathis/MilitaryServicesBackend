@@ -5,16 +5,19 @@ import com.militaryservices.app.dao.ServiceAccessImpl;
 import com.militaryservices.app.dao.ServiceRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.ServiceOfUnitDto;
+import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.enums.Situation;
 import com.militaryservices.app.entity.ServiceOfUnit;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
+import com.militaryservices.app.security.SanitizationUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class SerOfUnitService {
@@ -31,13 +34,14 @@ public class SerOfUnitService {
         this.serviceAccess = serviceAccess;
     }
 
-    public List<ServiceOfUnitDto> getAllServices(Unit unit, Date prevDate,boolean isPersonnel) {
+    public List<ServiceOfUnitDto> getAllServices(UserDto user, Date prevDate, boolean isPersonnel) {
 
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit, isPersonnel);
+        Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
+        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
         if(prevDate != null && dateOfLastCalculation.compareTo(prevDate) != 0)
-            return getPrevServices(unit,prevDate,isPersonnel);
+            return getPrevServices(soldier.getUnit(), prevDate,isPersonnel);
 
-        List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnitAndIsPersonnel(unit,isPersonnel);
+        List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnitAndIsPersonnel(soldier.getUnit(), isPersonnel);
         List<ServiceOfUnitDto> response = allServices.stream()
                 .map(service -> new ServiceOfUnitDto(
                         service.getId(),
@@ -67,7 +71,9 @@ public class SerOfUnitService {
         return response;
     }
 
-    public boolean checkIfAllowed(Unit unit,int numberOfGuards,ServiceOfUnit serviceOfUnit,boolean isPersonnel) {
+    public boolean checkIfAllowed(UserDto user,int numberOfGuards,ServiceOfUnitDto serviceOfUnit,boolean isPersonnel) {
+        Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
+        Unit unit = soldier.getUnit();
         // Load all Soldiers
         Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
         List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,isPersonnel);
@@ -88,8 +94,25 @@ public class SerOfUnitService {
         return canProceed;
     }
 
-    public ServiceOfUnit saveService(ServiceOfUnit serviceOfUnit) {
-        return serOfUnitRepository.save(serviceOfUnit);
+    public void saveService(ServiceOfUnitDto serviceOfUnitDto, UserDto user, boolean isPersonnel) {
+
+        Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
+        Unit unit = soldier.getUnit();
+        IntStream.range(0, serviceOfUnitDto.getNumberOfGuards())
+                .mapToObj(i -> {
+                    ServiceOfUnit newService = new ServiceOfUnit(
+                            SanitizationUtil.sanitize(serviceOfUnitDto.getService()),
+                            SanitizationUtil.sanitize(serviceOfUnitDto.getArmed()),
+                            SanitizationUtil.sanitize(serviceOfUnitDto.getDescription()),
+                            SanitizationUtil.sanitize(serviceOfUnitDto.getShift()),
+                            unit,
+                            isPersonnel,
+                            SanitizationUtil.sanitize(serviceOfUnitDto.getGroup())
+                    );
+                    newService.setId(null);
+                    return newService;
+                })
+                .forEach(serOfUnitRepository::save);
     }
 
     public void deleteService(Long id) {

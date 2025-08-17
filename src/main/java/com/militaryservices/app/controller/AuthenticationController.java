@@ -1,6 +1,7 @@
 package com.militaryservices.app.controller;
 
 import com.militaryservices.app.dto.LoginRequest;
+import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.service.AuthorityService;
@@ -31,14 +32,14 @@ public class AuthenticationController {
     @PostMapping("/performLogin")
     public ResponseEntity<?> performLogin(@RequestBody LoginRequest loginRequest) {
         try {
-            Optional<User> optionalUser = userService.findUser(loginRequest.getUsername());
-            if(optionalUser.isEmpty())
+            UserDto user = userService.findUser(loginRequest.getUsername());
+            if(user == null)
                 return ResponseEntity.status(401).body("Invalid username");
 
-            if (!encoder.matches(loginRequest.getPassword(), optionalUser.get().getPassword()))
+            if (!encoder.matches(loginRequest.getPassword(), user.getPassword()))
                 return ResponseEntity.status(401).body("Invalid password");
 
-            List<String> authorities = authorityService.findRolesByUsername(optionalUser.get());
+            List<String> authorities = authorityService.findRolesByUsername(user);
             String token = jwtUtil.generateToken(loginRequest.getUsername(),authorities);
 
             return ResponseEntity.ok(new JwtResponse(token));

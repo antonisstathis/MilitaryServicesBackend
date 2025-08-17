@@ -1,5 +1,6 @@
 package com.militaryservices.app.security;
 
+import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.entity.User;
 import com.militaryservices.app.enums.MessageKey;
 import com.militaryservices.app.service.MessageService;
@@ -47,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (jwtUtil.validateRequest(request)) {
-            Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
+            UserDto user = userService.findUser(jwtUtil.extractUsername(request));
             String token = jwtUtil.extractToken(request);
             List<String> roles = jwtUtil.extractClaim(token, claims -> claims.get("roles", List.class));
             Collection<GrantedAuthority> authorities = roles.stream()
@@ -55,8 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .collect(Collectors.toList());
 
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                    user.get().getUserId(),
-                    user.get().getPassword(),
+                    user.getUsername(),
+                    user.getPassword(),
                     authorities
             );
             Authentication authentication = new UsernamePasswordAuthenticationToken(

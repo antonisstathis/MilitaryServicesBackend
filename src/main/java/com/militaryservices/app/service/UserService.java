@@ -1,6 +1,7 @@
 package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.UserRepository;
+import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,13 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> findUser(String username) {
-        return userRepository.findById(username);
+    public UserDto findUser(String username) {
+        Optional<User> optionalUser =  userRepository.findById(username);
+        if(optionalUser.isEmpty())
+            return null;
+
+        User user = optionalUser.get();
+        return new UserDto(user.getUserId(), user.getPassword(), user.getSoldier().getId(), user.isEnabled(), user.getAuthorities());
     }
 
 }

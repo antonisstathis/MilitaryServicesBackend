@@ -1,5 +1,6 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.enums.Situation;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +30,14 @@ public class ServiceOfUnitDto {
     private int numberOfGuards;
 
     public ServiceOfUnitDto() {
+    }
+
+    public ServiceOfUnitDto(String service, String armed, String description, String shift, String group) {
+        this.service = service;
+        this.armed = armed;
+        this.description = description;
+        this.shift = shift;
+        this.group = group;
     }
 
     public ServiceOfUnitDto(Long id, String service, String armed, String description, String shift, String group) {
@@ -94,5 +103,13 @@ public class ServiceOfUnitDto {
 
     public void setNumberOfGuards(int numberOfGuards) {
         this.numberOfGuards = numberOfGuards;
+    }
+
+    public Boolean isArmed() {
+
+        if(Situation.ARMED.name().toLowerCase().equals(armed))
+            return true;
+        else
+            return false;
     }
 }

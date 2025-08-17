@@ -27,15 +27,15 @@ public interface SoldierService {
 
     SoldierUnitDto findSoldierUnit(int id);
 
-    List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId);
+    List<ServiceDto> findServicesOfSoldier(int soldierId);
 
-    boolean dischargeSoldier(int soldierId, Unit unit);
+    boolean dischargeSoldier(int soldierId);
 
-    List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType, boolean isPersonnel);
+    List<SoldierServiceStatDto> getSoldierServiceStats(UserDto user, StatisticalData caseType, boolean isPersonnel);
 
     void deleteServices(JsonNode services);
 
-    Date getDateOfLastCalculation(Unit unit,boolean isPersonnel);
+    Date getDateOfLastCalculation(UserDto user,boolean isPersonnel);
 
-    void saveNewSoldier(SoldierPersonalDataDto soldier, Unit unit);
+    void saveNewSoldier(SoldierPersonalDataDto soldier, UserDto user);
 }

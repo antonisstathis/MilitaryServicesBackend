@@ -167,14 +167,18 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public Date getDateOfLastCalculation(Unit unit, boolean isPersonnel) {
-		Date dateOfLastCalculationCalc = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+	public Date getDateOfLastCalculation(UserDto user, boolean isPersonnel) {
+		Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
+		Date dateOfLastCalculationCalc = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
 
 		return dateOfLastCalculationCalc;
 	}
 
 	@Override
-	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,Unit unit) {
+	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,UserDto user) {
+		Soldier sold = soldierAccess.findSoldierById(user.getSoldierId());
+		Unit unit = sold.getUnit();
+
 		Soldier soldier = new Soldier();
 		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit,soldierDto.isPersonnel());
 		soldier.setCompany(soldierDto.getCompany());
@@ -256,7 +260,7 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<ServiceDto> findServicesOfSoldier(Unit unit, int soldierId) {
+	public List<ServiceDto> findServicesOfSoldier(int soldierId) {
 
 		List<com.militaryservices.app.entity.Service> result = serviceRepository.findBySoldier(new Soldier(soldierId));
 
@@ -277,25 +281,26 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public boolean dischargeSoldier(int soldierId,Unit unit) {
+	public boolean dischargeSoldier(int soldierId) {
 		Soldier soldier = soldierAccess.findSoldierById(soldierId);
-		if(soldier.getUnit().getId() != unit.getId()) // An extra check if the user has the permission to discharge the selected soldier.
+		if(soldier.getUnit().getId() != soldier.getUnit().getId()) // An extra check if the user has the permission to discharge the selected soldier.
 			return false;
 		soldierRepository.updateDischargedStatusById(soldierId,true);
 		return true;
 	}
 
 	@Override
-	public List<SoldierServiceStatDto> getSoldierServiceStats(Unit unit, StatisticalData caseType,boolean isPersonnel) {
+	public List<SoldierServiceStatDto> getSoldierServiceStats(UserDto user, StatisticalData caseType,boolean isPersonnel) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Tuple> cq = cb.createTupleQuery();
 		Root<Soldier> soldier = cq.from(Soldier.class);
+		Soldier sold = soldierAccess.findSoldierById(user.getSoldierId());
 		Join<Soldier, com.militaryservices.app.entity.Service> service = soldier.join("services");
 
 		List<Predicate> predicates = new ArrayList<>();
 
 		predicates.add(cb.isFalse(soldier.get(Discharged.getDischarged())));
-		predicates.add(cb.equal(soldier.get("unit"), unit));
+		predicates.add(cb.equal(soldier.get("unit"), sold.getUnit()));
 		String situation = "";
 		switch (caseType) {
 			case ARMED_SERVICES_ARMED_SOLDIERS:
@@ -324,7 +329,7 @@ public class SoldierServiceImpl implements SoldierService {
 		List<SoldierServiceStatDto> statDtoList = soldierAccess.getSoldierServiceStatisticalData(cq, predicates, soldier, service, cb);
 
 		if(statDtoList.size() == 0)
-			return createListInCaseOfZeroServices(unit,isPersonnel,situation);
+			return createListInCaseOfZeroServices(sold.getUnit(), isPersonnel,situation);
 
 		return statDtoList;
 	}
