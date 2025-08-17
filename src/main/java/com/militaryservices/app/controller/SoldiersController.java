@@ -99,7 +99,6 @@ public class SoldiersController {
 
     @GetMapping("/getSoldierByRegistrationNumber")
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
-
         List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber);
         // Sanitize the data.
         soldiers = soldiers.stream()
@@ -218,7 +217,6 @@ public class SoldiersController {
 
     @PostMapping("/getSoldier")
     public ResponseEntity<?> getSoldier(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
-
         String token = soldDto.getToken();
         int id = Integer.valueOf(jwtUtil.extractUsername(token));
         SoldierSelectDto soldierDto = soldierService.findSoldier(id);
@@ -231,7 +229,6 @@ public class SoldiersController {
 
     @PostMapping("/changeSoldSituation")
     public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
-
         String token = soldDto.getToken();
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token, request, soldDto.getSituation(), soldDto.getActive());
         if(!userHasAccess)
@@ -266,14 +263,9 @@ public class SoldiersController {
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
     public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel) {
-
         UserDto user = userService.findUser(jwtUtil.extractUsername(request));
         if (user == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        //Soldier soldier = user.getSoldier();
-        //Unit unit = soldier.getUnit();
-        //ServiceOfUnit serviceOfUnit = new ServiceOfUnit(dto.getService(), dto.getArmed(), dto.getDescription(), dto.getShift(), unit, isPersonnel, dto.getGroup());
 
         if (!serOfUnitService.checkIfAllowed(user, dto.getNumberOfGuards(), dto, isPersonnel))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(), Locale.ENGLISH));
