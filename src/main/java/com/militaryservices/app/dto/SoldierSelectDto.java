@@ -1,12 +1,21 @@
 package com.militaryservices.app.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class SoldierSelectDto {
 
     private String token;
+    @NotBlank(message = "Name is required.")
     private String name;
+    @NotBlank(message = "Surname is required.")
     private String surname;
+    @NotBlank(message = "Situation is required.")
     private String situation;
+    @NotBlank(message = "Active is required.")
     private String active;
+    @NotBlank(message = "Group is required.")
+    @Pattern(regexp = "A|B|C|D|E", message = "Group must be A or B or C or D or E'")
     private String group;
 
     public SoldierSelectDto() {

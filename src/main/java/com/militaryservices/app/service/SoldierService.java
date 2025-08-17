@@ -21,7 +21,7 @@ public interface SoldierService {
 
     void calculateServices(String username,Date lastDate,boolean isPersonnel);
 
-    void updateSoldier(SoldDto soldier);
+    void updateSoldier(SoldierSelectDto soldier);
 
     SoldierSelectDto findSoldier(int id);
 

@@ -239,6 +239,20 @@ public class SoldiersController {
         return ResponseEntity.ok(soldierDto);
     }
 
+    @PostMapping("/changeSoldSituation")
+    public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
+
+        String token = soldDto.getToken();
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token, request, soldDto.getSituation(), soldDto.getActive());
+        if(!userHasAccess)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
+        int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
+        SoldierSelectDto soldierDto = new SoldierSelectDto(soldDto.getToken(), SanitizationUtil.sanitize(soldDto.getName()), SanitizationUtil.sanitize(soldDto.getSurname())
+                , SanitizationUtil.sanitize(soldDto.getSituation()), SanitizationUtil.sanitize(soldDto.getActive()), SanitizationUtil.sanitize(soldDto.getGroup()));
+        soldierService.updateSoldier(soldierDto);
+        return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_UPDATED.key(),Locale.ENGLISH));
+    }
+
     @PostMapping("/saveNewSoldier")
     public ResponseEntity<?> saveNewSoldier(HttpServletRequest request,@Valid @RequestBody SoldierPersonalDataDto soldierDto) {
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
@@ -301,21 +315,6 @@ public class SoldiersController {
         JsonNode jsonNode = getJsonNode(payload);
         soldierService.deleteServices(jsonNode.get("ids"));
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(),Locale.ENGLISH));
-    }
-
-    @PostMapping("/changeSoldSituation")
-    public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@RequestBody String sold) {
-
-        JsonNode jsonNode = getJsonNode(sold);
-        String token = jsonNode.get("token").asText();
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,jsonNode.get("situation").asText(),jsonNode.get("active").asText());
-        if(!userHasAccess)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
-        int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
-        SoldDto soldDto = new SoldDto(soldId,SanitizationUtil.sanitize(jsonNode.get("name").asText()), SanitizationUtil.sanitize(jsonNode.get("surname").asText())
-                , jsonNode.get("situation").asText(), jsonNode.get("active").asText());
-        soldierService.updateSoldier(soldDto);
-        return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_UPDATED.key(),Locale.ENGLISH));
     }
 
     private JsonNode getJsonNode(String json) {

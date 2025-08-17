@@ -228,10 +228,11 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void updateSoldier(SoldDto soldier) {
-		Soldier sold = soldierAccess.findSoldierById(soldier.getId());
+	public void updateSoldier(SoldierSelectDto soldier) {
+		Soldier sold = soldierAccess.findSoldierById(Integer.valueOf(jwtUtil.extractUsername(soldier.getToken())));
 		sold.setActive(soldier.getActive());
 		sold.setSituation(soldier.getSituation());
+		sold.setGroup(soldier.getGroup());
 
 		soldierAccess.updateSoldier(sold);
 	}
