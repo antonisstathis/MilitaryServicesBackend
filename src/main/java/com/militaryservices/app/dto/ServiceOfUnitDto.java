@@ -1,5 +1,7 @@
 package com.militaryservices.app.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -21,6 +23,10 @@ public class ServiceOfUnitDto {
     @NotBlank(message = "Group is required.")
     @Pattern(regexp = "A|B|C|D|E", message = "Please select a valid group (A, B, C, D, E).")
     private String group;
+
+    @Min(value = 1, message = "The number of guards must be at least 1")
+    @Max(value = 5, message = "The number of guards cannot exceed 5")
+    private int numberOfGuards;
 
     public ServiceOfUnitDto() {
     }
@@ -58,6 +64,10 @@ public class ServiceOfUnitDto {
         return group;
     }
 
+    public int getNumberOfGuards() {
+        return numberOfGuards;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -80,5 +90,9 @@ public class ServiceOfUnitDto {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public void setNumberOfGuards(int numberOfGuards) {
+        this.numberOfGuards = numberOfGuards;
     }
 }

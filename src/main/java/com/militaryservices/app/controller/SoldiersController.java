@@ -268,9 +268,7 @@ public class SoldiersController {
 
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
-    public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel,
-                                             @RequestParam("numberOfGuards") @Min(value = 1, message = "The number of guards must be at least 1")
-                                             @Max(value = 5, message = "The number of guards can not exceed 5") int numberOfGuards) {
+    public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel) {
 
         Optional<User> user = userService.findUser(jwtUtil.extractUsername(request));
         if (user.isEmpty())
@@ -280,10 +278,10 @@ public class SoldiersController {
         Unit unit = soldier.getUnit();
         ServiceOfUnit serviceOfUnit = new ServiceOfUnit(dto.getService(), dto.getArmed(), dto.getDescription(), dto.getShift(), unit, isPersonnel, dto.getGroup());
 
-        if (!serOfUnitService.checkIfAllowed(unit, numberOfGuards, serviceOfUnit, isPersonnel))
+        if (!serOfUnitService.checkIfAllowed(unit, dto.getNumberOfGuards(), serviceOfUnit, isPersonnel))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(), Locale.ENGLISH));
 
-        IntStream.range(0, numberOfGuards)
+        IntStream.range(0, dto.getNumberOfGuards())
                 .mapToObj(i -> {
                     ServiceOfUnit newService = new ServiceOfUnit(
                             SanitizationUtil.sanitize(dto.getService()),
