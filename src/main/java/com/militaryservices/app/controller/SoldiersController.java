@@ -56,7 +56,6 @@ public class SoldiersController {
     @GetMapping("/getSoldiers")
     public ResponseEntity<?> getSoldiers(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         List<SoldierDto> soldiers = soldierService.findAll(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)), isPersonnel);
-        // Sanitize the data which are String.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierDto(
                         soldier.getToken(),
@@ -77,7 +76,6 @@ public class SoldiersController {
     @GetMapping("/getSoldiersOfUnit")
     public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),isPersonnel);
-        // Sanitize the data.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
@@ -104,7 +102,6 @@ public class SoldiersController {
     @GetMapping("/getSoldierByRegistrationNumber")
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
         List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber);
-        // Sanitize the data.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
@@ -130,10 +127,8 @@ public class SoldiersController {
 
     @GetMapping("/getServicesOfSoldier")
     public  ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
         String soldierId = jwtUtil.extractUsername(soldierToken);
         List<ServiceDto> services = soldierService.findServicesOfSoldier(Integer.parseInt(soldierId));
-        // Sanitize the data
         services = services.stream()
                 .map(service -> new ServiceDto(
                         service.getId(),
@@ -149,7 +144,6 @@ public class SoldiersController {
 
     @GetMapping("/dischargeSoldier")
     public ResponseEntity<?> dischargeSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
         String soldierId = jwtUtil.extractUsername(soldierToken);
         boolean result = soldierService.dischargeSoldier(Integer.parseInt(soldierId));
         return result ? ResponseEntity.ok(messageService.getMessage(MessageKey.DISCHARGE_SOLDIER_SUCCESSFUL.key(), Locale.ENGLISH)) :
@@ -172,7 +166,6 @@ public class SoldiersController {
     @GetMapping("/getPreviousCalculation")
     public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
         List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),prevDate,isPersonnel);
-        // Sanitize the data which are String.
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPreviousServiceDto(
                         soldier.getToken(),
