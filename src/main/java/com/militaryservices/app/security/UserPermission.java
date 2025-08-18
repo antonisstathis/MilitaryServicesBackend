@@ -1,16 +1,15 @@
 package com.militaryservices.app.security;
 
-import com.militaryservices.app.dto.SoldierSelectDto;
+import com.militaryservices.app.dto.SoldierPersonalDataDto;
 import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.dto.UserDto;
-import com.militaryservices.app.entity.User;
 import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class UserPermission {
@@ -22,11 +21,12 @@ public class UserPermission {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public boolean checkIfUserHasAccess(String token, HttpServletRequest request,String situation,String active) {
+    public boolean checkIfUserHasAccess(String token, UserDto userDto,String situation,String active) {
+        String username = userDto.getUsername();
         if(!jwtUtil.isTokenValid(token))
             return false;
         int soldId = Integer.valueOf(jwtUtil.extractUsername(token));
-        boolean isPermitted = checkIfSoldierBelongsToUser(soldId,jwtUtil.extractUsername(request));
+        boolean isPermitted = checkIfSoldierBelongsToUser(soldId,username);
         if(!isPermitted)
             return false;
 
@@ -37,11 +37,28 @@ public class UserPermission {
         return true;
     }
 
+    public List<SoldierPersonalDataDto> checkIfUserHasAccess(UserDto userDto, List<SoldierPersonalDataDto> soldiers) {
+        String username = userDto.getUsername();
+        String token;
+        int soldId;
+        boolean isPermitted;
+        List<SoldierPersonalDataDto> finalListOfSoldiers = new ArrayList<>();
+        for(SoldierPersonalDataDto soldierPersonalDataDto : soldiers) {
+            token = soldierPersonalDataDto.getToken();
+            soldId = Integer.valueOf(jwtUtil.extractUsername(token));
+            isPermitted = checkIfSoldierBelongsToUser(soldId,username);
+            if(isPermitted)
+                finalListOfSoldiers.add(soldierPersonalDataDto);
+        }
+
+        return finalListOfSoldiers;
+    }
+
     public boolean checkIfSoldierBelongsToUser(int soldId,String username) {
-        SoldierUnitDto soldierToUpdate = soldierService.findSoldierUnit(soldId);
+        SoldierUnitDto soldier = soldierService.findSoldierUnit(soldId);
         UserDto userDto = userService.findUser(username);
         SoldierUnitDto user = soldierService.findSoldierUnit(userDto.getSoldierId());
 
-        return soldierToUpdate.getUnit().getId() == user.getUnit().getId() ? true : false;
+        return soldier.getUnit().getId() == user.getUnit().getId() ? true : false;
     }
 }

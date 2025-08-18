@@ -105,7 +105,9 @@ public class SoldiersController {
 
     @GetMapping("/getSoldierByRegistrationNumber")
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber);
+        soldiers = userPermission.checkIfUserHasAccess(userDto, soldiers);
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
@@ -224,7 +226,8 @@ public class SoldiersController {
         String token = soldDto.getToken();
         int id = Integer.valueOf(jwtUtil.extractUsername(token));
         SoldierSelectDto soldierDto = soldierService.findSoldier(id);
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,request,soldierDto.getSituation(),soldierDto.getActive());
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token,userDto,soldierDto.getSituation(),soldierDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
 
@@ -233,8 +236,9 @@ public class SoldiersController {
 
     @PostMapping("/changeSoldSituation")
     public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
         String token = soldDto.getToken();
-        boolean userHasAccess = userPermission.checkIfUserHasAccess(token, request, soldDto.getSituation(), soldDto.getActive());
+        boolean userHasAccess = userPermission.checkIfUserHasAccess(token, userDto, soldDto.getSituation(), soldDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         SoldierSelectDto soldierDto = new SoldierSelectDto(soldDto.getToken(), soldDto.getName(), soldDto.getSurname()
