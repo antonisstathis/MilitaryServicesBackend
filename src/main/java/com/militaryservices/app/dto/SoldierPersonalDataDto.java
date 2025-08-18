@@ -1,5 +1,6 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.security.SanitizationUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -62,20 +63,20 @@ public class SoldierPersonalDataDto {
     public SoldierPersonalDataDto(String token, String soldierRegistrationNumber, String company, String name, String surname, String situation, String active, String discharged,
                                   String patronymic, String matronymic, String mobilePhone, String city, String address,boolean isPersonnel,String group) {
         this.token = token;
-        this.soldierRegistrationNumber = soldierRegistrationNumber;
-        this.company = company;
-        this.name = name;
-        this.surname = surname;
-        this.situation = situation;
-        this.active = active;
-        this.discharged = discharged;
-        this.patronymic = patronymic;
-        this.matronymic = matronymic;
-        this.mobilePhone = mobilePhone;
-        this.city = city;
-        this.address = address;
+        this.soldierRegistrationNumber = SanitizationUtil.sanitize(soldierRegistrationNumber);
+        this.company = SanitizationUtil.sanitize(company);
+        this.name = SanitizationUtil.sanitize(name);
+        this.surname = SanitizationUtil.sanitize(surname);
+        this.situation = SanitizationUtil.sanitize(situation);
+        this.active = SanitizationUtil.sanitize(active);
+        this.discharged = SanitizationUtil.sanitize(discharged);
+        this.patronymic = SanitizationUtil.sanitize(patronymic);
+        this.matronymic = SanitizationUtil.sanitize(matronymic);
+        this.mobilePhone = SanitizationUtil.sanitize(mobilePhone);
+        this.city = SanitizationUtil.sanitize(city);
+        this.address = SanitizationUtil.sanitize(address);
         this.isPersonnel = isPersonnel;
-        this.group = group;
+        this.group = SanitizationUtil.sanitize(group);
     }
 
     public String getToken() {
@@ -143,27 +144,27 @@ public class SoldierPersonalDataDto {
     }
 
     public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
-        this.soldierRegistrationNumber = soldierRegistrationNumber;
+        this.soldierRegistrationNumber = SanitizationUtil.sanitize(soldierRegistrationNumber);
     }
 
     public void setCompany(String company) {
-        this.company = company;
+        this.company = SanitizationUtil.sanitize(company);
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = SanitizationUtil.sanitize(name);
     }
 
     public void setSurname(String surname) {
-        this.surname = surname;
+        this.surname = SanitizationUtil.sanitize(surname);
     }
 
     public void setSituation(String situation) {
-        this.situation = situation;
+        this.situation = SanitizationUtil.sanitize(situation);
     }
 
     public void setActive(String active) {
-        this.active = active;
+        this.active = SanitizationUtil.sanitize(active);
     }
 
     public void setPersonnel(boolean personnel) {
@@ -171,30 +172,30 @@ public class SoldierPersonalDataDto {
     }
 
     public void setDischarged(String discharged) {
-        this.discharged = discharged;
+        this.discharged = SanitizationUtil.sanitize(discharged);
     }
 
     public void setPatronymic(String patronymic) {
-        this.patronymic = patronymic;
+        this.patronymic = SanitizationUtil.sanitize(patronymic);
     }
 
     public void setMatronymic(String matronymic) {
-        this.matronymic = matronymic;
+        this.matronymic = SanitizationUtil.sanitize(matronymic);
     }
 
     public void setMobilePhone(String mobilePhone) {
-        this.mobilePhone = mobilePhone;
+        this.mobilePhone = SanitizationUtil.sanitize(mobilePhone);
     }
 
     public void setCity(String city) {
-        this.city = city;
+        this.city = SanitizationUtil.sanitize(city);
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address = SanitizationUtil.sanitize(address);
     }
 
     public void setGroup(String group) {
-        this.group = group;
+        this.group = SanitizationUtil.sanitize(group);
     }
 }

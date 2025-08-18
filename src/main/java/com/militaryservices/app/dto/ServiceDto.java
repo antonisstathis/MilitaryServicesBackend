@@ -1,5 +1,7 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.security.SanitizationUtil;
+
 import java.util.Date;
 
 public class ServiceDto {
@@ -18,11 +20,11 @@ public class ServiceDto {
 
     public ServiceDto(long id, String service, Date serviceDate, String armed, String description, String shift) {
         this.id = id;
-        this.service = service;
+        this.service = SanitizationUtil.sanitize(service);
         this.serviceDate = serviceDate;
-        this.armed = armed;
-        this.description = description;
-        this.shift = shift;
+        this.armed = SanitizationUtil.sanitize(armed);
+        this.description = SanitizationUtil.sanitize(description);
+        this.shift = SanitizationUtil.sanitize(shift);
     }
 
     public long getId() {

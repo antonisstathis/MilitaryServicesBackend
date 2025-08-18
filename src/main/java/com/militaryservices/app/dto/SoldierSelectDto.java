@@ -1,5 +1,6 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.security.SanitizationUtil;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -26,11 +27,11 @@ public class SoldierSelectDto {
 
     public SoldierSelectDto(String token, String name, String surname, String situation, String active, String group) {
         this.token = token;
-        this.name = name;
-        this.surname = surname;
-        this.situation = situation;
-        this.active = active;
-        this.group = group;
+        this.name = SanitizationUtil.sanitize(name);
+        this.surname = SanitizationUtil.sanitize(surname);
+        this.situation = SanitizationUtil.sanitize(situation);
+        this.active = SanitizationUtil.sanitize(active);
+        this.group = SanitizationUtil.sanitize(group);
     }
 
     public String getToken() {

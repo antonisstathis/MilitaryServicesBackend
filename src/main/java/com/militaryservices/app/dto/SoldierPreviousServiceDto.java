@@ -1,5 +1,7 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.security.SanitizationUtil;
+
 public class SoldierPreviousServiceDto {
 
     private String token;
@@ -23,16 +25,16 @@ public class SoldierPreviousServiceDto {
 
     public SoldierPreviousServiceDto(String token, String soldierRegistrationNumber, String company,String name, String surname, String situation, String active, String service, String date, String armed, String discharged) {
         this.token = token;
-        this.soldierRegistrationNumber = soldierRegistrationNumber;
-        this.company = company;
-        this.name = name;
-        this.surname = surname;
-        this.situation = situation;
-        this.active = active;
-        this.service = service;
-        this.date = date;
-        this.armed = armed;
-        this.discharged = discharged;
+        this.soldierRegistrationNumber = SanitizationUtil.sanitize(soldierRegistrationNumber);
+        this.company = SanitizationUtil.sanitize(company);
+        this.name = SanitizationUtil.sanitize(name);
+        this.surname = SanitizationUtil.sanitize(surname);
+        this.situation = SanitizationUtil.sanitize(situation);
+        this.active = SanitizationUtil.sanitize(active);
+        this.service = SanitizationUtil.sanitize(service);
+        this.date = SanitizationUtil.sanitize(date);
+        this.armed = SanitizationUtil.sanitize(armed);
+        this.discharged = SanitizationUtil.sanitize(discharged);
     }
 
     public String getToken() {

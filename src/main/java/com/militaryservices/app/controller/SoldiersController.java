@@ -60,14 +60,14 @@ public class SoldiersController {
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierDto(
                         soldier.getToken(),
-                        SanitizationUtil.sanitize(soldier.getCompany()),
-                        SanitizationUtil.sanitize(soldier.getName()),
-                        SanitizationUtil.sanitize(soldier.getSurname()),
-                        SanitizationUtil.sanitize(soldier.getSituation()),
-                        SanitizationUtil.sanitize(soldier.getActive()),
-                        SanitizationUtil.sanitize(soldier.getService()),
+                        soldier.getCompany(),
+                        soldier.getName(),
+                        soldier.getSurname(),
+                        soldier.getSituation(),
+                        soldier.getActive(),
+                        soldier.getService(),
                         soldier.extractDate(),
-                        SanitizationUtil.sanitize(soldier.getArmed())
+                        soldier.getArmed()
                 ))
                 .collect(Collectors.toList());
 
@@ -82,19 +82,19 @@ public class SoldiersController {
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
                         soldier.getSoldierRegistrationNumber(),
-                        SanitizationUtil.sanitize(soldier.getCompany()),
-                        SanitizationUtil.sanitize(soldier.getName()),
-                        SanitizationUtil.sanitize(soldier.getSurname()),
-                        SanitizationUtil.sanitize(soldier.getSituation()),
-                        SanitizationUtil.sanitize(soldier.getActive()),
-                        SanitizationUtil.sanitize(soldier.getDischarged()),
-                        SanitizationUtil.sanitize(soldier.getPatronymic()),
-                        SanitizationUtil.sanitize(soldier.getMatronymic()),
-                        SanitizationUtil.sanitize(soldier.getMobilePhone()),
-                        SanitizationUtil.sanitize(soldier.getCity()),
-                        SanitizationUtil.sanitize(soldier.getAddress()),
+                        soldier.getCompany(),
+                        soldier.getName(),
+                        soldier.getSurname(),
+                        soldier.getSituation(),
+                        soldier.getActive(),
+                        soldier.getDischarged(),
+                        soldier.getPatronymic(),
+                        soldier.getMatronymic(),
+                        soldier.getMobilePhone(),
+                        soldier.getCity(),
+                        soldier.getAddress(),
                         soldier.isPersonnel(),
-                        SanitizationUtil.sanitize(soldier.getGroup())
+                        soldier.getGroup()
                 ))
                 .collect(Collectors.toList());
 
@@ -109,19 +109,19 @@ public class SoldiersController {
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
                         soldier.getSoldierRegistrationNumber(),
-                        SanitizationUtil.sanitize(soldier.getCompany()),
-                        SanitizationUtil.sanitize(soldier.getName()),
-                        SanitizationUtil.sanitize(soldier.getSurname()),
-                        SanitizationUtil.sanitize(soldier.getSituation()),
-                        SanitizationUtil.sanitize(soldier.getActive()),
-                        SanitizationUtil.sanitize(soldier.getDischarged()),
-                        SanitizationUtil.sanitize(soldier.getPatronymic()),
-                        SanitizationUtil.sanitize(soldier.getMatronymic()),
-                        SanitizationUtil.sanitize(soldier.getMobilePhone()),
-                        SanitizationUtil.sanitize(soldier.getCity()),
-                        SanitizationUtil.sanitize(soldier.getAddress()),
+                        soldier.getCompany(),
+                        soldier.getName(),
+                        soldier.getSurname(),
+                        soldier.getSituation(),
+                        soldier.getActive(),
+                        soldier.getDischarged(),
+                        soldier.getPatronymic(),
+                        soldier.getMatronymic(),
+                        soldier.getMobilePhone(),
+                        soldier.getCity(),
+                        soldier.getAddress(),
                         soldier.isPersonnel(),
-                        SanitizationUtil.sanitize(soldier.getGroup())
+                        soldier.getGroup()
                 ))
                 .collect(Collectors.toList());
 
@@ -137,11 +137,11 @@ public class SoldiersController {
         services = services.stream()
                 .map(service -> new ServiceDto(
                         service.getId(),
-                        SanitizationUtil.sanitize(service.getService()),
+                        service.getService(),
                         service.getServiceDate(),
-                        SanitizationUtil.sanitize(service.getArmed()),
-                        SanitizationUtil.sanitize(service.getDescription()),
-                        SanitizationUtil.sanitize(service.getShift())
+                        service.getArmed(),
+                        service.getDescription(),
+                        service.getShift()
                 )).collect(Collectors.toList());
 
         return ResponseEntity.ok(services);
@@ -176,16 +176,16 @@ public class SoldiersController {
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPreviousServiceDto(
                         soldier.getToken(),
-                        SanitizationUtil.sanitize(soldier.getSoldierRegistrationNumber()),
-                        SanitizationUtil.sanitize(soldier.getCompany()),
-                        SanitizationUtil.sanitize(soldier.getName()),
-                        SanitizationUtil.sanitize(soldier.getSurname()),
-                        SanitizationUtil.sanitize(soldier.getSituation()),
-                        SanitizationUtil.sanitize(soldier.getActive()),
-                        SanitizationUtil.sanitize(soldier.getService()),
+                        soldier.getSoldierRegistrationNumber(),
+                        soldier.getCompany(),
+                        soldier.getName(),
+                        soldier.getSurname(),
+                        soldier.getSituation(),
+                        soldier.getActive(),
+                        soldier.getService(),
                         soldier.getDate(),
                         soldier.getArmed(),
-                        SanitizationUtil.sanitize(soldier.getDischarged())
+                        soldier.getDischarged()
                 ))
                 .collect(Collectors.toList());
 
@@ -237,8 +237,8 @@ public class SoldiersController {
         boolean userHasAccess = userPermission.checkIfUserHasAccess(token, request, soldDto.getSituation(), soldDto.getActive());
         if(!userHasAccess)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
-        SoldierSelectDto soldierDto = new SoldierSelectDto(soldDto.getToken(), SanitizationUtil.sanitize(soldDto.getName()), SanitizationUtil.sanitize(soldDto.getSurname())
-                , SanitizationUtil.sanitize(soldDto.getSituation()), SanitizationUtil.sanitize(soldDto.getActive()), SanitizationUtil.sanitize(soldDto.getGroup()));
+        SoldierSelectDto soldierDto = new SoldierSelectDto(soldDto.getToken(), soldDto.getName(), soldDto.getSurname()
+                , soldDto.getSituation(), soldDto.getActive(), soldDto.getGroup());
         soldierService.updateSoldier(soldierDto);
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_UPDATED.key(),Locale.ENGLISH));
     }
@@ -247,19 +247,19 @@ public class SoldiersController {
     public ResponseEntity<?> saveNewSoldier(HttpServletRequest request,@Valid @RequestBody SoldierPersonalDataDto soldierDto) {
         UserDto user = userService.findUser(jwtUtil.extractUsername(request));
         SoldierPersonalDataDto soldier = new SoldierPersonalDataDto();
-        soldier.setSoldierRegistrationNumber(SanitizationUtil.sanitize(soldierDto.getSoldierRegistrationNumber()));
-        soldier.setCompany(SanitizationUtil.sanitize(soldierDto.getCompany()));
-        soldier.setName(SanitizationUtil.sanitize(soldierDto.getName()));
-        soldier.setSurname(SanitizationUtil.sanitize(soldierDto.getSurname()));
+        soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
+        soldier.setCompany(soldierDto.getCompany());
+        soldier.setName(soldierDto.getName());
+        soldier.setSurname(soldierDto.getSurname());
         soldier.setDischarged(Discharged.getDischarged(false));
-        soldier.setSituation(SanitizationUtil.sanitize(soldierDto.getSituation()));
-        soldier.setActive(SanitizationUtil.sanitize(soldierDto.getActive()));
-        soldier.setPatronymic(SanitizationUtil.sanitize(soldierDto.getPatronymic()));
-        soldier.setMatronymic(SanitizationUtil.sanitize(soldierDto.getMatronymic()));
-        soldier.setMobilePhone(SanitizationUtil.sanitize(soldierDto.getMobilePhone()));
-        soldier.setCity(SanitizationUtil.sanitize(soldierDto.getCity()));
-        soldier.setAddress(SanitizationUtil.sanitize(soldierDto.getAddress()));
-        soldier.setGroup(SanitizationUtil.sanitize(soldierDto.getGroup()));
+        soldier.setSituation(soldierDto.getSituation());
+        soldier.setActive(soldierDto.getActive());
+        soldier.setPatronymic(soldierDto.getPatronymic());
+        soldier.setMatronymic(soldierDto.getMatronymic());
+        soldier.setMobilePhone(soldierDto.getMobilePhone());
+        soldier.setCity(soldierDto.getCity());
+        soldier.setAddress(soldierDto.getAddress());
+        soldier.setGroup(soldierDto.getGroup());
         soldierService.saveNewSoldier(soldier,user);
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
     }

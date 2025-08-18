@@ -1,5 +1,7 @@
 package com.militaryservices.app.dto;
 
+import com.militaryservices.app.security.SanitizationUtil;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,14 +27,14 @@ public class SoldierDto {
 
     public SoldierDto(String token,String company,String name, String surname, String situation, String active, String service, Date date,String armed) {
         this.token = token;
-        this.company = company;
-        this.name = name;
-        this.surname = surname;
-        this.situation = situation;
-        this.active = active;
-        this.service = service;
+        this.company = SanitizationUtil.sanitize(company);
+        this.name = SanitizationUtil.sanitize(name);
+        this.surname = SanitizationUtil.sanitize(surname);
+        this.situation = SanitizationUtil.sanitize(situation);
+        this.active = SanitizationUtil.sanitize(active);
+        this.service = SanitizationUtil.sanitize(service);
         this.date = date;
-        this.armed = armed;
+        this.armed = SanitizationUtil.sanitize(armed);
     }
 
     public String getToken() {
