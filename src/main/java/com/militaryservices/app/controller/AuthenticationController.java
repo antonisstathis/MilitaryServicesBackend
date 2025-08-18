@@ -2,7 +2,6 @@ package com.militaryservices.app.controller;
 
 import com.militaryservices.app.dto.LoginRequest;
 import com.militaryservices.app.dto.UserDto;
-import com.militaryservices.app.entity.User;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.service.AuthorityService;
 import com.militaryservices.app.service.UserService;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class AuthenticationController {
