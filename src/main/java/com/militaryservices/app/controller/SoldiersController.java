@@ -106,8 +106,7 @@ public class SoldiersController {
     @GetMapping("/getSoldierByRegistrationNumber")
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
-        List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber);
-        soldiers = userPermission.checkIfUserHasAccess(userDto, soldiers);
+        List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber,userDto);
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),

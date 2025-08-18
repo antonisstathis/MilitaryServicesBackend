@@ -37,23 +37,6 @@ public class UserPermission {
         return true;
     }
 
-    public List<SoldierPersonalDataDto> checkIfUserHasAccess(UserDto userDto, List<SoldierPersonalDataDto> soldiers) {
-        String username = userDto.getUsername();
-        String token;
-        int soldId;
-        boolean isPermitted;
-        List<SoldierPersonalDataDto> finalListOfSoldiers = new ArrayList<>();
-        for(SoldierPersonalDataDto soldierPersonalDataDto : soldiers) {
-            token = soldierPersonalDataDto.getToken();
-            soldId = Integer.valueOf(jwtUtil.extractUsername(token));
-            isPermitted = checkIfSoldierBelongsToUser(soldId,username);
-            if(isPermitted)
-                finalListOfSoldiers.add(soldierPersonalDataDto);
-        }
-
-        return finalListOfSoldiers;
-    }
-
     public boolean checkIfSoldierBelongsToUser(int soldId,String username) {
         SoldierUnitDto soldier = soldierService.findSoldierUnit(soldId);
         UserDto userDto = userService.findUser(username);

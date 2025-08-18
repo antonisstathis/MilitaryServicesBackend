@@ -13,7 +13,7 @@ public interface SoldierService {
 
     List<SoldierPersonalDataDto> loadSoldiers(UserDto userDto,boolean isPersonnel);
 
-    List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber);
+    List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber, UserDto userDto);
 
     List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto, Date date,boolean isPersonnel);
 

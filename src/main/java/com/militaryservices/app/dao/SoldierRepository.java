@@ -16,7 +16,10 @@ public interface SoldierRepository extends JpaRepository<Soldier, String> {
 
     List<Soldier> findByUnitAndDischargedAndIsPersonnelAndSituation(Unit unit,boolean discharged,boolean isPersonnel,String situation);
 
-    List<Soldier> findBySoldierRegistrationNumberContainingIgnoreCase(String registrationFragment);
+    @Modifying
+    @Transactional
+    @Query("SELECT s FROM Soldier s WHERE s.unit = :unit AND s.soldierRegistrationNumber LIKE %:registrationFragment%")
+    List<Soldier> findBySoldRegNumbAndUnit(Unit unit, String registrationFragment);
 
     @Modifying
     @Transactional

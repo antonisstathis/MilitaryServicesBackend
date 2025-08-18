@@ -109,8 +109,10 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber) {
-		List<Soldier> result = soldierRepository.findBySoldierRegistrationNumberContainingIgnoreCase(registrationNumber);
+	public List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber,UserDto userDto) {
+		Optional<User> user = userRepository.findById(userDto.getUsername());
+		Unit unit = user.get().getSoldier().getUnit();
+		List<Soldier> result = soldierRepository.findBySoldRegNumbAndUnit(unit,registrationNumber);
 
 		List<SoldierPersonalDataDto> allSoldiers = result.stream()
 				.map(soldier -> {

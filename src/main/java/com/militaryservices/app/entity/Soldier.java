@@ -310,26 +310,5 @@ public class Soldier implements Serializable {
 		else
 			return false;
 	}
-
-	public boolean isOut() {
-		if("out".equals(getService().getServiceName()))
-			return true;
-		else
-			return false;
-	}
-
-	public boolean isAvailable() {
-		if("available".equals(getService().getServiceName()))
-			return true;
-		else
-			return false;
-	}
-
-	public void print() {
-		
-		String s = name + " " + surname + " " + situation + " " + active;
-
-		System.out.println(s);
-	}
 	
 }
