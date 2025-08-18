@@ -9,17 +9,17 @@ import java.util.Date;
 import java.util.List;
 
 public interface SoldierService {
-    List<SoldierDto> findAll(String username,boolean isPersonnel);
+    List<SoldierDto> findAll(UserDto userDto,boolean isPersonnel);
 
-    List<SoldierPersonalDataDto> loadSoldiers(String username,boolean isPersonnel);
+    List<SoldierPersonalDataDto> loadSoldiers(UserDto userDto,boolean isPersonnel);
 
     List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber);
 
-    List<SoldierPreviousServiceDto> findPreviousCalculation(String username, Date date,boolean isPersonnel);
+    List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto, Date date,boolean isPersonnel);
 
-    Date getDateByCalculationNumber(String username,int calculation);
+    Date getDateByCalculationNumber(UserDto userDto,int calculation);
 
-    void calculateServices(String username,Date lastDate,boolean isPersonnel);
+    void calculateServices(UserDto user,Date lastDate,boolean isPersonnel);
 
     void updateSoldier(SoldierSelectDto soldier);
 

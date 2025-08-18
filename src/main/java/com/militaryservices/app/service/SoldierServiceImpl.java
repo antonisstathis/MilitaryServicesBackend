@@ -56,9 +56,9 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 	
 	@Override
-	public List<SoldierDto> findAll(String username,boolean isPersonnel) {
+	public List<SoldierDto> findAll(UserDto userDto,boolean isPersonnel) {
 
-		Optional<User> user = userRepository.findById(username);
+		Optional<User> user = userRepository.findById(userDto.getUsername());
 		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier(),isPersonnel);
 		List<SoldierDto> response = soldiers.stream()
 				.map(sold -> {
@@ -79,8 +79,8 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPersonalDataDto> loadSoldiers(String username,boolean isPersonnel) {
-		Optional<User> user = userRepository.findById(username);
+	public List<SoldierPersonalDataDto> loadSoldiers(UserDto userDto,boolean isPersonnel) {
+		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
 		List<Soldier> allSoldiers = soldierRepository.findByUnitAndDischargedAndIsPersonnel(unit,false,isPersonnel);
 
@@ -136,8 +136,8 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPreviousServiceDto> findPreviousCalculation(String username,Date date,boolean isPersonnel) {
-		Optional<User> user = userRepository.findById(username);
+	public List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto,Date date,boolean isPersonnel) {
+		Optional<User> user = userRepository.findById(userDto.getUsername());
 		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date, isPersonnel);
 
 		List<SoldierPreviousServiceDto> resultList = soldierPreviousServiceDtoList.stream()
@@ -162,9 +162,9 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public Date getDateByCalculationNumber(String username,int calculation) {
+	public Date getDateByCalculationNumber(UserDto userDto,int calculation) {
 
-		Optional<User> user = userRepository.findById(username);
+		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
 		return soldierAccess.getDateOfCalculation(unit,calculation);
 	}
@@ -206,9 +206,10 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void calculateServices(String username,Date lastDate,boolean isPersonnel) {
-		
+	public void calculateServices(UserDto userDto,Date lastDate,boolean isPersonnel) {
+
 		try {
+			String username = userDto.getUsername();
 			Optional<User> user = userRepository.findById(username);
 			Unit unit = user.get().getSoldier().getUnit();
 			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
@@ -219,7 +220,7 @@ public class SoldierServiceImpl implements SoldierService {
 				boolean results = checkOutput.checkResults(username);
 			}
 		} catch (IOException e) {
-			logger.error("Failed to calculate services for user {}: {}", username, e.getMessage(), e);
+			logger.error("Failed to calculate services for user {}: {}", userDto.getUsername(), e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}

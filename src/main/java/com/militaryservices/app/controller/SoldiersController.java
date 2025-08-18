@@ -46,6 +46,8 @@ public class SoldiersController {
     private MessageService messageService;
     @Autowired
     private UnitService unitService;
+    @Autowired
+    private UserRequestHelper userRequestHelper;
     private static final Logger logger = LoggerFactory.getLogger(SoldiersController.class);
 
 
@@ -55,7 +57,8 @@ public class SoldiersController {
 
     @GetMapping("/getSoldiers")
     public ResponseEntity<?> getSoldiers(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
-        List<SoldierDto> soldiers = soldierService.findAll(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)), isPersonnel);
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
+        List<SoldierDto> soldiers = soldierService.findAll(userDto, isPersonnel);
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierDto(
                         soldier.getToken(),
@@ -75,7 +78,8 @@ public class SoldiersController {
 
     @GetMapping("/getSoldiersOfUnit")
     public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
-        List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),isPersonnel);
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
+        List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(userDto,isPersonnel);
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPersonalDataDto(
                         soldier.getToken(),
@@ -152,20 +156,22 @@ public class SoldiersController {
 
     @GetMapping("/getFirstCalcDate")
     public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
-        Date dateOfFirstCalc = soldierService.getDateByCalculationNumber(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),1);
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
+        Date dateOfFirstCalc = soldierService.getDateByCalculationNumber(userDto,1);
         return ResponseEntity.ok(dateOfFirstCalc);
     }
 
     @GetMapping("/getLastCalcDate")
     public ResponseEntity<?> getLastCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
+        UserDto user = userRequestHelper.getUserFromRequest(request);
         Date dateOfLastCalculation = soldierService.getDateOfLastCalculation(user,isPersonnel);
         return ResponseEntity.ok(dateOfLastCalculation);
     }
 
     @GetMapping("/getPreviousCalculation")
     public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
-        List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),prevDate,isPersonnel);
+        UserDto userDto = userRequestHelper.getUserFromRequest(request);
+        List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(userDto,prevDate,isPersonnel);
         soldiers = soldiers.stream()
                 .map(soldier -> new SoldierPreviousServiceDto(
                         soldier.getToken(),
@@ -188,26 +194,27 @@ public class SoldiersController {
     @GetMapping("/calc")
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date lastDate,
                                                   @RequestParam("isPersonnel") boolean isPersonnel){
-        soldierService.calculateServices(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)),lastDate,isPersonnel); // Sanitize username
+        UserDto user = userRequestHelper.getUserFromRequest(request);
+        soldierService.calculateServices(user,lastDate,isPersonnel);
         return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
     }
 
     @GetMapping("/getServices")
     public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,
                                          @RequestParam("isPersonnel") boolean isPersonnel) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
+        UserDto user = userRequestHelper.getUserFromRequest(request);
         return ResponseEntity.ok(serOfUnitService.getAllServices(user,prevDate,isPersonnel));
     }
 
     @GetMapping("/getNameOfUnit")
     public ResponseEntity<?> getNameOfUnit(HttpServletRequest request) {
-        UserDto user = userService.findUser(SanitizationUtil.sanitize(jwtUtil.extractUsername(request)));
-        return ResponseEntity.ok(SanitizationUtil.sanitize(unitService.findNameOfUnit(user))); // Sanitize name of unit data
+        UserDto user = userRequestHelper.getUserFromRequest(request);
+        return ResponseEntity.ok(unitService.findNameOfUnit(user));
     }
 
     @GetMapping("/getSoldiersStatistics")
     public ResponseEntity<?> getStatistics(HttpServletRequest request,@RequestParam StatisticalData statisticalDataOption, @RequestParam("isPersonnel") boolean isPersonnel) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
+        UserDto user = userRequestHelper.getUserFromRequest(request);
         List<SoldierServiceStatDto> soldierServiceStatDtos = soldierService.getSoldierServiceStats(user, statisticalDataOption,isPersonnel);
         return ResponseEntity.ok(soldierServiceStatDtos);
     }
@@ -238,7 +245,7 @@ public class SoldiersController {
 
     @PostMapping("/saveNewSoldier")
     public ResponseEntity<?> saveNewSoldier(HttpServletRequest request,@Valid @RequestBody SoldierPersonalDataDto soldierDto) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
+        UserDto user = userRequestHelper.getUserFromRequest(request);
         SoldierPersonalDataDto soldier = new SoldierPersonalDataDto();
         soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
         soldier.setCompany(soldierDto.getCompany());
@@ -260,7 +267,7 @@ public class SoldiersController {
     @PostMapping("/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
     public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel) {
-        UserDto user = userService.findUser(jwtUtil.extractUsername(request));
+        UserDto user = userRequestHelper.getUserFromRequest(request);
         if (user == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
