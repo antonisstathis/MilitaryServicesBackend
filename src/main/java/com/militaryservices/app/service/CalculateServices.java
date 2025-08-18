@@ -9,6 +9,8 @@ import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.enums.Situation;
 import com.militaryservices.app.dto.SoldierProportion;
 import com.militaryservices.app.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,7 @@ public class CalculateServices {
     UserRepository userRepository;
     @Autowired
     CountServicesForEachSold countServicesForEachSold;
+    private static final Logger logger = LoggerFactory.getLogger(CalculateServices.class);
 
     public CalculateServices() {
     }
@@ -82,6 +85,7 @@ public class CalculateServices {
         try {
             soldierAccess.saveSoldiers(allSoldiers);
         } catch (IOException | SQLException e) {
+            logger.error("Failed to save soldiers: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

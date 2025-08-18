@@ -9,6 +9,7 @@ import com.militaryservices.app.entity.Unit;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +21,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 @Component
 public class SoldierAccessImpl {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	private static final Logger logger = LoggerFactory.getLogger(SoldierAccessImpl.class);
 
 	@Autowired
 	public SoldierAccessImpl(EntityManagerFactory entityManagerFactory) {
@@ -279,7 +282,8 @@ public class SoldierAccessImpl {
 		try {
 			return dateFormat.parse(date);
 		} catch (ParseException e) {
-			throw new RuntimeException(e);
+			logger.error("Failed to parse date string '{}'", date, e);
+			throw new IllegalArgumentException("Invalid date format: " + date, e);
 		}
 	}
 

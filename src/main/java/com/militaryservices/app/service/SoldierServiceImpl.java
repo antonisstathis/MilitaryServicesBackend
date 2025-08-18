@@ -16,6 +16,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,7 @@ public class SoldierServiceImpl implements SoldierService {
 	private SerOfUnitRepository serOfUnitRepository;
 	@PersistenceContext
 	private EntityManager entityManager;
+	private static final Logger logger = LoggerFactory.getLogger(SoldierServiceImpl.class);
 	@Autowired
 	CheckOutput checkOutput;
 
@@ -216,7 +219,8 @@ public class SoldierServiceImpl implements SoldierService {
 				boolean results = checkOutput.checkResults(username);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to calculate services for user {}: {}", username, e.getMessage(), e);
+			throw new RuntimeException(e);
 		}
 	}
 

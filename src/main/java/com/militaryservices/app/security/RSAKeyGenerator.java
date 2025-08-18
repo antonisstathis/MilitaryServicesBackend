@@ -14,8 +14,12 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RSAKeyGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(RSAKeyGenerator.class);
 
     public static void produceKeys() {
         try {
@@ -27,9 +31,10 @@ public class RSAKeyGenerator {
 
             // Save the public key to a file
             savePublicKey((RSAPublicKey) keyPair.getPublic(), "public_key.pem");
-
+            logger.info("RSA key pair successfully generated and saved.");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error occurred while generating RSA keys", e);
+            throw new RuntimeException("Failed to generate or save RSA keys", e);
         }
     }
 
@@ -73,6 +78,7 @@ public class RSAKeyGenerator {
             keyFactory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(decoded));
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            logger.error("Failed to load RSA private key: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -87,6 +93,7 @@ public class RSAKeyGenerator {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(decoded));
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            logger.error("Failed to load RSA public key: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

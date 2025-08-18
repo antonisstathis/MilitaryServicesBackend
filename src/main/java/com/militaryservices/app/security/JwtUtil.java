@@ -1,10 +1,13 @@
 package com.militaryservices.app.security;
 
+import com.militaryservices.app.controller.AuthenticationController;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.security.interfaces.RSAPrivateKey;
@@ -19,6 +22,7 @@ public class JwtUtil {
     private RSAPublicKey publicKey;
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 5; // 5 hours
     //private static final long EXPIRATION_TIME = 1000 * 4; // 4 seconds
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     public JwtUtil() {
         RSAKeyGenerator.produceKeys();
@@ -81,6 +85,7 @@ public class JwtUtil {
 
             return false;  // If no exception was thrown, the token is not tampered or expired
         } catch (JwtException | IllegalArgumentException e) {
+            logger.warn("JWT token verification failed: {}", e.getMessage());
             return true;
         }
     }

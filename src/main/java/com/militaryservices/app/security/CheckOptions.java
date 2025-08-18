@@ -2,8 +2,12 @@ package com.militaryservices.app.security;
 
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Situation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CheckOptions {
+
+    private static final Logger logger = LoggerFactory.getLogger(CheckOptions.class);
 
     public static boolean checkOptions(String situation,String active) {
         if(checkSituation(situation) && checkActive(active))
@@ -19,6 +23,7 @@ public class CheckOptions {
             if(Situation.UNARMED.name().toLowerCase().equals(situation))
                 return true;
         } catch (IllegalArgumentException e) {
+            logger.error("Invalid situation value: {}", situation, e);
             return false;
         }
 
@@ -32,6 +37,7 @@ public class CheckOptions {
             if(Active.ACTIVE.name().toLowerCase().equals(active))
                 return true;
         } catch (IllegalArgumentException e) {
+            logger.error("Invalid active value: {}", active, e);
             return false;
         }
 

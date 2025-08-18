@@ -14,6 +14,7 @@ import com.militaryservices.app.security.UserPermission;
 import com.militaryservices.app.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 
 @RestController
 @Validated
@@ -44,6 +46,8 @@ public class SoldiersController {
     private MessageService messageService;
     @Autowired
     private UnitService unitService;
+    private static final Logger logger = LoggerFactory.getLogger(SoldiersController.class);
+
 
     public SoldiersController() {
 
@@ -289,6 +293,7 @@ public class SoldiersController {
         try {
             jsonNode = objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
+            logger.error("Failed to parse JSON: {}", json, e);
             throw new RuntimeException(e);
         }
 
