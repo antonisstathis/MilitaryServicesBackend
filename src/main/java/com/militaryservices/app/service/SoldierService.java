@@ -33,7 +33,7 @@ public interface SoldierService {
 
     List<SoldierServiceStatDto> getSoldierServiceStats(UserDto user, StatisticalData caseType, boolean isPersonnel);
 
-    void deleteServices(JsonNode services);
+    void deleteServices(List<Long> ids);
 
     Date getDateOfLastCalculation(UserDto user,boolean isPersonnel);
 

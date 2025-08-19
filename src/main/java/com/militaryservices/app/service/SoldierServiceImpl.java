@@ -362,9 +362,7 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void deleteServices(JsonNode services) {
-		List<Long> ids = new ArrayList<>();
-		services.forEach(node -> ids.add(node.asLong()));
+	public void deleteServices(List<Long> ids) {
 		serOfUnitRepository.deleteAllById(ids);
 	}
 

@@ -131,7 +131,7 @@ public class SoldiersController {
     }
 
     @GetMapping("/getServicesOfSoldier")
-    public  ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
+    public ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
         String soldierId = jwtUtil.extractUsername(soldierToken);
         List<ServiceDto> services = soldierService.findServicesOfSoldier(Integer.parseInt(soldierId));
         services = services.stream()
@@ -284,23 +284,9 @@ public class SoldiersController {
 
     @PostMapping("/deleteServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
-    public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody String payload) {
-        JsonNode jsonNode = getJsonNode(payload);
-        soldierService.deleteServices(jsonNode.get("ids"));
+    public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody List<Long> ids) {
+        soldierService.deleteServices(ids);
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(),Locale.ENGLISH));
-    }
-
-    private JsonNode getJsonNode(String json) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode;
-        try {
-            jsonNode = objectMapper.readTree(json);
-        } catch (JsonProcessingException e) {
-            logger.error("Failed to parse JSON: {}", json, e);
-            throw new RuntimeException(e);
-        }
-
-        return jsonNode;
     }
 
 }
