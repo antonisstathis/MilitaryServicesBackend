@@ -128,6 +128,8 @@ public class SoldiersController {
 
     @GetMapping("/getServicesOfSoldier")
     public ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
+        if(!jwtUtil.isTokenValid(soldierToken))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         String soldierId = jwtUtil.extractUsername(soldierToken);
         List<ServiceDto> services = soldierService.findServicesOfSoldier(Integer.parseInt(soldierId));
         services = services.stream()
@@ -145,6 +147,8 @@ public class SoldiersController {
 
     @GetMapping("/dischargeSoldier")
     public ResponseEntity<?> dischargeSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
+        if(!jwtUtil.isTokenValid(soldierToken))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         String soldierId = jwtUtil.extractUsername(soldierToken);
         boolean result = soldierService.dischargeSoldier(Integer.parseInt(soldierId));
         return result ? ResponseEntity.ok(messageService.getMessage(MessageKey.DISCHARGE_SOLDIER_SUCCESSFUL.key(), Locale.ENGLISH)) :
@@ -219,6 +223,8 @@ public class SoldiersController {
     @PostMapping("/getSoldier")
     public ResponseEntity<?> getSoldier(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
         String token = soldDto.getToken();
+        if(!jwtUtil.isTokenValid(token))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         int id = Integer.valueOf(jwtUtil.extractUsername(token));
         SoldierSelectDto soldierDto = soldierService.findSoldier(id);
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
