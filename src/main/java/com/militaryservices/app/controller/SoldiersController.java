@@ -1,15 +1,11 @@
 package com.militaryservices.app.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.enums.Discharged;
 import com.militaryservices.app.enums.MessageKey;
 import com.militaryservices.app.enums.StatisticalData;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.security.RoleExpressions;
-import com.militaryservices.app.security.SanitizationUtil;
 import com.militaryservices.app.security.UserPermission;
 import com.militaryservices.app.service.*;
 import jakarta.servlet.http.HttpServletRequest;
