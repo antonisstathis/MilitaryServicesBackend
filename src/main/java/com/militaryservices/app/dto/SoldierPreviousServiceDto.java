@@ -86,42 +86,42 @@ public class SoldierPreviousServiceDto {
     }
 
     public void setSoldierRegistrationNumber(String soldierRegistrationNumber) {
-        this.soldierRegistrationNumber = soldierRegistrationNumber;
+        this.soldierRegistrationNumber = SanitizationUtil.sanitize(soldierRegistrationNumber);
     }
 
     public void setCompany(String company) {
-        this.company = company;
+        this.company = SanitizationUtil.sanitize(company);
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = SanitizationUtil.sanitize(name);
     }
 
     public void setSurname(String surname) {
-        this.surname = surname;
+        this.surname = SanitizationUtil.sanitize(surname);
     }
 
     public void setSituation(String situation) {
-        this.situation = situation;
+        this.situation = SanitizationUtil.sanitize(situation);
     }
 
     public void setActive(String active) {
-        this.active = active;
+        this.active = SanitizationUtil.sanitize(active);
     }
 
     public void setService(String service) {
-        this.service = service;
+        this.service = SanitizationUtil.sanitize(service);
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.date = SanitizationUtil.sanitize(date);
     }
 
     public void setArmed(String armed) {
-        this.armed = armed;
+        this.armed = SanitizationUtil.sanitize(armed);
     }
 
     public void setDischarged(String discharged) {
-        this.discharged = discharged;
+        this.discharged = SanitizationUtil.sanitize(discharged);
     }
 }

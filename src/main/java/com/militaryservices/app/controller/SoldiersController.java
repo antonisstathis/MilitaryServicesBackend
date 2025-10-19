@@ -55,19 +55,6 @@ public class SoldiersController {
     public ResponseEntity<?> getSoldiers(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierDto> soldiers = soldierService.findAll(userDto, isPersonnel);
-        soldiers = soldiers.stream()
-                .map(soldier -> new SoldierDto(
-                        soldier.getToken(),
-                        soldier.getCompany(),
-                        soldier.getName(),
-                        soldier.getSurname(),
-                        soldier.getSituation(),
-                        soldier.getActive(),
-                        soldier.getService(),
-                        soldier.extractDate(),
-                        soldier.getArmed()
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(soldiers);
     }
@@ -76,25 +63,6 @@ public class SoldiersController {
     public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(userDto,isPersonnel);
-        soldiers = soldiers.stream()
-                .map(soldier -> new SoldierPersonalDataDto(
-                        soldier.getToken(),
-                        soldier.getSoldierRegistrationNumber(),
-                        soldier.getCompany(),
-                        soldier.getName(),
-                        soldier.getSurname(),
-                        soldier.getSituation(),
-                        soldier.getActive(),
-                        soldier.getDischarged(),
-                        soldier.getPatronymic(),
-                        soldier.getMatronymic(),
-                        soldier.getMobilePhone(),
-                        soldier.getCity(),
-                        soldier.getAddress(),
-                        soldier.isPersonnel(),
-                        soldier.getGroup()
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(soldiers);
     }
@@ -103,25 +71,6 @@ public class SoldiersController {
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber,userDto);
-        soldiers = soldiers.stream()
-                .map(soldier -> new SoldierPersonalDataDto(
-                        soldier.getToken(),
-                        soldier.getSoldierRegistrationNumber(),
-                        soldier.getCompany(),
-                        soldier.getName(),
-                        soldier.getSurname(),
-                        soldier.getSituation(),
-                        soldier.getActive(),
-                        soldier.getDischarged(),
-                        soldier.getPatronymic(),
-                        soldier.getMatronymic(),
-                        soldier.getMobilePhone(),
-                        soldier.getCity(),
-                        soldier.getAddress(),
-                        soldier.isPersonnel(),
-                        soldier.getGroup()
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(soldiers);
     }
@@ -132,15 +81,6 @@ public class SoldiersController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
         String soldierId = jwtUtil.extractUsername(soldierToken);
         List<ServiceDto> services = soldierService.findServicesOfSoldier(Integer.parseInt(soldierId));
-        services = services.stream()
-                .map(service -> new ServiceDto(
-                        service.getId(),
-                        service.getService(),
-                        service.getServiceDate(),
-                        service.getArmed(),
-                        service.getDescription(),
-                        service.getShift()
-                )).collect(Collectors.toList());
 
         return ResponseEntity.ok(services);
     }
@@ -173,21 +113,6 @@ public class SoldiersController {
     public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(userDto,prevDate,isPersonnel);
-        soldiers = soldiers.stream()
-                .map(soldier -> new SoldierPreviousServiceDto(
-                        soldier.getToken(),
-                        soldier.getSoldierRegistrationNumber(),
-                        soldier.getCompany(),
-                        soldier.getName(),
-                        soldier.getSurname(),
-                        soldier.getSituation(),
-                        soldier.getActive(),
-                        soldier.getService(),
-                        soldier.getDate(),
-                        soldier.getArmed(),
-                        soldier.getDischarged()
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(soldiers);
     }

@@ -56,7 +56,7 @@ public class ServiceDto {
     }
 
     public void setService(String service) {
-        this.service = service;
+        this.service = SanitizationUtil.sanitize(service);
     }
 
     public void setServiceDate(Date serviceDate) {
@@ -64,14 +64,14 @@ public class ServiceDto {
     }
 
     public void setArmed(String armed) {
-        this.armed = armed;
+        this.armed = SanitizationUtil.sanitize(armed);
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = SanitizationUtil.sanitize(description);
     }
 
     public void setShift(String shift) {
-        this.shift = shift;
+        this.shift = SanitizationUtil.sanitize(shift);
     }
 }
