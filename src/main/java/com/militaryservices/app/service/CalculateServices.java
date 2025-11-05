@@ -55,7 +55,7 @@ public class CalculateServices {
         boolean flag = true;
         // 1. Calculate next outgoing soldiers
         addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
-        setFreeAndOutgoingSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers);
+        excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
         int numberOfOutgoing = calculateNumberOfOutgoing(allSoldiers,isPersonnel,group);
         if((armedSoldiers.size() - armedServices.size()) >= numberOfOutgoing) {
             proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,true,"",isPersonnel, group);
@@ -122,7 +122,7 @@ public class CalculateServices {
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);
     }
 
-    private void setFreeAndOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers) {
+    private void excludeUnavailablePersonnel(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers) {
         // Set the free of duty soldiers.
         Soldier sold;
         for (int i = 0; i < allSoldiers.size(); i++) {
