@@ -56,18 +56,18 @@ public class CalculateServices {
         // 1. Calculate next outgoing soldiers
         addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
         excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
-        int numberOfOutgoing = calculateNumberOfOutgoing(allSoldiers,isPersonnel,group);
-        if((armedSoldiers.size() - armedServices.size()) >= numberOfOutgoing) {
+        int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel,group);
+        if((armedSoldiers.size() - armedServices.size()) >= numberOfFreePersonnel) {
             proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,true,"",isPersonnel, group);
-            calculateOutgoingSoldiers(allSoldiers, armedSoldiers, unarmedSoldiers, soldierMap, proportionList,isPersonnel, group);
+            computeFreeSoldiers(allSoldiers, armedSoldiers, unarmedSoldiers, soldierMap, proportionList,isPersonnel, group);
             flag = false;
         }
-        if(flag && ((armedSoldiers.size() - armedServices.size()) < numberOfOutgoing)) {
+        if(flag && ((armedSoldiers.size() - armedServices.size()) < numberOfFreePersonnel)) {
             int numOfArmedSoldForOut = armedSoldiers.size() - armedServices.size();
             proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false, Situation.ARMED.name().toLowerCase(),isPersonnel, group);
-            calculateOutgoingInRareCase(armedSoldiers,soldierMap,proportionList,numOfArmedSoldForOut);
+            computeFreeSoldiersInRareCase(armedSoldiers,soldierMap,proportionList,numOfArmedSoldForOut);
             proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
-            calculateOutgoingInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfOutgoing - numOfArmedSoldForOut);
+            computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
         calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
@@ -137,45 +137,45 @@ public class CalculateServices {
         }
     }
 
-    private void calculateOutgoingSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
+    private void computeFreeSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
 
-        int numOfOutgoing = calculateNumberOfOutgoing(allSoldiers,isPersonnel, group);
-        assignAsOutgoingBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numOfOutgoing);
+        int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel, group);
+        assignAsOutgoingBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel);
     }
 
     // Assign as outgoing the soldiers with the worst proportion until now
-    private void assignAsOutgoingBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numOfOutgoing) {
-        if(numOfOutgoing == 0)
+    private void assignAsOutgoingBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
+        if(numberOfFreePersonnel == 0)
             return;
 
         Collections.sort(proportionList, Comparator.comparingDouble(SoldierProportion::getProportion).reversed());
         Soldier soldier;
         for(SoldierProportion soldierProportion : proportionList) {
-            if(numOfOutgoing == 0)
+            if(numberOfFreePersonnel == 0)
                 return;
-            if(numOfOutgoing>0) {
+            if(numberOfFreePersonnel > 0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
                 soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
-                numOfOutgoing -= 1;
+                numberOfFreePersonnel -= 1;
             }
         }
     }
 
-    private void calculateOutgoingInRareCase(Set<Soldier> soldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numOfOutgoing) {
-        if(numOfOutgoing == 0)
+    private void computeFreeSoldiersInRareCase(Set<Soldier> soldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
+        if(numberOfFreePersonnel == 0)
             return;
 
         Collections.sort(proportionList, Comparator.comparingDouble(SoldierProportion::getProportion).reversed());
         Soldier soldier;
         for(SoldierProportion soldierProportion : proportionList) {
-            if(numOfOutgoing == 0)
+            if(numberOfFreePersonnel == 0)
                 return;
-            if(numOfOutgoing>0) {
+            if(numberOfFreePersonnel>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
                 soldier.setService(new Service("out", Active.getFreeOfDuty(), new Date(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
                 soldiers.remove(soldier);
-                numOfOutgoing -= 1;
+                numberOfFreePersonnel -= 1;
             }
         }
     }
@@ -187,7 +187,7 @@ public class CalculateServices {
             unarmedSoldiers.remove(soldier);
     }
 
-    private int calculateNumberOfOutgoing(List<Soldier> allSoldiers,boolean isPersonnel, String group) {
+    private int calculateNumberOfFreePersonnel(List<Soldier> allSoldiers,boolean isPersonnel, String group) {
 
         List<Long> countServices = serOfUnitAccess.countServicesOfUnit(allSoldiers.get(0).getUnit(),isPersonnel,group);
         int totalNumberOfServices = countServices != null ? countServices.get(0).intValue() : 0;
