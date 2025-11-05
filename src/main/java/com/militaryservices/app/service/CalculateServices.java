@@ -53,7 +53,7 @@ public class CalculateServices {
         List<Service> unarmedServices = new ArrayList<>();
         List<SoldierProportion> proportionList;
         boolean flag = true;
-        // 1. Calculate next outgoing soldiers
+        // 1. Calculate the free of duty soldiers
         addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
         excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
         int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel,group);
@@ -140,11 +140,11 @@ public class CalculateServices {
     private void computeFreeSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
 
         int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel, group);
-        assignAsOutgoingBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel);
+        setFreeBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel);
     }
 
-    // Assign as outgoing the soldiers with the worst proportion until now
-    private void assignAsOutgoingBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
+    // Assign as free of duty the soldiers with the worst proportion until now
+    private void setFreeBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
         if(numberOfFreePersonnel == 0)
             return;
 
