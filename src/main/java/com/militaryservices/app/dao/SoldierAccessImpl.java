@@ -177,26 +177,6 @@ public class SoldierAccessImpl {
 		entityManager.merge(soldier);
 	}
 
-	/*
-	@Transactional
-	public void deleteSoldier(Soldier soldier) throws IOException {
-
-		int index = findIndexOfSoldier(soldier.getID());
-		Scanner sc = new Scanner(new File("pointers.txt"));
-		String ch = sc.next();
-		int nextOutgoing = Integer.parseInt(String.valueOf(ch));
-		if(nextOutgoing > index) {
-			nextOutgoing--;
-			Writer wr = new FileWriter("pointers.txt");
-			wr.write(Integer.toString(nextOutgoing));
-			wr.close();
-		}
-
-		//allSoldiers.remove(index);
-		entityManager.merge(soldier);
-	}
-	*/
-
 	@Transactional
 	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed,boolean isPersonnel, String group) {
 
