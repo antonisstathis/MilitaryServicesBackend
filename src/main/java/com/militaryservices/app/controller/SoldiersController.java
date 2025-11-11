@@ -194,7 +194,7 @@ public class SoldiersController {
         if(isSaved)
             return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
         else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.DUPLICATE_REG_NUMBER.key(), Locale.ENGLISH));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.REG_NUMBER_ALREADY_EXISTS.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/saveNewServices")
