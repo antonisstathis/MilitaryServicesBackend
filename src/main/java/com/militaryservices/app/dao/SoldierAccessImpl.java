@@ -159,7 +159,7 @@ public class SoldierAccessImpl {
 		try {
 			return (Date) nativeQuery.getSingleResult();
 		} catch (NoResultException e) {
-			return new Date();
+			return new Date(); // This is for the first day that there are no entries yet.
 		}
 	}
 
