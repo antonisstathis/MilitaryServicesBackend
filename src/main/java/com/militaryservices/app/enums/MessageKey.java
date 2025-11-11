@@ -10,7 +10,8 @@ public enum MessageKey {
     NEW_SERVICES_CALCULATED("newservicescalculated"),
     DISCHARGE_SOLDIER_SUCCESSFUL("dischargesoldier"),
     DISCHARGE_SOLDIER_NOT_PERMITTED("dischargesoldienotpermitted"),
-    SOLDIER_SAVED("soldiersaved");
+    SOLDIER_SAVED("soldiersaved"),
+    DUPLICATE_REG_NUMBER("duplicateregnumb");
 
 
     private final String key;

@@ -37,5 +37,5 @@ public interface SoldierService {
 
     Date getDateOfLastCalculation(UserDto user,boolean isPersonnel);
 
-    void saveNewSoldier(SoldierPersonalDataDto soldier, UserDto user);
+    boolean saveNewSoldier(SoldierPersonalDataDto soldier, UserDto user);
 }

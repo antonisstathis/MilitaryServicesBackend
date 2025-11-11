@@ -189,8 +189,12 @@ public class SoldiersController {
         soldier.setCity(soldierDto.getCity());
         soldier.setAddress(soldierDto.getAddress());
         soldier.setGroup(soldierDto.getGroup());
-        soldierService.saveNewSoldier(soldier,user);
-        return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
+        boolean isSaved = soldierService.saveNewSoldier(soldier,user);
+
+        if(isSaved)
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_SAVED.key(), Locale.ENGLISH));
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.DUPLICATE_REG_NUMBER.key(), Locale.ENGLISH));
     }
 
     @PostMapping("/saveNewServices")

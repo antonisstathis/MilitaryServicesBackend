@@ -176,9 +176,13 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void saveNewSoldier(SoldierPersonalDataDto soldierDto,UserDto user) {
+	public boolean saveNewSoldier(SoldierPersonalDataDto soldierDto,UserDto user) {
 		Soldier sold = soldierAccess.findSoldierById(user.getSoldierId());
 		Unit unit = sold.getUnit();
+
+		List<Soldier> soldWithRegNumber = soldierRepository.findBySoldRegNumbAndUnit(unit,soldierDto.getSoldierRegistrationNumber());
+		if(soldWithRegNumber.get(0).getSoldierRegistrationNumber().equals(soldierDto.getSoldierRegistrationNumber()))
+			return false;
 
 		Soldier soldier = new Soldier();
 		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit,soldierDto.isPersonnel());
@@ -201,6 +205,8 @@ public class SoldierServiceImpl implements SoldierService {
 		soldier.setService(service);
 		soldierRepository.save(soldier);
 		serviceRepository.save(service);
+
+		return true;
 	}
 
 	@Override
