@@ -181,7 +181,7 @@ public class SoldierServiceImpl implements SoldierService {
 		Unit unit = sold.getUnit();
 
 		List<Soldier> soldWithRegNumber = soldierRepository.findBySoldRegNumbAndUnit(unit,soldierDto.getSoldierRegistrationNumber());
-		if(soldWithRegNumber.size() != 0 && soldWithRegNumber.get(0).getSoldierRegistrationNumber().equals(soldierDto.getSoldierRegistrationNumber()))
+		if(soldWithRegNumber.size() != 0)
 			return false;
 
 		Soldier soldier = new Soldier();
