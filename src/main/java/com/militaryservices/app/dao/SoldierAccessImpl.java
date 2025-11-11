@@ -155,7 +155,12 @@ public class SoldierAccessImpl {
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("isPersonnel",isPersonnel);
 		nativeQuery.setParameter("unit",unit);
-		return (Date) nativeQuery.getSingleResult();
+
+		try {
+			return (Date) nativeQuery.getSingleResult();
+		} catch (NoResultException e) {
+			return new Date();
+		}
 	}
 
 	@Transactional
