@@ -84,13 +84,16 @@ public class SerOfUnitService {
         // Load all Services
         List<ServiceOfUnit> armedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnelAndGroup(unit, Situation.ARMED.name().toLowerCase(),isPersonnel, group);
         List<ServiceOfUnit> unarmedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnelAndGroup(unit, Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
-        int allServices = armedServices.size() + unarmedServices.size();
 
-        boolean canProceed = allSoldiers.size() >= (allServices + numberOfGuards)
-                && (serviceOfUnit.isArmed() ? armedSoldiers.size() >= (armedServices.size() + numberOfGuards)
-                : unarmedSoldiers.size() >= (unarmedServices.size() + numberOfGuards));
+        int numberOfArmedServices = serviceOfUnit.isArmed() ? armedServices.size() + numberOfGuards : armedServices.size();
+        int numberOfUnarmedServices = !serviceOfUnit.isArmed() ? unarmedServices.size() + numberOfGuards : unarmedServices.size();
+        if(unarmedSoldiers.size() >= numberOfUnarmedServices && armedSoldiers.size() >= numberOfArmedServices)
+            return true;
 
-        return canProceed;
+        if(unarmedSoldiers.size() < numberOfUnarmedServices && armedSoldiers.size() >= (numberOfArmedServices + (numberOfUnarmedServices - unarmedSoldiers.size())))
+            return true;
+
+        return false;
     }
 
     public void saveService(ServiceOfUnitDto serviceOfUnitDto, UserDto user, boolean isPersonnel) {
