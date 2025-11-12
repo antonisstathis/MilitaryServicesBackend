@@ -1,9 +1,6 @@
 package com.militaryservices.app.service;
 
-import com.militaryservices.app.dao.SerOfUnitRepository;
-import com.militaryservices.app.dao.ServiceAccessImpl;
-import com.militaryservices.app.dao.ServiceRepository;
-import com.militaryservices.app.dao.SoldierAccessImpl;
+import com.militaryservices.app.dao.*;
 import com.militaryservices.app.dto.ServiceOfUnitDto;
 import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.enums.Situation;
@@ -24,14 +21,17 @@ public class SerOfUnitService {
 
     private final SerOfUnitRepository serOfUnitRepository;
     private final SoldierAccessImpl soldierAccess;
+
+    private final SoldierRepository soldierRepository;
     private final ServiceRepository serviceRepository;
     private final ServiceAccessImpl serviceAccess;
 
-    public SerOfUnitService(SerOfUnitRepository repository, SoldierAccessImpl soldierAccess, ServiceRepository serviceRepository,ServiceAccessImpl serviceAccess) {
+    public SerOfUnitService(SerOfUnitRepository repository, SoldierAccessImpl soldierAccess, ServiceRepository serviceRepository,ServiceAccessImpl serviceAccess, SoldierRepository soldierRepository) {
         this.serOfUnitRepository = repository;
         this.soldierAccess = soldierAccess;
         this.serviceRepository = serviceRepository;
         this.serviceAccess = serviceAccess;
+        this.soldierRepository = soldierRepository;
     }
 
     public List<ServiceOfUnitDto> getAllServices(UserDto user, LocalDate prevDate, boolean isPersonnel) {
@@ -71,20 +71,19 @@ public class SerOfUnitService {
         return response;
     }
 
-    public boolean checkIfAllowed(UserDto user,int numberOfGuards,ServiceOfUnitDto serviceOfUnit,boolean isPersonnel) {
+    public boolean checkIfAllowed(UserDto user,int numberOfGuards,ServiceOfUnitDto serviceOfUnit,boolean isPersonnel,String group) {
         Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
         Unit unit = soldier.getUnit();
         // Load all Soldiers
-        LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
-        List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,isPersonnel);
+        List<Soldier> allSoldiers = soldierRepository.findByUnitAndDischargedAndIsPersonnelAndGroup(unit,false,isPersonnel,group);
         Map<Boolean, List<Soldier>> partitioned = allSoldiers.stream()
                 .collect(Collectors.partitioningBy(Soldier::isArmed));
         List<Soldier> armedSoldiers = partitioned.get(true);
         List<Soldier> unarmedSoldiers = partitioned.get(false);
 
         // Load all Services
-        List<ServiceOfUnit> armedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnel(unit, Situation.ARMED.name().toLowerCase(),isPersonnel);
-        List<ServiceOfUnit> unarmedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnel(unit, Situation.UNARMED.name().toLowerCase(),isPersonnel);
+        List<ServiceOfUnit> armedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnelAndGroup(unit, Situation.ARMED.name().toLowerCase(),isPersonnel, group);
+        List<ServiceOfUnit> unarmedServices = serOfUnitRepository.findByUnitAndArmedAndIsPersonnelAndGroup(unit, Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
         int allServices = armedServices.size() + unarmedServices.size();
 
         boolean canProceed = allSoldiers.size() >= (allServices + numberOfGuards)

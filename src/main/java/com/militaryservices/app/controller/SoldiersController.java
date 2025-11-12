@@ -205,7 +205,7 @@ public class SoldiersController {
         if (user == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        if (!serOfUnitService.checkIfAllowed(user, dto.getNumberOfGuards(), dto, isPersonnel))
+        if (!serOfUnitService.checkIfAllowed(user, dto.getNumberOfGuards(), dto, isPersonnel, dto.getGroup()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.ADD_SERVICES_REJECTED.key(), Locale.ENGLISH));
 
         serOfUnitService.saveService(dto, user, isPersonnel);

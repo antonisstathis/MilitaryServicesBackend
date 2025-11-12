@@ -18,6 +18,8 @@ public interface SerOfUnitRepository extends JpaRepository<ServiceOfUnit, Long> 
 
     List<ServiceOfUnit> findByUnitAndArmedAndIsPersonnel(Unit unit, String armed,boolean isPersonnel);
 
+    List<ServiceOfUnit> findByUnitAndArmedAndIsPersonnelAndGroup(Unit unit, String armed,boolean isPersonnel,String group);
+
     @Query("SELECT DISTINCT s.group FROM ServiceOfUnit s WHERE s.unit = :unit and s.isPersonnel =:isPersonnel")
     List<String> findDistinctGroups(@Param("unit") Unit unit, @Param("isPersonnel") boolean isPersonnel);
 }
