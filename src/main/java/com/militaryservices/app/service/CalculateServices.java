@@ -163,11 +163,13 @@ public class CalculateServices {
     }
 
     private int totalSolForCalc(List<Soldier> allSoldiers) {
-        long counter = allSoldiers.stream()
-                .filter(s -> Active.ACTIVE.name().toLowerCase().equals(s.getActive()))
-                .count();
+        int counter = 0;
+        for(Soldier soldier : allSoldiers) {
+            if(!soldier.getActive().equals(Active.getFreeOfDuty()))
+                counter += 1;
+        }
 
-        return (int) counter;
+        return counter;
     }
 
     private void calculateServicesForUnarmedSoldiers(Set<Soldier> unarmedSoldiers,List<Service> unarmedServices) {
@@ -185,7 +187,7 @@ public class CalculateServices {
     }
 
     private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
-        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel, group);
+        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
 
         Map<Integer,Soldier> soldiersMap = new HashMap<>();
         for(Soldier soldier : allSoldiers)

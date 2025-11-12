@@ -1,15 +1,11 @@
 package com.militaryservices.app.security;
 
-import com.militaryservices.app.dto.SoldierPersonalDataDto;
 import com.militaryservices.app.dto.SoldierUnitDto;
 import com.militaryservices.app.dto.UserDto;
 import com.militaryservices.app.service.SoldierService;
 import com.militaryservices.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class UserPermission {

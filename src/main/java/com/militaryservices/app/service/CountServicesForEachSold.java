@@ -42,9 +42,9 @@ public class CountServicesForEachSold {
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
-        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase(),isPersonnel, group);
-        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
-        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Active.getFreeOfDuty(),isPersonnel, group);
+        List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
+        List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
+        List<HistoricalData> out = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Active.getFreeOfDuty(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
         if(out.size()<allSoldiers.size())
             addTheRestOnes(out,soldierMap);
         if(unarmedServices.size()<unarmedSoldiers.size())

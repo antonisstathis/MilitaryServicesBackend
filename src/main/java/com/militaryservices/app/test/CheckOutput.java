@@ -47,7 +47,7 @@ public class CheckOutput {
                 freq = servicesMap.get(serviceName);
                 servicesMap.put(serviceName, freq - 1);
             }
-            if (!servicesMap.containsKey(serviceName) && !"out".equals(soldier.getService().getServiceName()))
+            if (!servicesMap.containsKey(serviceName) && !"out".equals(soldier.getService().getServiceName()) && !"free of duty".equals(soldier.getService().getServiceName()))
                 return false;
         }
 

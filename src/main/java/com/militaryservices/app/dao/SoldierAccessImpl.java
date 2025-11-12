@@ -184,11 +184,11 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed,boolean isPersonnel, String group) {
+	public List<HistoricalData> getHistoricalDataDesc(Unit unit,String armed,boolean isPersonnel, String group, String active) {
 
 		String query = "select new com.militaryservices.app.dto.HistoricalData(s.id, count(*)) from Soldier s inner join Service u on " +
-				"(s = u.soldier) where s.unit = :unit and s.isPersonnel =:isPersonnel and s.discharged = :discharged and s.group =:group " +
-				"and u.armed = :armed group by s.id order by count(*) desc";
+				"(s = u.soldier) where s.unit = :unit and s.isPersonnel =:isPersonnel and s.discharged = :discharged and s.active =:active " +
+				" and s.group =:group and u.armed = :armed group by s.id order by count(*) desc";
 
 		Query nativeQuery;
 		List<HistoricalData> historicalData;
@@ -196,6 +196,7 @@ public class SoldierAccessImpl {
 		nativeQuery.setParameter("unit", unit);
 		nativeQuery.setParameter("isPersonnel", isPersonnel);
 		nativeQuery.setParameter("discharged", false);
+		nativeQuery.setParameter("active",active);
 		nativeQuery.setParameter("armed", armed);
 		nativeQuery.setParameter("group", group);
 		historicalData = nativeQuery.getResultList();
