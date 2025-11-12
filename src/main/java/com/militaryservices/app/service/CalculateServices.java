@@ -85,15 +85,6 @@ public class CalculateServices {
         return allSoldiers;
     }
 
-    public void saveNewServices(List<Soldier> allSoldiers) {
-        try {
-            soldierAccess.saveSoldiers(allSoldiers);
-        } catch (IOException | SQLException e) {
-            logger.error("Failed to save soldiers: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
-    }
-
     private List<Soldier> loadSoldiersAndServices(String username,boolean isPersonnel, String group) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
@@ -220,6 +211,15 @@ public class CalculateServices {
             service = armedServices.get(randomIndex);
             sold.setService(service);
             armedServices.remove(randomIndex);
+        }
+    }
+
+    public void saveNewServices(List<Soldier> allSoldiers) {
+        try {
+            soldierAccess.saveSoldiers(allSoldiers);
+        } catch (IOException | SQLException e) {
+            logger.error("Failed to save soldiers: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 

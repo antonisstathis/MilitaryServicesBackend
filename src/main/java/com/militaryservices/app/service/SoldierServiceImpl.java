@@ -56,7 +56,14 @@ public class SoldierServiceImpl implements SoldierService {
 	public List<SoldierDto> findAll(UserDto userDto,boolean isPersonnel) {
 
 		Optional<User> user = userRepository.findById(userDto.getUsername());
+		Unit unit = user.get().getSoldier().getUnit();
 		List<Soldier> soldiers =  soldierAccess.findAll(user.get().getSoldier(),isPersonnel);
+
+		if(soldiers.size() == 0) {
+			soldiers = soldierRepository.findByUnitAndDischargedAndIsPersonnel(unit, false, isPersonnel);
+			addServicesForTheFirstDay(soldiers, isPersonnel);
+		}
+
 		List<SoldierDto> response = soldiers.stream()
 				.map(sold -> {
 					String token = jwtUtil.generateToken(Integer.toString(sold.getId()));
@@ -73,6 +80,13 @@ public class SoldierServiceImpl implements SoldierService {
 				.collect(Collectors.toList());
 
 		return response;
+	}
+
+	private void addServicesForTheFirstDay(List<Soldier> soldiers, boolean isPersonnel) {
+
+		for(Soldier soldier : soldiers)
+			soldier.setService(new com.militaryservices.app.entity.Service("", "", LocalDate.now(), soldier.getUnit(), "", "", isPersonnel));
+
 	}
 
 	@Override
