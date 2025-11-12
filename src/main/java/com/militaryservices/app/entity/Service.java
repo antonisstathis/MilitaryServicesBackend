@@ -4,7 +4,7 @@ import com.militaryservices.app.enums.Situation;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "services",schema = "ms")
@@ -20,7 +20,7 @@ public class Service implements Serializable {
 	private String armed;
 
 	@Column(name = "ser_date")
-	private Date date;
+	private LocalDate date;
 
 	@ManyToOne
 	@JoinColumn(name = "unit_id")
@@ -46,14 +46,14 @@ public class Service implements Serializable {
 
 	}
 	
-	public Service(String serviceName,String armed,Date date,Unit unit) {
+	public Service(String serviceName,String armed,LocalDate date,Unit unit) {
 		this.serviceName = serviceName;
 		this.armed = armed;
 		this.date = date;
 		this.unit = unit;
 	}
 
-	public Service(String serviceName, String armed, Date date, Unit unit, String description, String shift,boolean isPersonnel) {
+	public Service(String serviceName, String armed, LocalDate date, Unit unit, String description, String shift,boolean isPersonnel) {
 		this.serviceName = serviceName;
 		this.armed = armed;
 		this.date = date;
@@ -112,12 +112,12 @@ public class Service implements Serializable {
 		return soldier;
 	}
 	
-	public Date getDate() {
+	public LocalDate getDate() {
 		
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		
 		this.date = date;
 	}

@@ -2,8 +2,8 @@ package com.militaryservices.app.dto;
 
 import com.militaryservices.app.entity.Unit;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class SoldierServiceDto {
     private int id;
@@ -19,7 +19,7 @@ public class SoldierServiceDto {
     private boolean isPersonnel;
     private long serviceId;
     private String service;
-    private Date date;
+    private LocalDate date;
     private Unit unit;
     private String armed;
     private boolean discharged;
@@ -30,7 +30,7 @@ public class SoldierServiceDto {
 
     private String group;
 
-    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, Date date,String armed,Unit unit,boolean discharged) {
+    public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,long serviceId, String service, LocalDate date,String armed,Unit unit,boolean discharged) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -47,7 +47,7 @@ public class SoldierServiceDto {
     }
 
     public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,
-                             long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
+                             long serviceId, String service, LocalDate date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -67,7 +67,7 @@ public class SoldierServiceDto {
     }
 
     public SoldierServiceDto(int id,String company,String soldierRegistrationNumber, String name, String surname, String situation, String active,boolean isPersonnel,
-                             String group, long serviceId, String service, Date date,String armed,Unit unit,boolean discharged,String description,String shift) {
+                             String group, long serviceId, String service, LocalDate date,String armed,Unit unit,boolean discharged,String description,String shift) {
         this.id = id;
         this.company = company;
         this.soldierRegistrationNumber = soldierRegistrationNumber;
@@ -148,8 +148,8 @@ public class SoldierServiceDto {
     }
 
     public String getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        return dateFormat.format(date);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return date.format(formatter);
     }
 
     public String getArmed() {
@@ -208,7 +208,7 @@ public class SoldierServiceDto {
         this.service = service;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

@@ -11,7 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -26,7 +26,7 @@ public class ServiceAccessImpl {
     }
 
     @Transactional
-    public List<Service> getServicesByDate(Unit unit, Date date, boolean isPersonnel) {
+    public List<Service> getServicesByDate(Unit unit, LocalDate date, boolean isPersonnel) {
         String query = "select s from Service s where s.unit =:unit and " +
                 "s.date =:date and s.isPersonnel =:isPersonnel and s.armed !=:armed";
         Query nativeQuery;

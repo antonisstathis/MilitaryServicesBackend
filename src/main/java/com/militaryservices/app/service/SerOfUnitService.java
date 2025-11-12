@@ -13,7 +13,7 @@ import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.security.SanitizationUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,11 +34,11 @@ public class SerOfUnitService {
         this.serviceAccess = serviceAccess;
     }
 
-    public List<ServiceOfUnitDto> getAllServices(UserDto user, Date prevDate, boolean isPersonnel) {
+    public List<ServiceOfUnitDto> getAllServices(UserDto user, LocalDate prevDate, boolean isPersonnel) {
 
         Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
-        if(prevDate != null && dateOfLastCalculation.compareTo(prevDate) != 0)
+        LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
+        if(prevDate != null && !dateOfLastCalculation.equals(prevDate))
             return getPrevServices(soldier.getUnit(), prevDate,isPersonnel);
 
         List<ServiceOfUnit> allServices =  serOfUnitRepository.findByUnitAndIsPersonnel(soldier.getUnit(), isPersonnel);
@@ -56,7 +56,7 @@ public class SerOfUnitService {
         return response;
     }
 
-    private List<ServiceOfUnitDto> getPrevServices(Unit unit, Date prevDate,boolean isPersonnel) {
+    private List<ServiceOfUnitDto> getPrevServices(Unit unit, LocalDate prevDate,boolean isPersonnel) {
         List<com.militaryservices.app.entity.Service> services = serviceAccess.getServicesByDate(unit,prevDate,isPersonnel);
         List<ServiceOfUnitDto> response = services.stream()
                 .map(service -> new ServiceOfUnitDto(
@@ -75,7 +75,7 @@ public class SerOfUnitService {
         Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
         Unit unit = soldier.getUnit();
         // Load all Soldiers
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+        LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
         List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,isPersonnel);
         Map<Boolean, List<Soldier>> partitioned = allSoldiers.stream()
                 .collect(Collectors.partitioningBy(Soldier::isArmed));

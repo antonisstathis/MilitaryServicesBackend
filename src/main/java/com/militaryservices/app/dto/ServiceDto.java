@@ -2,14 +2,14 @@ package com.militaryservices.app.dto;
 
 import com.militaryservices.app.security.SanitizationUtil;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class ServiceDto {
 
     private long id;
 
     private String service;
-    private Date serviceDate;
+    private LocalDate serviceDate;
 
     private String armed;
     private String description;
@@ -18,7 +18,7 @@ public class ServiceDto {
     public ServiceDto() {
     }
 
-    public ServiceDto(long id, String service, Date serviceDate, String armed, String description, String shift) {
+    public ServiceDto(long id, String service, LocalDate serviceDate, String armed, String description, String shift) {
         this.id = id;
         this.service = SanitizationUtil.sanitize(service);
         this.serviceDate = serviceDate;
@@ -35,7 +35,7 @@ public class ServiceDto {
         return service;
     }
 
-    public Date getServiceDate() {
+    public LocalDate getServiceDate() {
         return serviceDate;
     }
 
@@ -59,7 +59,7 @@ public class ServiceDto {
         this.service = SanitizationUtil.sanitize(service);
     }
 
-    public void setServiceDate(Date serviceDate) {
+    public void setServiceDate(LocalDate serviceDate) {
         this.serviceDate = serviceDate;
     }
 

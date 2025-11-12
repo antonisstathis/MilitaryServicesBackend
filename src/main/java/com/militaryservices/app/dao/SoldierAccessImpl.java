@@ -15,10 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public void saveSoldier(Soldier soldier,Date currentDate) {
+	public void saveSoldier(Soldier soldier,LocalDate currentDate) {
 
 		String query = "INSERT INTO Soldier (id,name,surname,situation,active,discharged) VALUES (:id, :name, :surname, :situation, :active, :discharged)";
 		String query1 = "INSERT INTO Service (serviceName,armed,date,soldierId) VALUES (:serName, :armed, :serDate, :soldId)";
@@ -71,7 +70,7 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<Soldier> loadSold(Unit unit,Date dateOfLastCalc,boolean isPersonnel) {
+	public List<Soldier> loadSold(Unit unit,LocalDate dateOfLastCalc,boolean isPersonnel) {
 
 		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.company,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,s.isPersonnel, u.id,u.serviceName, " +
 				"u.date,u.armed,s.unit,s.discharged, u.description, u.shift) from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.discharged =:discharged " +
@@ -99,7 +98,7 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<Soldier> loadSoldByGroup(Unit unit,Date dateOfLastCalc,boolean isPersonnel, String group) {
+	public List<Soldier> loadSoldByGroup(Unit unit,LocalDate dateOfLastCalc,boolean isPersonnel, String group) {
 
 		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.company,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,s.isPersonnel,s.group,u.id,u.serviceName, " +
 				"u.date,u.armed,s.unit,s.discharged, u.description, u.shift) from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.discharged =:discharged " +
@@ -127,27 +126,29 @@ public class SoldierAccessImpl {
 		return allSoldiers;
 	}
 
-	public Date getDateOfCalculation(Unit unit,int calculations) {
-
-		Date dateOfFirstCalculation = getDateOfFirstCalculation(unit);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dateOfFirstCalculation);
-		cal.add(Calendar.DAY_OF_MONTH, calculations-1);
-		return cal.getTime();
+	public LocalDate getDateOfCalculation(Unit unit, int calculations, boolean isPersonnel) {
+		LocalDate dateOfFirstCalculation = getDateOfFirstCalculation(unit, isPersonnel);
+		return dateOfFirstCalculation.plusDays(calculations - 1);
 	}
 
 	@Transactional
-	public Date getDateOfFirstCalculation(Unit unit) {
-		String query = "select distinct u.date from Service u where u.unit =:unit and u.date = (select min(s.date) from Service s)";
+	public LocalDate getDateOfFirstCalculation(Unit unit, boolean isPersonnel) {
+		String query = "select distinct u.date from Service u where u.isPersonnel =:isPersonnel and u.unit =:unit and u.date = (select min(s.date) from Service s " +
+				"where s.isPersonnel =:isPersonnel)";
 		Query nativeQuery;
 
 		nativeQuery = entityManager.createQuery(query);
 		nativeQuery.setParameter("unit",unit);
-		return (Date) nativeQuery.getSingleResult();
+		nativeQuery.setParameter("isPersonnel",isPersonnel);
+		try {
+			return (LocalDate) nativeQuery.getSingleResult();
+		} catch (NoResultException e) {
+			return LocalDate.now(); // This is for the first day that there are no entries yet.
+		}
 	}
 
 	@Transactional
-	public Date getDateOfLastCalculation(Unit unit,boolean isPersonnel) {
+	public LocalDate getDateOfLastCalculation(Unit unit,boolean isPersonnel) {
 		String query = "select distinct u.date from Service u where u.isPersonnel =:isPersonnel and u.unit =:unit and u.date = (select max(s.date) from Service s " +
 				"where s.isPersonnel =:isPersonnel)";
 		Query nativeQuery;
@@ -157,14 +158,14 @@ public class SoldierAccessImpl {
 		nativeQuery.setParameter("unit",unit);
 
 		try {
-			return (Date) nativeQuery.getSingleResult();
+			return (LocalDate) nativeQuery.getSingleResult();
 		} catch (NoResultException e) {
-			return new Date(); // This is for the first day that there are no entries yet.
+			return LocalDate.now(); // This is for the first day that there are no entries yet.
 		}
 	}
 
 	@Transactional
-	public List<SoldierServiceDto> findCalculationByDate(Unit unit, Date date,boolean isPersonnel) {
+	public List<SoldierServiceDto> findCalculationByDate(Unit unit, LocalDate date,boolean isPersonnel) {
 		String query = "select distinct new com.militaryservices.app.dto.SoldierServiceDto(s.id,s.company,s.soldierRegistrationNumber,s.name,s.surname,s.situation,s.active,u.id,u.serviceName,u.date,u.armed,s.unit,s.discharged) " +
 				"from Soldier s inner join Service u on (s = u.soldier) where s.unit =:unit and s.isPersonnel =:isPersonnel and u.date =:date order by s.id asc";
 		Query nativeQuery;
@@ -257,16 +258,15 @@ public class SoldierAccessImpl {
 	
 	public List<Soldier> findAll(Soldier soldier,boolean isPersonnel) {
 
-		Date dateOfLastCalculation = getDateOfLastCalculation(soldier.getUnit(),isPersonnel);
+		LocalDate dateOfLastCalculation = getDateOfLastCalculation(soldier.getUnit(),isPersonnel);
 		return loadSold(soldier.getUnit(),dateOfLastCalculation,isPersonnel);
 	}
 
-	private Date convertStringToDate(String date) {
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	private LocalDate convertStringToDate(String date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 		try {
-			return dateFormat.parse(date);
-		} catch (ParseException e) {
+			return LocalDate.parse(date, formatter);
+		} catch (DateTimeParseException e) {
 			logger.error("Failed to parse date string '{}'", date, e);
 			throw new IllegalArgumentException("Invalid date format: " + date, e);
 		}

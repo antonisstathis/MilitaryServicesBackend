@@ -158,7 +158,7 @@ public class Soldier implements Serializable {
 	
 	public Service getService() {
 		
-		return services.get(0);
+		return services.size() != 0 ? services.get(0) : null;
 	}
 
 	public Unit getUnit() {

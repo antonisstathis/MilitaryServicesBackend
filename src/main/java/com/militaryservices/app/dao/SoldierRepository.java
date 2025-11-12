@@ -14,6 +14,8 @@ public interface SoldierRepository extends JpaRepository<Soldier, String> {
 
     List<Soldier> findByUnitAndDischargedAndIsPersonnel(Unit unit,boolean discharged,boolean isPersonnel);
 
+    List<Soldier> findByUnitAndDischargedAndIsPersonnelAndGroup(Unit unit,boolean discharged,boolean isPersonnel, String group);
+
     List<Soldier> findByUnitAndDischargedAndIsPersonnelAndSituation(Unit unit,boolean discharged,boolean isPersonnel,String situation);
 
     @Modifying

@@ -2,8 +2,8 @@ package com.militaryservices.app.dto;
 
 import com.militaryservices.app.security.SanitizationUtil;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class SoldierDto {
     private String token;
@@ -15,7 +15,7 @@ public class SoldierDto {
     private String situation;
     private String active;
     private String service;
-    private Date date;
+    private LocalDate date;
     private String armed;
 
     public SoldierDto(String name, String surname, String situation, String active) {
@@ -25,7 +25,7 @@ public class SoldierDto {
         this.active = active;
     }
 
-    public SoldierDto(String token,String company,String name, String surname, String situation, String active, String service, Date date,String armed) {
+    public SoldierDto(String token, String company, String name, String surname, String situation, String active, String service, LocalDate date, String armed) {
         this.token = token;
         this.company = SanitizationUtil.sanitize(company);
         this.name = SanitizationUtil.sanitize(name);
@@ -66,11 +66,12 @@ public class SoldierDto {
     }
 
     public String getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        return dateFormat.format(date);
+        if (date == null) return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return date.format(formatter);
     }
 
-    public Date extractDate() {
+    public LocalDate extractDate() {
         return date;
     }
 
@@ -106,7 +107,7 @@ public class SoldierDto {
         this.service = service;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

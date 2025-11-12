@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class SoldierServiceImpl implements SoldierService {
 					String situation = sold.getSituation();
 					String active = sold.getActive();
 					String service = sold.getService().getServiceName();
-					Date date = sold.getService().getDate();
+					LocalDate date = sold.getService().getDate();
 					String armed = sold.getService().getArmed();
 					return new SoldierDto(token, company, name, surname, situation, active, service, date, armed);
 				})
@@ -134,7 +135,7 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto,Date date,boolean isPersonnel) {
+	public List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto,LocalDate date,boolean isPersonnel) {
 		Optional<User> user = userRepository.findById(userDto.getUsername());
 		List<SoldierServiceDto> soldierPreviousServiceDtoList = soldierAccess.findCalculationByDate(user.get().getSoldier().getUnit(), date, isPersonnel);
 
@@ -160,17 +161,17 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public Date getDateByCalculationNumber(UserDto userDto,int calculation) {
+	public LocalDate getDateByCalculationNumber(UserDto userDto,int calculation,boolean isPersonnel) {
 
 		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
-		return soldierAccess.getDateOfCalculation(unit,calculation);
+		return soldierAccess.getDateOfCalculation(unit,calculation,isPersonnel);
 	}
 
 	@Override
-	public Date getDateOfLastCalculation(UserDto user, boolean isPersonnel) {
+	public LocalDate getDateOfLastCalculation(UserDto user, boolean isPersonnel) {
 		Soldier soldier = soldierAccess.findSoldierById(user.getSoldierId());
-		Date dateOfLastCalculationCalc = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
+		LocalDate dateOfLastCalculationCalc = soldierAccess.getDateOfLastCalculation(soldier.getUnit(), isPersonnel);
 
 		return dateOfLastCalculationCalc;
 	}
@@ -185,7 +186,7 @@ public class SoldierServiceImpl implements SoldierService {
 			return false;
 
 		Soldier soldier = new Soldier();
-		Date dateOfCalc = soldierAccess.getDateOfLastCalculation(unit,soldierDto.isPersonnel());
+		LocalDate dateOfCalc = soldierAccess.getDateOfLastCalculation(unit,soldierDto.isPersonnel());
 		soldier.setCompany(soldierDto.getCompany());
 		soldier.setSoldierRegistrationNumber(soldierDto.getSoldierRegistrationNumber());
 		soldier.setName(soldierDto.getName());
@@ -210,15 +211,16 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
-	public void calculateServices(UserDto userDto,Date lastDate,boolean isPersonnel) {
+	public void calculateServices(UserDto userDto,LocalDate lastDate,boolean isPersonnel) {
 
 		try {
 			String username = userDto.getUsername();
 			Optional<User> user = userRepository.findById(username);
 			Unit unit = user.get().getSoldier().getUnit();
-			Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
+			LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
 			List<String> groups = serOfUnitRepository.findDistinctGroups(unit,isPersonnel);
-			if(dateOfLastCalculation.compareTo(lastDate) == 0) {
+			List<com.militaryservices.app.entity.Service> lastServices = serviceRepository.findByUnitAndDateAndIsPersonnel(unit,lastDate,isPersonnel);
+			if(lastServices.size() == 0 || dateOfLastCalculation.compareTo(lastDate) == 0) {
 				List<Soldier> allSoldiers = calculateServicesForAllGroups(username,isPersonnel,groups);
 				service.saveNewServices(allSoldiers);
 				boolean results = checkOutput.checkResults(username);
@@ -271,7 +273,7 @@ public class SoldierServiceImpl implements SoldierService {
 	@Override
 	public List<ServiceDto> findServicesOfSoldier(int soldierId) {
 
-		List<com.militaryservices.app.entity.Service> result = serviceRepository.findBySoldier(new Soldier(soldierId));
+		List<com.militaryservices.app.entity.Service> result = serviceRepository.findBySoldierOrderByDateAsc(new Soldier(soldierId));
 
 		List<ServiceDto> servicesOfSoldier = new ArrayList<>();
 		ServiceDto serviceDto;

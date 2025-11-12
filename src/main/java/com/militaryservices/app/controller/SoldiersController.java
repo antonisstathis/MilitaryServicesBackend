@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 import org.slf4j.Logger;
 
@@ -95,21 +96,21 @@ public class SoldiersController {
     }
 
     @GetMapping("/getFirstCalcDate")
-    public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request) {
+    public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
-        Date dateOfFirstCalc = soldierService.getDateByCalculationNumber(userDto,1);
+        LocalDate dateOfFirstCalc = soldierService.getDateByCalculationNumber(userDto,1, isPersonnel);
         return ResponseEntity.ok(dateOfFirstCalc);
     }
 
     @GetMapping("/getLastCalcDate")
     public ResponseEntity<?> getLastCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
-        Date dateOfLastCalculation = soldierService.getDateOfLastCalculation(user,isPersonnel);
+        LocalDate dateOfLastCalculation = soldierService.getDateOfLastCalculation(user,isPersonnel);
         return ResponseEntity.ok(dateOfLastCalculation);
     }
 
     @GetMapping("/getPreviousCalculation")
-    public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
+    public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(userDto,prevDate,isPersonnel);
 
@@ -117,7 +118,7 @@ public class SoldiersController {
     }
 
     @GetMapping("/calc")
-    public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date lastDate,
+    public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate lastDate,
                                                   @RequestParam("isPersonnel") boolean isPersonnel){
         UserDto user = userRequestHelper.getUserFromRequest(request);
         soldierService.calculateServices(user,lastDate,isPersonnel);
@@ -125,7 +126,7 @@ public class SoldiersController {
     }
 
     @GetMapping("/getServices")
-    public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date prevDate,
+    public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate prevDate,
                                          @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         return ResponseEntity.ok(serOfUnitService.getAllServices(user,prevDate,isPersonnel));

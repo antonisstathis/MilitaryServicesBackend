@@ -1,11 +1,9 @@
 package com.militaryservices.app.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.militaryservices.app.dto.*;
-import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.enums.StatisticalData;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface SoldierService {
@@ -15,11 +13,11 @@ public interface SoldierService {
 
     List<SoldierPersonalDataDto> findSoldiersByRegistrationNumber(String registrationNumber, UserDto userDto);
 
-    List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto, Date date,boolean isPersonnel);
+    List<SoldierPreviousServiceDto> findPreviousCalculation(UserDto userDto, LocalDate date,boolean isPersonnel);
 
-    Date getDateByCalculationNumber(UserDto userDto,int calculation);
+    LocalDate getDateByCalculationNumber(UserDto userDto, int calculation, boolean isPersonnel);
 
-    void calculateServices(UserDto user,Date lastDate,boolean isPersonnel);
+    void calculateServices(UserDto user,LocalDate lastDate,boolean isPersonnel);
 
     void updateSoldier(SoldierSelectDto soldier);
 
@@ -35,7 +33,7 @@ public interface SoldierService {
 
     void deleteServices(List<Long> ids);
 
-    Date getDateOfLastCalculation(UserDto user,boolean isPersonnel);
+    LocalDate getDateOfLastCalculation(UserDto user,boolean isPersonnel);
 
     boolean saveNewSoldier(SoldierPersonalDataDto soldier, UserDto user);
 }

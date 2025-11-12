@@ -7,6 +7,7 @@ import com.militaryservices.app.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -26,7 +27,7 @@ public class CheckOutput {
     public boolean checkResults(String username) {
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
-        Date dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,false);
+        LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,false);
         List<Soldier> allSoldiers = soldierAccess.loadSold(unit,dateOfLastCalculation,false);
         List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnitAndIsPersonnel(user.get().getSoldier().getUnit(),false);
         Map<String, Integer> servicesMap = new HashMap<>();
