@@ -75,7 +75,7 @@ public class AssignServicesForTheFirstDay {
         for(Soldier soldier : allSoldiers) {
             if(unarmedService == unarmedServices.size())
                 break;
-            if(unarmedService < unarmedServices.size() && soldier.isArmed()) {
+            if(unarmedService < unarmedServices.size() && soldier.isArmed() && !soldier.getActive().equals(Active.getFreeOfDuty())) {
                 soldier.setService(unarmedServices.get(unarmedService));
                 unarmedService += 1;
                 armedSoldiers.remove(soldier);
@@ -86,7 +86,7 @@ public class AssignServicesForTheFirstDay {
     private void assignArmedServices(List<Soldier> allSoldiers, Set<Soldier> armedSoldiers, List<Service> armedServices) {
         int armedService = 0;
         for(Soldier soldier : allSoldiers) {
-            if(armedService < armedServices.size() && armedSoldiers.contains(soldier)) {
+            if(armedService < armedServices.size() && armedSoldiers.contains(soldier) && !soldier.getActive().equals(Active.getFreeOfDuty())) {
                 soldier.setService(armedServices.get(armedService));
                 armedService += 1;
                 armedSoldiers.remove(soldier);
