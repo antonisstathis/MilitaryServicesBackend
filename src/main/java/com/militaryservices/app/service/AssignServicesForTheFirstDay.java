@@ -61,7 +61,7 @@ public class AssignServicesForTheFirstDay {
     private int assignUnarmedServices(List<Soldier> allSoldiers, Set<Soldier> unarmedSoldiers, List<Service> unarmedServices) {
         int unarmedService = 0;
         for(Soldier soldier : allSoldiers) {
-            if(unarmedService < unarmedServices.size() && !soldier.isArmed()) {
+            if(unarmedService < unarmedServices.size() && !soldier.isArmed() && !soldier.getActive().equals(Active.getFreeOfDuty())) {
                 soldier.setService(unarmedServices.get(unarmedService));
                 unarmedService += 1;
                 unarmedSoldiers.remove(soldier);
