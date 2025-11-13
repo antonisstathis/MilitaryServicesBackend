@@ -89,6 +89,34 @@ public class CountServicesForEachSold {
         }
     }
 
+    public void addTheRestArmedOnes(List<HistoricalData> historicalData, Map<Integer,Soldier> soldierMap, Set<Soldier> armedSoldiers) {
+        Map<Integer, Soldier> allWithHistoricalData = new HashMap<>();
+        Soldier sold;
+        for (HistoricalData hd : historicalData) {
+            sold = soldierMap.get(hd.getSoldierId());
+            allWithHistoricalData.put(sold.getId(), sold);
+        }
+
+        Integer soldId;
+        Soldier soldier;
+        List<Soldier> allArmedSoldiers = new ArrayList<>();
+        for (Map.Entry<Integer, Soldier> entry : soldierMap.entrySet()) {
+            soldId = entry.getKey();
+            soldier = soldierMap.get(soldId);
+            if (armedSoldiers.contains(soldier))
+                allArmedSoldiers.add(soldier);
+        }
+
+        HistoricalData hd;
+        for (Soldier tempSold : allArmedSoldiers) {
+            if (!allWithHistoricalData.containsKey(tempSold.getId())) {
+                hd = new HistoricalData(tempSold.getId(),0);
+                historicalData.add(hd);
+            }
+        }
+
+    }
+
     private Map<Integer,HistoricalData> createMap(List<HistoricalData> historicalDatas) {
 
         Map<Integer,HistoricalData> map = new HashMap<>();

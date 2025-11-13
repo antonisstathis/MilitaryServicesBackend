@@ -81,4 +81,10 @@ public class CalculateServicesHelper {
             }
         }
     }
+
+    protected void setAsAvailableAllSoldiers(List<Soldier> allSoldiers) {
+
+        for(Soldier soldier : allSoldiers)
+            soldier.setService(new Service("available","available",LocalDate.now()));
+    }
 }

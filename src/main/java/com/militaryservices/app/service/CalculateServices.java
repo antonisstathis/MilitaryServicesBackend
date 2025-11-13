@@ -58,6 +58,7 @@ public class CalculateServices {
         List<SoldierProportion> proportionList;
         boolean flag = true;
         // 1. Calculate the free of duty soldiers
+        calculateServicesHelper.setAsAvailableAllSoldiers(allSoldiers);
         calculateServicesHelper.addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
         calculateServicesHelper.excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
         int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel,group);
@@ -96,7 +97,7 @@ public class CalculateServices {
         return lastDate.plusDays(1);
     }
 
-    private void computeFreeSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
+    private void computeFreeSoldiers(List<Soldier> allSoldiers, Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
 
         int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel, group);
         setFreeBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel);
@@ -185,7 +186,7 @@ public class CalculateServices {
             soldiersMap.put(soldier.getId(),soldier);
 
         if(historicalData.size()<armedSoldiers.size())
-            countServicesForEachSold.addTheRestOnes(historicalData,soldierMap);
+            countServicesForEachSold.addTheRestArmedOnes(historicalData,soldierMap,armedSoldiers);
         Soldier soldier;
         int soldId;
         for(HistoricalData hd : historicalData) {
@@ -199,7 +200,6 @@ public class CalculateServices {
             if(unarmedServices.size() == 0)
                 break;
         }
-        unarmedServices.clear();
     }
 
     private void calculateServicesForArmedSoldiers(Set<Soldier> armedSoldiers,List<Service> armedServices) {

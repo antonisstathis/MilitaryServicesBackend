@@ -45,6 +45,12 @@ public class Service implements Serializable {
 	public Service() {
 
 	}
+
+	public Service(String serviceName,String armed,LocalDate date) {
+		this.serviceName = serviceName;
+		this.armed = armed;
+		this.date = date;
+	}
 	
 	public Service(String serviceName,String armed,LocalDate date,Unit unit) {
 		this.serviceName = serviceName;
