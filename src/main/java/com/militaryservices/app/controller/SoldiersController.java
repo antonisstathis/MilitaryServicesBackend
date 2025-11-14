@@ -121,7 +121,10 @@ public class SoldiersController {
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate lastDate,
                                                   @RequestParam("isPersonnel") boolean isPersonnel){
         UserDto user = userRequestHelper.getUserFromRequest(request);
+        long start = System.nanoTime();  // start timer
         soldierService.calculateServices(user,lastDate,isPersonnel);
+        long end = System.nanoTime();    // end timer
+        long elapsedMs = (end - start) / 1_000_000; // convert to ms
         return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
     }
 
