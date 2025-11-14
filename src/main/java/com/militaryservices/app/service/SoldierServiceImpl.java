@@ -237,7 +237,7 @@ public class SoldierServiceImpl implements SoldierService {
 			if(lastServices.size() == 0 || dateOfLastCalculation.compareTo(lastDate) == 0) {
 				List<Soldier> allSoldiers = calculateServicesForAllGroups(username,isPersonnel,groups);
 				service.saveNewServices(allSoldiers);
-				boolean results = checkOutput.checkResults(username);
+				//boolean results = checkOutput.checkResults(username);
 			}
 		} catch (IOException e) {
 			logger.error("Failed to calculate services for user {}: {}", userDto.getUsername(), e.getMessage(), e);
