@@ -235,7 +235,10 @@ public class SoldierServiceImpl implements SoldierService {
 			List<String> groups = serOfUnitRepository.findDistinctGroups(unit,isPersonnel);
 			List<com.militaryservices.app.entity.Service> lastServices = serviceRepository.findByUnitAndDateAndIsPersonnel(unit,lastDate,isPersonnel);
 			if(lastServices.size() == 0 || dateOfLastCalculation.compareTo(lastDate) == 0) {
+				long start = System.nanoTime();  // start timer
 				List<Soldier> allSoldiers = calculateServicesForAllGroups(username,isPersonnel,groups);
+				long end = System.nanoTime();    // end timer
+				long elapsedMs = (end - start) / 1_000_000; // convert to ms
 				service.saveNewServices(allSoldiers);
 				//boolean results = checkOutput.checkResults(username);
 			}
