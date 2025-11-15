@@ -25,7 +25,7 @@ RUN mvn clean package -DskipTests
 RUN ls -l /app/target/
 
 # Step 6: Use a smaller base image to run the application
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-jammy AS runtime
 
 # Step 7: Set the working directory
 WORKDIR /app
