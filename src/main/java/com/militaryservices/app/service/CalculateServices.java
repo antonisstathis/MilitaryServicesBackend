@@ -206,16 +206,13 @@ public class CalculateServices {
     private void calculateServicesForArmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> armedServices,
                                                    Unit unit, boolean isPersonnel, String group) {
 
-        // Add all available armed soldiers to a new HashMap to acces them in O(1) time complexity using the soldier id
+        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
         Soldier soldier;
-        Map<Integer,Soldier> allAvailableSoldiers = new HashMap<>();
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
         for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
             soldier = entry.getValue();
-            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available")) {
-                allAvailableSoldiers.put(soldier.getId(), soldier);
+            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
                 soldiersIds.put(soldier.getId(), soldier);
-            }
         }
 
         List<ServiceRatioDto> ratios;
