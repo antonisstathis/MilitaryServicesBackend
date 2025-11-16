@@ -1,5 +1,6 @@
 package com.militaryservices.app.dao;
 
+import com.militaryservices.app.dto.ServiceRatioDto;
 import com.militaryservices.app.dto.SoldierServiceStatDto;
 import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.dto.SoldierServiceDto;
@@ -202,6 +203,68 @@ public class SoldierAccessImpl {
 		historicalData = nativeQuery.getResultList();
 
 		return historicalData;
+	}
+
+	@Transactional
+	public List<ServiceRatioDto> getRatioOfArmedServicesForEachArmedSoldier(
+			Unit unit,
+			String serviceName,
+			String armed,
+			boolean isPersonnel,
+			String group,
+			String active,
+			List<Integer> soldierIds
+	) {
+
+		String sql = """
+        WITH total_heavy AS (
+            SELECT s.sold_id, COUNT(*) AS total_heavy_count
+            FROM ms.services s
+            JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
+            WHERE s.armed = :armed
+              AND sol.unit_id = :unitId
+              AND sol.is_personnel = :isPersonnel
+              AND sol.sold_group = :group
+              AND sol.active = :active
+              AND sol.discharged = false
+              AND s.sold_id IN (:soldierIds)
+            GROUP BY s.sold_id
+        ),
+        service_heavy AS (
+            SELECT s.sold_id, s.ser_name, COUNT(*) AS service_heavy_count
+            FROM ms.services s
+            JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
+            WHERE s.ser_name = :serviceName
+              AND s.armed = :armed
+              AND sol.unit_id = :unitId
+              AND sol.is_personnel = :isPersonnel
+              AND sol.sold_group = :group
+              AND sol.active = :active
+              AND sol.discharged = false
+              AND s.sold_id IN (:soldierIds)
+            GROUP BY s.sold_id, s.ser_name
+        )
+        SELECT 
+            sh.sold_id,
+            sh.ser_name,
+            sh.service_heavy_count,
+            th.total_heavy_count,
+            ROUND((sh.service_heavy_count::NUMERIC / th.total_heavy_count) * 100, 2) AS percent_share
+        FROM service_heavy sh
+        JOIN total_heavy th ON th.sold_id = sh.sold_id
+        ORDER BY percent_share ASC
+        """;
+
+		Query nativeQuery = entityManager.createNativeQuery(sql, "ServiceRatioMapping");
+		nativeQuery.setParameter("serviceName", serviceName);
+		nativeQuery.setParameter("armed", armed);
+		nativeQuery.setParameter("unitId", unit.getId());
+		nativeQuery.setParameter("isPersonnel", isPersonnel);
+		nativeQuery.setParameter("group", group);
+		nativeQuery.setParameter("active", active);
+		nativeQuery.setParameter("soldierIds", soldierIds);
+
+		return nativeQuery.getResultList();
 	}
 
 	@Transactional

@@ -3,11 +3,11 @@ package com.militaryservices.app.service;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
+import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Situation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
 
 @Component
@@ -39,6 +39,35 @@ public class CountServicesForEachSold {
         }
 
         return proportions;
+    }
+
+    public List<ServiceRatioDto> getRatioOfArmedServicesForEachArmedSoldier(Unit unit, String serviceName, String armed, boolean isPersonnel,
+            String group, String active, Map<Integer, Soldier> soldiersMap) {
+
+        List<Integer> soldierIds = new ArrayList<>();
+        for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())
+            soldierIds.add(entry.getKey());
+
+        List<ServiceRatioDto> ratios = soldierAccess.getRatioOfArmedServicesForEachArmedSoldier(unit, serviceName, armed, isPersonnel,
+                group, active, soldierIds);
+
+        Set<Integer> soldiersIdsInRatios = new HashSet<>();
+        if(ratios.size() < soldierIds.size()) {
+            for(ServiceRatioDto ratioDto : ratios)
+                soldiersIdsInRatios.add(ratioDto.getSoldId());
+
+            addTheRestRatios(soldierIds, ratios, soldiersIdsInRatios, serviceName);
+        }
+
+        return ratios;
+    }
+
+    private void addTheRestRatios(List<Integer> soldierIds, List<ServiceRatioDto> ratios,  Set<Integer> soldiersIdsInRatios, String serviceName) {
+        for(Integer soldId : soldierIds) {
+            if(!soldiersIdsInRatios.contains(soldId)) {
+                ratios.add(0, new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
+            }
+        }
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
