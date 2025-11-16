@@ -76,7 +76,7 @@ public class CalculateServices {
             computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
-        calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
+        unarmedServices = calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
         // 3. Calculate services for armed soldiers
         if(unarmedServices.size()!=0)
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
@@ -165,7 +165,7 @@ public class CalculateServices {
         return counter;
     }
 
-    private void calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
+    private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
                                                    Unit unit, boolean isPersonnel, String group) {
 
         // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
@@ -178,13 +178,24 @@ public class CalculateServices {
         }
 
         List<ServiceRatioDto> ratios;
+        Map<Service,Service> mapOfServices = new HashMap<>();
+        List<Service> unarmedServicesForArmedSoldiers = new ArrayList<>();
+        for(Service service : unarmedServices)
+            mapOfServices.put(service, service);
+
         for(Service service : unarmedServices) {
             ratios = countServicesForEachSold.getRatioOfArmedServicesForEachArmedSoldier(unit, service.getServiceName(),
                     "unarmed", isPersonnel, group, "active",soldiersIds);
             soldier = allSoldiers.get(ratios.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
+            mapOfServices.remove(service);
         }
+
+        for (Map.Entry<Service, Service> entry : mapOfServices.entrySet())
+            unarmedServicesForArmedSoldiers.add(entry.getKey());
+
+        return unarmedServicesForArmedSoldiers;
     }
 
     private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
