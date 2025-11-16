@@ -176,6 +176,8 @@ public class CalculateServices {
             if(!soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
                 soldiersIds.put(soldier.getId(), soldier);
         }
+        if(soldiersIds.size() == 0)
+            return unarmedServices;
 
         List<ServiceRatioDto> ratios;
         Map<Service,Service> mapOfServices = new HashMap<>();
@@ -190,6 +192,8 @@ public class CalculateServices {
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
             mapOfServices.remove(service);
+            if(soldiersIds.size() == 0)
+                break;
         }
 
         for (Map.Entry<Service, Service> entry : mapOfServices.entrySet())
