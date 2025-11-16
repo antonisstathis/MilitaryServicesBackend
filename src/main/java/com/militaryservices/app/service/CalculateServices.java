@@ -76,7 +76,7 @@ public class CalculateServices {
             computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
-        calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
+        calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
         // 3. Calculate services for armed soldiers
         if(unarmedServices.size()!=0)
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
@@ -165,17 +165,25 @@ public class CalculateServices {
         return counter;
     }
 
-    private void calculateServicesForUnarmedSoldiers(Set<Soldier> unarmedSoldiers,List<Service> unarmedServices) {
-        Random random = new Random();
-        int randomIndex;
-        Service service;
-        for(Soldier sold : unarmedSoldiers){
-            randomIndex = random.nextInt(unarmedServices.size());
-            service = unarmedServices.get(randomIndex);
-            sold.setService(service);
-            unarmedServices.remove(randomIndex);
-            if(unarmedServices.size()==0)
-                break;
+    private void calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
+                                                   Unit unit, boolean isPersonnel, String group) {
+
+        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
+        Soldier soldier;
+        Map<Integer, Soldier> soldiersIds = new HashMap<>();
+        for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
+            soldier = entry.getValue();
+            if(!soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
+                soldiersIds.put(soldier.getId(), soldier);
+        }
+
+        List<ServiceRatioDto> ratios;
+        for(Service service : unarmedServices) {
+            ratios = countServicesForEachSold.getRatioOfArmedServicesForEachArmedSoldier(unit, service.getServiceName(),
+                    "unarmed", isPersonnel, group, "active",soldiersIds);
+            soldier = allSoldiers.get(ratios.get(0).getSoldId());
+            soldier.setService(service);
+            soldiersIds.remove(soldier.getId());
         }
     }
 
