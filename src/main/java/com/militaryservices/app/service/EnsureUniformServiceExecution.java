@@ -40,48 +40,8 @@ public class EnsureUniformServiceExecution {
     public EnsureUniformServiceExecution() {
     }
 
-    public List<Soldier> calculateServices(String username,boolean isPersonnel,String group) {
-        // Data structures for Soldiers
-        List<Soldier> allSoldiers = loadSoldiersAndServices(username,isPersonnel,group);
-        if(allSoldiers.size() == 0)
-            return assignServicesForTheFirstDay.calculateServicesForTheFirstDay(username,isPersonnel,group);
-        Set<Soldier> armedSoldiers = new HashSet<>();
-        Set<Soldier> unarmedSoldiers = new HashSet<>();
-        Map<Integer,Soldier> soldierMap = new HashMap<>();
-        // The date of the next day calculation
-        LocalDate nextDate = findNextCalculationDate(allSoldiers.get(0).getService().getDate());
-        // Data structures for services of the unit
-        Unit unit = allSoldiers.get(0).getUnit();
-        List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnitAndIsPersonnelAndGroup(unit,isPersonnel,group);
-        List<Service> armedServices = new ArrayList<>();
-        List<Service> unarmedServices = new ArrayList<>();
-        List<SoldierProportion> proportionList;
-        boolean flag = true;
-        // 1. Calculate the free of duty soldiers
-        calculateServicesHelper.setAsAvailableAllSoldiers(allSoldiers);
-        calculateServicesHelper.addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
-        calculateServicesHelper.excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
-        int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel,group);
-        if((armedSoldiers.size() - armedServices.size()) >= numberOfFreePersonnel) {
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,true,"",isPersonnel, group);
-            computeFreeSoldiers(allSoldiers, armedSoldiers, unarmedSoldiers, soldierMap, proportionList,isPersonnel, group);
-            flag = false;
-        }
-        if(flag && ((armedSoldiers.size() - armedServices.size()) < numberOfFreePersonnel)) {
-            int numOfArmedSoldForOut = armedSoldiers.size() - armedServices.size();
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false, Situation.ARMED.name().toLowerCase(),isPersonnel, group);
-            computeFreeSoldiersInRareCase(armedSoldiers,soldierMap,proportionList,numOfArmedSoldForOut);
-            proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
-            computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
-        }
-        // 2. Calculate services for unarmed soldiers
-        unarmedServices = calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
-        // 3. Calculate services for armed soldiers
-        if(unarmedServices.size()!=0)
-            setUnarmedServicesToArmedSoldiers(unit, armedSoldiers, soldierMap, unarmedServices, isPersonnel, group);
-        calculateServicesForArmedSoldiers(soldierMap,armedServices,unit,isPersonnel, group);
-        // 4. Set dates and units
-        calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
+    public List<Soldier> ensureAllServicesAreUniform(List<Soldier> allSoldiers) {
+
 
         return allSoldiers;
     }

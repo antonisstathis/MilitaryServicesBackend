@@ -22,6 +22,8 @@ public class CalculateServices {
     @Autowired
     AssignServicesForTheFirstDay assignServicesForTheFirstDay;
     @Autowired
+    EnsureUniformServiceExecution ensureUniformServiceExecution;
+    @Autowired
     private SoldierAccessImpl soldierAccess;
     @Autowired
     private SoldierRepository soldierRepository;
@@ -82,6 +84,7 @@ public class CalculateServices {
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         // 4. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
+        //ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers);
 
         return allSoldiers;
     }
