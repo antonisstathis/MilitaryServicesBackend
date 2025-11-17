@@ -43,6 +43,7 @@ public class CalculateServicesHelper {
             else
                 unarmedServices.add(new Service(serviceOfUnit.getServiceName(),serviceOfUnit.getArmed(),LocalDate.now(),unit,serviceOfUnit.getDescription(),serviceOfUnit.getShift(), serviceOfUnit.isPersonnel()));
         }
+        // Fix the order of unarmed services in the list so that all unarmed services are assigned to unarmed soldiers
 
         addSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap);
     }

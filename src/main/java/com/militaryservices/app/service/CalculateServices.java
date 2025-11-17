@@ -1,7 +1,6 @@
 package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.*;
-import com.militaryservices.app.dto.ServiceRatioDto;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.dto.HistoricalData;
 import com.militaryservices.app.enums.Situation;
@@ -76,11 +75,11 @@ public class CalculateServices {
             computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
         }
         // 2. Calculate services for unarmed soldiers
-        unarmedServices = calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
+        calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
         // 3. Calculate services for armed soldiers
         if(unarmedServices.size()!=0)
-            setUnarmedServicesToArmedSoldiers(unit, armedSoldiers, soldierMap, unarmedServices, isPersonnel, group);
-        calculateServicesForArmedSoldiers(soldierMap,armedServices,unit,isPersonnel, group);
+            setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
+        calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         // 4. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
 
@@ -165,83 +164,53 @@ public class CalculateServices {
         return counter;
     }
 
-    private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
-                                                   Unit unit, boolean isPersonnel, String group) {
-
-        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
-        Soldier soldier;
-        Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
-            soldier = entry.getValue();
-            if(!soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
-                soldiersIds.put(soldier.getId(), soldier);
-        }
-        if(soldiersIds.size() == 0)
-            return unarmedServices;
-
-        List<ServiceRatioDto> ratios;
-        Map<Service,Service> mapOfServices = new HashMap<>();
-        List<Service> unarmedServicesForArmedSoldiers = new ArrayList<>();
-        for(Service service : unarmedServices)
-            mapOfServices.put(service, service);
-
-        for(Service service : unarmedServices) {
-            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(),
-                    Situation.UNARMED.name().toLowerCase(), isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
-            soldier = allSoldiers.get(ratios.get(0).getSoldId());
-            soldier.setService(service);
-            soldiersIds.remove(soldier.getId());
-            mapOfServices.remove(service);
-            if(soldiersIds.size() == 0)
+    private void calculateServicesForUnarmedSoldiers(Set<Soldier> unarmedSoldiers,List<Service> unarmedServices) {
+        Random random = new Random();
+        int randomIndex;
+        Service service;
+        for(Soldier sold : unarmedSoldiers){
+            randomIndex = random.nextInt(unarmedServices.size());
+            service = unarmedServices.get(randomIndex);
+            sold.setService(service);
+            unarmedServices.remove(randomIndex);
+            if(unarmedServices.size()==0)
                 break;
         }
-
-        for (Map.Entry<Service, Service> entry : mapOfServices.entrySet())
-            unarmedServicesForArmedSoldiers.add(entry.getKey());
-
-        return unarmedServicesForArmedSoldiers;
     }
 
-    private void setUnarmedServicesToArmedSoldiers(Unit unit,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
+    private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
+        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
 
+        Map<Integer,Soldier> soldiersMap = new HashMap<>();
+        for(Soldier soldier : allSoldiers)
+            soldiersMap.put(soldier.getId(),soldier);
+
+        if(historicalData.size()<armedSoldiers.size())
+            countServicesForEachSold.addTheRestArmedOnes(historicalData,soldierMap,armedSoldiers);
         Soldier soldier;
-        Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        for (Map.Entry<Integer, Soldier> entry : soldierMap.entrySet()) {
-            soldier = entry.getValue();
-            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
-                soldiersIds.put(soldier.getId(), soldier);
-        }
-
-        List<ServiceRatioDto> ratios;
-        for(Service service : unarmedServices) {
-            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(), Situation.UNARMED.name().toLowerCase(),
-                    isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
-            soldier = soldierMap.get(ratios.get(0).getSoldId());
-            soldier.setService(service);
+        int soldId;
+        for(HistoricalData hd : historicalData) {
+            soldId = hd.getSoldierId();
+            soldier = soldiersMap.get(soldId);
+            if("out".equals(soldier.getService().getServiceName()))
+                continue;
+            soldier.setService(unarmedServices.get(0));
+            unarmedServices.remove(0);
             armedSoldiers.remove(soldier);
-            soldiersIds.remove(soldier.getId());
+            if(unarmedServices.size() == 0)
+                break;
         }
     }
 
-    private void calculateServicesForArmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> armedServices,
-                                                   Unit unit, boolean isPersonnel, String group) {
-
-        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id (average case)
-        Soldier soldier;
-        Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
-            soldier = entry.getValue();
-            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
-                soldiersIds.put(soldier.getId(), soldier);
-        }
-
-        List<ServiceRatioDto> ratios;
-        for(Service service : armedServices) {
-            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(), Situation.ARMED.name().toLowerCase(), isPersonnel,
-                    group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
-            soldier = allSoldiers.get(ratios.get(0).getSoldId());
-            soldier.setService(service);
-            soldiersIds.remove(soldier.getId());
+    private void calculateServicesForArmedSoldiers(Set<Soldier> armedSoldiers,List<Service> armedServices) {
+        Random random = new Random();
+        int randomIndex;
+        Service service;
+        for(Soldier sold : armedSoldiers){
+            randomIndex = random.nextInt(armedServices.size());
+            service = armedServices.get(randomIndex);
+            sold.setService(service);
+            armedServices.remove(randomIndex);
         }
     }
 
