@@ -53,77 +53,6 @@ public class EnsureUniformServiceExecution {
         return soldierAccess.loadSoldByGroup(unit,dateOfLastCalculation,isPersonnel,group);
     }
 
-    private LocalDate findNextCalculationDate(LocalDate lastDate) {
-        return lastDate.plusDays(1);
-    }
-
-    private void computeFreeSoldiers(List<Soldier> allSoldiers, Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,boolean isPersonnel, String group) {
-
-        int numberOfFreePersonnel = calculateNumberOfFreePersonnel(allSoldiers,isPersonnel, group);
-        setFreeBasedOnProp(armedSoldiers,unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel);
-    }
-
-    // Assign as free of duty the soldiers with the worst proportion until now
-    private void setFreeBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
-        if(numberOfFreePersonnel == 0)
-            return;
-
-        Collections.sort(proportionList, Comparator.comparingDouble(SoldierProportion::getProportion).reversed());
-        Soldier soldier;
-        for(SoldierProportion soldierProportion : proportionList) {
-            if(numberOfFreePersonnel == 0)
-                return;
-            if(numberOfFreePersonnel > 0) {
-                soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), LocalDate.now(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
-                removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
-                numberOfFreePersonnel -= 1;
-            }
-        }
-    }
-
-    private void computeFreeSoldiersInRareCase(Set<Soldier> soldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
-        if(numberOfFreePersonnel == 0)
-            return;
-
-        Collections.sort(proportionList, Comparator.comparingDouble(SoldierProportion::getProportion).reversed());
-        Soldier soldier;
-        for(SoldierProportion soldierProportion : proportionList) {
-            if(numberOfFreePersonnel == 0)
-                return;
-            if(numberOfFreePersonnel>0) {
-                soldier = soldierMap.get(soldierProportion.getSoldId());
-                soldier.setService(new Service("out", Active.getFreeOfDuty(), LocalDate.now(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
-                soldiers.remove(soldier);
-                numberOfFreePersonnel -= 1;
-            }
-        }
-    }
-
-    private void removeSoldier(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Soldier soldier) {
-        if(soldier.isArmed())
-            armedSoldiers.remove(soldier);
-        else
-            unarmedSoldiers.remove(soldier);
-    }
-
-    private int calculateNumberOfFreePersonnel(List<Soldier> allSoldiers,boolean isPersonnel, String group) {
-
-        List<Long> countServices = serOfUnitAccess.countServicesOfUnit(allSoldiers.get(0).getUnit(),isPersonnel,group);
-        int totalNumberOfServices = countServices != null ? countServices.get(0).intValue() : 0;
-        return totalSolForCalc(allSoldiers) - totalNumberOfServices;
-    }
-
-    private int totalSolForCalc(List<Soldier> allSoldiers) {
-        int counter = 0;
-        for(Soldier soldier : allSoldiers) {
-            if(!soldier.getActive().equals(Active.getFreeOfDuty()))
-                counter += 1;
-        }
-
-        return counter;
-    }
-
     private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
                                                               Unit unit, boolean isPersonnel, String group) {
 
@@ -201,15 +130,6 @@ public class EnsureUniformServiceExecution {
             soldier = allSoldiers.get(ratios.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
-        }
-    }
-
-    public void saveNewServices(List<Soldier> allSoldiers) {
-        try {
-            soldierAccess.saveSoldiers(allSoldiers);
-        } catch (IOException | SQLException e) {
-            logger.error("Failed to save soldiers: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
         }
     }
 
