@@ -77,6 +77,10 @@ public class EnsureUniformServiceExecution {
         for(Service service : unarmedServices)
             mapOfServices.put(service, service);
 
+        Random random = new Random();
+        if(random.nextBoolean())
+            unarmedServices = invertServices(unarmedServices);
+
         for(Service service : unarmedServices) {
             ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(),
                     Situation.UNARMED.name().toLowerCase(), isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
@@ -94,6 +98,16 @@ public class EnsureUniformServiceExecution {
         return unarmedServicesForArmedSoldiers;
     }
 
+    private List<Service> invertServices(List<Service> unarmedServices) {
+
+        List<Service> invertedServices = new ArrayList<>();
+        for(int i = unarmedServices.size() - 1; i >= 0; i--) {
+            invertedServices.add(unarmedServices.get(i));
+        }
+
+        return invertedServices;
+    }
+
     private void setUnarmedServicesToArmedSoldiers(Unit unit, Map<Integer,Soldier> soldierMap, List<Service> unarmedServices, boolean isPersonnel, String group) {
         Soldier soldier;
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
@@ -102,6 +116,10 @@ public class EnsureUniformServiceExecution {
             if(soldier.isArmed() && !soldier.getService().isArmed() && !soldier.getService().getServiceName().equals("out"))
                 soldiersIds.put(soldier.getId(), soldier);
         }
+
+        Random random = new Random();
+        if(random.nextBoolean())
+            unarmedServices = invertServices(unarmedServices);
 
         List<ServiceRatioDto> ratios;
         for(Service service : unarmedServices) {
@@ -124,6 +142,10 @@ public class EnsureUniformServiceExecution {
             if(soldier.isArmed() && soldier.getService().isArmed())
                 soldiersIds.put(soldier.getId(), soldier);
         }
+
+        Random random = new Random();
+        if(random.nextBoolean())
+            armedServices = invertServices(armedServices);
 
         List<ServiceRatioDto> ratios;
         for(Service service : armedServices) {
