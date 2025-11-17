@@ -134,6 +134,7 @@ public class EnsureUniformServiceExecution {
             armedServices = invertServices(armedServices);
 
         List<ServiceRatioDto> ratios;
+        long start = System.nanoTime();  // start timer
         for(Service service : armedServices) {
             ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(), Situation.ARMED.name().toLowerCase(), isPersonnel,
                     group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
@@ -141,6 +142,10 @@ public class EnsureUniformServiceExecution {
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
         }
+        long end = System.nanoTime();    // end timer
+        long elapsedMs = (end - start) / 1_000_000; // convert to ms
+        elapsedMs = (end - start) / 1_000_000; // convert to ms
+
     }
 
 }
