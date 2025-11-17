@@ -48,8 +48,11 @@ public class CountServicesForEachSold {
         for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())
             soldierIds.add(entry.getKey());
 
+        long start = System.nanoTime();  // start timer
         List<ServiceRatioDto> ratios = soldierAccess.getRatioOfServicesForEachSoldier(unit, serviceName, armed, isPersonnel,
                 group, active, soldierIds);
+        long end = System.nanoTime();    // end timer
+        long elapsedMs = (end - start) / 1_000_000; // convert to ms
 
         Set<Integer> soldiersIdsInRatios = new HashSet<>();
         if(ratios.size() < soldierIds.size()) {
