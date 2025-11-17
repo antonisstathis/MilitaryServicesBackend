@@ -206,7 +206,7 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<ServiceRatioDto> getRatioOfArmedServicesForEachArmedSoldier(
+	public List<ServiceRatioDto> getRatioOfServicesForEachSoldier(
 			Unit unit,
 			String serviceName,
 			String armed,

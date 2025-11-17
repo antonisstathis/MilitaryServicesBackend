@@ -48,7 +48,7 @@ public class CountServicesForEachSold {
         for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())
             soldierIds.add(entry.getKey());
 
-        List<ServiceRatioDto> ratios = soldierAccess.getRatioOfArmedServicesForEachArmedSoldier(unit, serviceName, armed, isPersonnel,
+        List<ServiceRatioDto> ratios = soldierAccess.getRatioOfServicesForEachSoldier(unit, serviceName, armed, isPersonnel,
                 group, active, soldierIds);
 
         Set<Integer> soldiersIdsInRatios = new HashSet<>();
