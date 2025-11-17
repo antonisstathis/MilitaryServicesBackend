@@ -41,26 +41,15 @@ public class CountServicesForEachSold {
         return proportions;
     }
 
-    public List<ServiceRatioDto> getRatioOfServicesForEachSoldier(Unit unit, String serviceName, String armed, boolean isPersonnel,
+    public Map<String, List<ServiceRatioDto>> getRatioOfServicesForEachSoldier(Unit unit, String armed, boolean isPersonnel,
             String group, String active, Map<Integer, Soldier> soldiersMap) {
 
         List<Integer> soldierIds = new ArrayList<>();
         for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())
             soldierIds.add(entry.getKey());
 
-        long start = System.nanoTime();  // start timer
-        List<ServiceRatioDto> ratios = soldierAccess.getRatioOfServicesForEachSoldier(unit, serviceName, armed, isPersonnel,
+        Map<String, List<ServiceRatioDto>> ratios = soldierAccess.getRatiosForAllServicesForSoldiers(unit, armed, isPersonnel,
                 group, active, soldierIds);
-        long end = System.nanoTime();    // end timer
-        long elapsedMs = (end - start) / 1_000_000; // convert to ms
-
-        Set<Integer> soldiersIdsInRatios = new HashSet<>();
-        if(ratios.size() < soldierIds.size()) {
-            for(ServiceRatioDto ratioDto : ratios)
-                soldiersIdsInRatios.add(ratioDto.getSoldId());
-
-            ratios = addTheRestRatios(soldierIds, ratios, soldiersIdsInRatios, serviceName);
-        }
 
         return ratios;
     }

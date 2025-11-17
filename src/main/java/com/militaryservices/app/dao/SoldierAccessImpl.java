@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
@@ -206,65 +206,69 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<ServiceRatioDto> getRatioOfServicesForEachSoldier(
-			Unit unit,
-			String serviceName,
-			String armed,
-			boolean isPersonnel,
-			String group,
-			String active,
-			List<Integer> soldierIds
-	) {
+	public Map<String, List<ServiceRatioDto>> getRatiosForAllServicesForSoldiers(Unit unit, String armed, boolean isPersonnel, String group, String active, List<Integer> soldierIds) {
+
+		if (soldierIds == null || soldierIds.isEmpty())
+			return Collections.emptyMap();
 
 		String sql = """
-        WITH total_heavy AS (
-            SELECT s.sold_id, COUNT(*) AS total_heavy_count
-            FROM ms.services s
-            JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
-            WHERE s.armed = :armed
-              AND sol.unit_id = :unitId
-              AND sol.is_personnel = :isPersonnel
-              AND sol.sold_group = :group
-              AND sol.active = :active
-              AND sol.discharged = false
-              AND s.sold_id IN (:soldierIds)
-            GROUP BY s.sold_id
-        ),
-        service_heavy AS (
-            SELECT s.sold_id, s.ser_name, COUNT(*) AS service_heavy_count
-            FROM ms.services s
-            JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
-            WHERE s.ser_name = :serviceName
-              AND s.armed = :armed
-              AND sol.unit_id = :unitId
-              AND sol.is_personnel = :isPersonnel
-              AND sol.sold_group = :group
-              AND sol.active = :active
-              AND sol.discharged = false
-              AND s.sold_id IN (:soldierIds)
-            GROUP BY s.sold_id, s.ser_name
-        )
-        SELECT 
-            sh.sold_id,
-            sh.ser_name,
-            sh.service_heavy_count,
-            th.total_heavy_count,
-            ROUND((sh.service_heavy_count::NUMERIC / th.total_heavy_count) * 100, 2) AS percent_share
-        FROM service_heavy sh
-        JOIN total_heavy th ON th.sold_id = sh.sold_id
-        ORDER BY percent_share ASC
-        """;
+				WITH soldier_services AS (
+				    SELECT
+				        s.sold_id,
+				        s.ser_name,
+				        COUNT(*) AS service_count
+				    FROM ms.services s
+				    JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
+				    WHERE s.armed = :armed
+				      AND sol.unit_id = :unitId
+				      AND sol.is_personnel = :isPersonnel
+				      AND sol.sold_group = :group
+				      AND sol.active = :active
+				      AND sol.discharged = false
+				      AND s.sold_id IN (:soldierIds)
+				    GROUP BY s.sold_id, s.ser_name
+				),
+				total_services AS (
+				    SELECT 
+				        sold_id,
+				        SUM(service_count) AS total_count
+				    FROM soldier_services
+				    GROUP BY sold_id
+				)
+				SELECT
+				    ss.sold_id,
+				    ss.ser_name,
+				    ss.service_count AS service_heavy_count,
+				    ts.total_count AS total_heavy_count,
+				    ROUND((ss.service_count::NUMERIC / ts.total_count) * 100, 2) AS percent_share
+				FROM soldier_services ss
+				JOIN total_services ts ON ts.sold_id = ss.sold_id
+				ORDER BY ss.sold_id, ss.ser_name;
+				""";
 
-		Query nativeQuery = entityManager.createNativeQuery(sql, "ServiceRatioMapping");
-		nativeQuery.setParameter("serviceName", serviceName);
-		nativeQuery.setParameter("armed", armed);
-		nativeQuery.setParameter("unitId", unit.getId());
-		nativeQuery.setParameter("isPersonnel", isPersonnel);
-		nativeQuery.setParameter("group", group);
-		nativeQuery.setParameter("active", active);
-		nativeQuery.setParameter("soldierIds", soldierIds);
+		Query query = entityManager.createNativeQuery(sql, "ServiceRatioMapping");
+		query.setParameter("armed", armed);
+		query.setParameter("unitId", unit.getId());
+		query.setParameter("isPersonnel", isPersonnel);
+		query.setParameter("group", group);
+		query.setParameter("active", active);
+		query.setParameter("soldierIds", soldierIds);
 
-		return nativeQuery.getResultList();
+		@SuppressWarnings("unchecked")
+		List<ServiceRatioDto> flatList = query.getResultList();
+
+		Map<String, List<ServiceRatioDto>> result = new HashMap<>();
+
+		for (ServiceRatioDto dto : flatList) {
+			result
+					.computeIfAbsent(dto.getServiceName(), k -> new ArrayList<>())
+					.add(dto);
+		}
+
+		for (List<ServiceRatioDto> list : result.values())
+			list.sort(Comparator.comparing(ServiceRatioDto::getPercentShare));
+
+		return result;
 	}
 
 	@Transactional
