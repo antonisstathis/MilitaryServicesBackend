@@ -41,7 +41,7 @@ public class CountServicesForEachSold {
         return proportions;
     }
 
-    public List<ServiceRatioDto> getRatioOfArmedServicesForEachArmedSoldier(Unit unit, String serviceName, String armed, boolean isPersonnel,
+    public List<ServiceRatioDto> getRatioOfServicesForEachSoldier(Unit unit, String serviceName, String armed, boolean isPersonnel,
             String group, String active, Map<Integer, Soldier> soldiersMap) {
 
         List<Integer> soldierIds = new ArrayList<>();
