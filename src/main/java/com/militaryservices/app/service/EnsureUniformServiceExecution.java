@@ -46,53 +46,30 @@ public class EnsureUniformServiceExecution {
 
     private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers, List<Service> unarmedServices, Unit unit, boolean isPersonnel, String group) {
 
-        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
-        Soldier soldier;
+        Map<Service, Service> mapOfServices = new HashMap<>();
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
-            soldier = entry.getValue();
-            if(!soldier.isArmed() && !soldier.getService().getServiceName().equals("out"))
-                soldiersIds.put(soldier.getId(), soldier);
-        }
-        if(soldiersIds.size() == 0)
+        if(!addServicesToDataStructures(allSoldiers, unarmedServices, mapOfServices, soldiersIds))
             return unarmedServices;
 
-        Map<Service,Service> mapOfServices = new HashMap<>();
-        List<Service> unarmedServicesForArmedSoldiers = new ArrayList<>();
-        for(Service service : unarmedServices)
-            mapOfServices.put(service, service);
-
-        Random random = new Random();
-        if(random.nextBoolean())
-            unarmedServices = invertServices(unarmedServices);
-
         List<ServiceRatioDto> ratiosForService;
+        Soldier soldier;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        for(Service service : unarmedServices) {
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, unarmedServices);
+        for (Service service : unarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = allSoldiers.get(ratiosForService.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
             mapOfServices.remove(service);
-            if(soldiersIds.size() == 0)
+            if (soldiersIds.size() == 0)
                 break;
         }
 
+        List<Service> unarmedServicesForArmedSoldiers = new ArrayList<>();
         for (Map.Entry<Service, Service> entry : mapOfServices.entrySet())
             unarmedServicesForArmedSoldiers.add(entry.getKey());
 
         return unarmedServicesForArmedSoldiers;
-    }
-
-    private List<Service> invertServices(List<Service> unarmedServices) {
-
-        List<Service> invertedServices = new ArrayList<>();
-        for(int i = unarmedServices.size() - 1; i >= 0; i--) {
-            invertedServices.add(unarmedServices.get(i));
-        }
-
-        return invertedServices;
     }
 
     private void setUnarmedServicesToArmedSoldiers(Unit unit, Map<Integer,Soldier> soldierMap, List<Service> unarmedServices, boolean isPersonnel, String group) {
@@ -100,7 +77,7 @@ public class EnsureUniformServiceExecution {
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
         for (Map.Entry<Integer, Soldier> entry : soldierMap.entrySet()) {
             soldier = entry.getValue();
-            if(soldier.isArmed() && !soldier.getService().isArmed() && !soldier.getService().getServiceName().equals("out"))
+            if(soldier.isArmed() && !soldier.getService().isArmed() && !soldier.getService().getArmed().equals(Active.getFreeOfDuty()))
                 soldiersIds.put(soldier.getId(), soldier);
         }
 
@@ -110,7 +87,7 @@ public class EnsureUniformServiceExecution {
 
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, unarmedServices);
         for(Service service : unarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = soldierMap.get(ratiosForService.get(0).getSoldId());
@@ -137,18 +114,45 @@ public class EnsureUniformServiceExecution {
 
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.ARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        long start = System.nanoTime();  // start timer
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, armedServices);
         for(Service service : armedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = allSoldiers.get(ratiosForService.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
         }
-        long end = System.nanoTime();    // end timer
-        long elapsedMs = (end - start) / 1_000_000; // convert to ms
-        elapsedMs = (end - start) / 1_000_000; // convert to ms
 
+    }
+
+    private boolean addServicesToDataStructures(Map<Integer, Soldier> allSoldiers, List<Service> unarmedServices, Map<Service, Service> mapOfServices,  Map<Integer, Soldier> soldiersIds) {
+        // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
+        Soldier soldier;
+        for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
+            soldier = entry.getValue();
+            if (!soldier.isArmed() && !soldier.getService().getArmed().equals(Active.getFreeOfDuty()))
+                soldiersIds.put(soldier.getId(), soldier);
+        }
+        if (soldiersIds.size() == 0)
+            return false;
+
+        for (Service service : unarmedServices)
+            mapOfServices.put(service, service);
+
+        Random random = new Random();
+        if (random.nextBoolean())
+            unarmedServices = invertServices(unarmedServices);
+
+        return true;
+    }
+
+    private List<Service> invertServices(List<Service> services) {
+
+        List<Service> invertedServices = new ArrayList<>();
+        for(int i = services.size() - 1; i >= 0; i--) {
+            invertedServices.add(services.get(i));
+        }
+
+        return invertedServices;
     }
 
 }

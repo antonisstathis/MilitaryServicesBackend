@@ -212,38 +212,58 @@ public class SoldierAccessImpl {
 			return Collections.emptyMap();
 
 		String sql = """
-				WITH soldier_services AS (
-				    SELECT
-				        s.sold_id,
-				        s.ser_name,
-				        COUNT(*) AS service_count
-				    FROM ms.services s
-				    JOIN ms.soldiers sol ON sol.sold_id = s.sold_id
-				    WHERE s.armed = :armed
-				      AND sol.unit_id = :unitId
+				WITH selected_soldiers AS (
+				    SELECT sol.sold_id
+				    FROM ms.soldiers sol
+				    WHERE sol.unit_id = :unitId
 				      AND sol.is_personnel = :isPersonnel
 				      AND sol.sold_group = :group
 				      AND sol.active = :active
 				      AND sol.discharged = false
-				      AND s.sold_id IN (:soldierIds)
-				    GROUP BY s.sold_id, s.ser_name
+				      AND sol.sold_id IN (:soldierIds)
 				),
-				total_services AS (
-				    SELECT 
+				services_of_unit AS (
+				    SELECT ser_name
+				    FROM ms.ser_of_unit
+				    WHERE unit_id = :unitId
+				      AND armed = :armed
+				),
+				soldier_service_matrix AS (
+				    SELECT ss.sold_id, su.ser_name
+				    FROM selected_soldiers ss
+				    CROSS JOIN services_of_unit su
+				),
+				soldier_service_counts AS (
+				    SELECT
+				        sm.sold_id,
+				        sm.ser_name,
+				        COALESCE(COUNT(s.ser_name), 0) AS service_count
+				    FROM soldier_service_matrix sm
+				    LEFT JOIN ms.services s
+				           ON s.sold_id = sm.sold_id
+				          AND s.ser_name = sm.ser_name
+				          AND s.armed = :armed
+				    GROUP BY sm.sold_id, sm.ser_name
+				),
+				total_counts AS (
+				    SELECT
 				        sold_id,
 				        SUM(service_count) AS total_count
-				    FROM soldier_services
+				    FROM soldier_service_counts
 				    GROUP BY sold_id
 				)
 				SELECT
-				    ss.sold_id,
-				    ss.ser_name,
-				    ss.service_count AS service_heavy_count,
-				    ts.total_count AS total_heavy_count,
-				    ROUND((ss.service_count::NUMERIC / ts.total_count) * 100, 2) AS percent_share
-				FROM soldier_services ss
-				JOIN total_services ts ON ts.sold_id = ss.sold_id
-				ORDER BY ss.sold_id, ss.ser_name;
+				    sc.sold_id,
+				    sc.ser_name,
+				    sc.service_count AS service_heavy_count,
+				    tc.total_count AS total_heavy_count,
+				    CASE\s
+				        WHEN tc.total_count = 0 THEN 0
+				        ELSE ROUND((sc.service_count::NUMERIC / tc.total_count) * 100, 2)
+				    END AS percent_share
+				FROM soldier_service_counts sc
+				JOIN total_counts tc ON sc.sold_id = tc.sold_id
+				ORDER BY percent_share ASC, sc.sold_id, sc.ser_name;
 				""";
 
 		Query query = entityManager.createNativeQuery(sql, "ServiceRatioMapping");

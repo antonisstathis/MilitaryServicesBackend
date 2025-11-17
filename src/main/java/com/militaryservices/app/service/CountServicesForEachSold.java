@@ -2,6 +2,7 @@ package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dto.*;
+import com.militaryservices.app.entity.Service;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.enums.Active;
@@ -42,7 +43,7 @@ public class CountServicesForEachSold {
     }
 
     public Map<String, List<ServiceRatioDto>> getRatioOfServicesForEachSoldier(Unit unit, String armed, boolean isPersonnel,
-            String group, String active, Map<Integer, Soldier> soldiersMap) {
+            String group, String active, Map<Integer, Soldier> soldiersMap, List<Service> services) {
 
         List<Integer> soldierIds = new ArrayList<>();
         for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())
@@ -52,21 +53,6 @@ public class CountServicesForEachSold {
                 group, active, soldierIds);
 
         return ratios;
-    }
-
-    private List<ServiceRatioDto> addTheRestRatios(List<Integer> soldierIds, List<ServiceRatioDto> ratios,  Set<Integer> soldiersIdsInRatios, String serviceName) {
-
-        List<ServiceRatioDto> finalRatios = new ArrayList<>();
-        for(Integer soldId : soldierIds) {
-            if(!soldiersIdsInRatios.contains(soldId)) {
-                finalRatios.add(new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
-            }
-        }
-
-        for(ServiceRatioDto serviceRatioDto : ratios)
-            finalRatios.add(serviceRatioDto);
-
-        return finalRatios;
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
