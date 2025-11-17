@@ -67,7 +67,7 @@ public class CountServicesForEachSold {
         List<ServiceRatioDto> finalRatios = new ArrayList<>();
         for(Integer soldId : soldierIds) {
             if(!soldiersIdsInRatios.contains(soldId)) {
-                finalRatios.add(0, new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
+                finalRatios.add(new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
             }
         }
 
