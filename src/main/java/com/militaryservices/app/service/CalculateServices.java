@@ -79,7 +79,7 @@ public class CalculateServices {
         unarmedServices = calculateServicesForUnarmedSoldiers(soldierMap ,unarmedServices, unit, isPersonnel, group);
         // 3. Calculate services for armed soldiers
         if(unarmedServices.size()!=0)
-            setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
+            setUnarmedServicesToArmedSoldiers(unit, armedSoldiers, soldierMap, unarmedServices, isPersonnel, group);
         calculateServicesForArmedSoldiers(soldierMap,armedServices,unit,isPersonnel, group);
         // 4. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
@@ -187,7 +187,7 @@ public class CalculateServices {
 
         for(Service service : unarmedServices) {
             ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(),
-                    "unarmed", isPersonnel, group, "active",soldiersIds);
+                    Situation.UNARMED.name().toLowerCase(), isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
             soldier = allSoldiers.get(ratios.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
@@ -202,27 +202,24 @@ public class CalculateServices {
         return unarmedServicesForArmedSoldiers;
     }
 
-    private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
-        List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
+    private void setUnarmedServicesToArmedSoldiers(Unit unit,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
 
-        Map<Integer,Soldier> soldiersMap = new HashMap<>();
-        for(Soldier soldier : allSoldiers)
-            soldiersMap.put(soldier.getId(),soldier);
-
-        if(historicalData.size()<armedSoldiers.size())
-            countServicesForEachSold.addTheRestArmedOnes(historicalData,soldierMap,armedSoldiers);
         Soldier soldier;
-        int soldId;
-        for(HistoricalData hd : historicalData) {
-            soldId = hd.getSoldierId();
-            soldier = soldiersMap.get(soldId);
-            if("out".equals(soldier.getService().getServiceName()))
-                continue;
-            soldier.setService(unarmedServices.get(0));
-            unarmedServices.remove(0);
+        Map<Integer, Soldier> soldiersIds = new HashMap<>();
+        for (Map.Entry<Integer, Soldier> entry : soldierMap.entrySet()) {
+            soldier = entry.getValue();
+            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
+                soldiersIds.put(soldier.getId(), soldier);
+        }
+
+        List<ServiceRatioDto> ratios;
+        for(Service service : unarmedServices) {
+            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(), Situation.UNARMED.name().toLowerCase(),
+                    isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
+            soldier = soldierMap.get(ratios.get(0).getSoldId());
+            soldier.setService(service);
             armedSoldiers.remove(soldier);
-            if(unarmedServices.size() == 0)
-                break;
+            soldiersIds.remove(soldier.getId());
         }
     }
 
@@ -240,8 +237,8 @@ public class CalculateServices {
 
         List<ServiceRatioDto> ratios;
         for(Service service : armedServices) {
-            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(),
-                    "armed", isPersonnel, group, "active",soldiersIds);
+            ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(), Situation.ARMED.name().toLowerCase(), isPersonnel,
+                    group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
             soldier = allSoldiers.get(ratios.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
