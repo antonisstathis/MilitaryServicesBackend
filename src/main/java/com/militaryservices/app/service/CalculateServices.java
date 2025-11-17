@@ -83,10 +83,7 @@ public class CalculateServices {
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         //4. Ensure that all services are distributed uniformly
-        //long start = System.nanoTime();  // start timer
         //ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
-        //long end = System.nanoTime();    // end timer
-        //long elapsedMs = (end - start) / 1_000_000; // convert to ms
         // 5. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
 
