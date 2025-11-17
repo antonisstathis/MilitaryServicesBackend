@@ -56,18 +56,25 @@ public class CountServicesForEachSold {
             for(ServiceRatioDto ratioDto : ratios)
                 soldiersIdsInRatios.add(ratioDto.getSoldId());
 
-            addTheRestRatios(soldierIds, ratios, soldiersIdsInRatios, serviceName);
+            ratios = addTheRestRatios(soldierIds, ratios, soldiersIdsInRatios, serviceName);
         }
 
         return ratios;
     }
 
-    private void addTheRestRatios(List<Integer> soldierIds, List<ServiceRatioDto> ratios,  Set<Integer> soldiersIdsInRatios, String serviceName) {
+    private List<ServiceRatioDto> addTheRestRatios(List<Integer> soldierIds, List<ServiceRatioDto> ratios,  Set<Integer> soldiersIdsInRatios, String serviceName) {
+
+        List<ServiceRatioDto> finalRatios = new ArrayList<>();
         for(Integer soldId : soldierIds) {
             if(!soldiersIdsInRatios.contains(soldId)) {
-                ratios.add(0, new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
+                finalRatios.add(0, new ServiceRatioDto(soldId, serviceName, 0l, 0l, 0d));
             }
         }
+
+        for(ServiceRatioDto serviceRatioDto : ratios)
+            finalRatios.add(serviceRatioDto);
+
+        return finalRatios;
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
