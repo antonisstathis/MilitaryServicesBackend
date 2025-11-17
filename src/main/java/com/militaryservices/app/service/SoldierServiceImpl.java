@@ -32,7 +32,9 @@ public class SoldierServiceImpl implements SoldierService {
 	private SoldierAccessImpl soldierAccess;
 
 	@Autowired
-	private CalculateServices service;
+	private CalculateServices calculateServices;
+	@Autowired
+	private EnsureUniformServiceExecution ensureUniformServiceExecution;
 	@Autowired
 	private JwtUtil jwtUtil;
 	@Autowired
@@ -239,7 +241,7 @@ public class SoldierServiceImpl implements SoldierService {
 				List<Soldier> allSoldiers = calculateServicesForAllGroups(username,isPersonnel,groups);
 				long end = System.nanoTime();    // end timer
 				long elapsedMs = (end - start) / 1_000_000; // convert to ms
-				service.saveNewServices(allSoldiers);
+				calculateServices.saveNewServices(allSoldiers);
 				//boolean results = checkOutput.checkResults(username);
 			}
 		} catch (IOException e) {
@@ -252,7 +254,7 @@ public class SoldierServiceImpl implements SoldierService {
 		List<Soldier> allSoldiers = new ArrayList<>();
 		List<Soldier> soldiers;
 		for(String group : groups) {
-			soldiers = service.calculateServices(username,isPersonnel,group);
+			soldiers = calculateServices.calculateServices(username,isPersonnel,group);
 			allSoldiers.addAll(soldiers);
 		}
 
