@@ -79,12 +79,13 @@ public class CalculateServices {
         // 2. Calculate services for unarmed soldiers
         calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
         // 3. Calculate services for armed soldiers
-        if(unarmedServices.size()!=0)
+        if(unarmedServices.size() != 0)
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
-        // 4. Set dates and units
+        //4. Ensure that all services are distributed uniformly
+        ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
+        // 5. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
-        //ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers);
 
         return allSoldiers;
     }

@@ -40,28 +40,32 @@ public class EnsureUniformServiceExecution {
     public EnsureUniformServiceExecution() {
     }
 
-    public List<Soldier> ensureAllServicesAreUniform(List<Soldier> allSoldiers) {
+    public List<Soldier> ensureAllServicesAreUniform(List<Soldier> allSoldiers, Unit unit, boolean isPersonnel, String group ) {
 
+        Map<Integer, Soldier> soldierMap = new HashMap<>();
+        Set<Soldier> armedSoldiers = new HashSet<>();
+        Set<Soldier> unarmedSoldiers = new HashSet<>();
+        List<ServiceOfUnit> servicesOfUnit = serOfUnitRepository.findByUnitAndIsPersonnelAndGroup(unit,isPersonnel,group);
+        List<Service> armedServices = new ArrayList<>();
+        List<Service> unarmedServices = new ArrayList<>();
+        calculateServicesHelper.addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
+
+        unarmedServices = calculateServicesForUnarmedSoldiers(soldierMap, unarmedServices , unit, isPersonnel, group);
+        if(unarmedServices.size() != 0)
+            setUnarmedServicesToArmedSoldiers(unit, soldierMap, unarmedServices, isPersonnel, group);
+        calculateServicesForArmedSoldiers(soldierMap, armedServices, unit, isPersonnel, group);
 
         return allSoldiers;
     }
 
-    private List<Soldier> loadSoldiersAndServices(String username,boolean isPersonnel, String group) {
-        Optional<User> user = userRepository.findById(username);
-        Unit unit = user.get().getSoldier().getUnit();
-        LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,isPersonnel);
-        return soldierAccess.loadSoldByGroup(unit,dateOfLastCalculation,isPersonnel,group);
-    }
-
-    private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers ,List<Service> unarmedServices,
-                                                              Unit unit, boolean isPersonnel, String group) {
+    private List<Service> calculateServicesForUnarmedSoldiers(Map<Integer, Soldier> allSoldiers, List<Service> unarmedServices, Unit unit, boolean isPersonnel, String group) {
 
         // Add all available armed soldiers to a new HashMap to access them in O(1) time complexity using the soldier id
         Soldier soldier;
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
         for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
             soldier = entry.getValue();
-            if(!soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
+            if(!soldier.isArmed() && !soldier.getService().getServiceName().equals("out"))
                 soldiersIds.put(soldier.getId(), soldier);
         }
         if(soldiersIds.size() == 0)
@@ -75,7 +79,7 @@ public class EnsureUniformServiceExecution {
 
         for(Service service : unarmedServices) {
             ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, service.getServiceName(),
-                    Situation.UNARMED.name().toLowerCase(), isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
+                    Situation.UNARMED.name().toLowerCase(), isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
             soldier = allSoldiers.get(ratios.get(0).getSoldId());
             soldier.setService(service);
             soldiersIds.remove(soldier.getId());
@@ -90,13 +94,12 @@ public class EnsureUniformServiceExecution {
         return unarmedServicesForArmedSoldiers;
     }
 
-    private void setUnarmedServicesToArmedSoldiers(Unit unit,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
-
+    private void setUnarmedServicesToArmedSoldiers(Unit unit, Map<Integer,Soldier> soldierMap, List<Service> unarmedServices, boolean isPersonnel, String group) {
         Soldier soldier;
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
         for (Map.Entry<Integer, Soldier> entry : soldierMap.entrySet()) {
             soldier = entry.getValue();
-            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
+            if(soldier.isArmed() && !soldier.getService().isArmed() && !soldier.getService().getServiceName().equals("out"))
                 soldiersIds.put(soldier.getId(), soldier);
         }
 
@@ -106,7 +109,6 @@ public class EnsureUniformServiceExecution {
                     isPersonnel, group, Active.ACTIVE.name().toLowerCase(),soldiersIds);
             soldier = soldierMap.get(ratios.get(0).getSoldId());
             soldier.setService(service);
-            armedSoldiers.remove(soldier);
             soldiersIds.remove(soldier.getId());
         }
     }
@@ -119,7 +121,7 @@ public class EnsureUniformServiceExecution {
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
         for (Map.Entry<Integer, Soldier> entry : allSoldiers.entrySet()) {
             soldier = entry.getValue();
-            if(soldier.isArmed() && soldier.getService().getServiceName().equals("available"))
+            if(soldier.isArmed() && soldier.getService().isArmed())
                 soldiersIds.put(soldier.getId(), soldier);
         }
 
