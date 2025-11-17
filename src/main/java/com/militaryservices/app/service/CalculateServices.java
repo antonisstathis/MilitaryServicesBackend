@@ -83,14 +83,10 @@ public class CalculateServices {
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         //4. Ensure that all services are distributed uniformly
-        /*
-        The step 4 is a problem for 1000 soldiers and 500 services as it calls the query once for each service and the entries are a lot.
-        Someone can comment it out and the free of duty days, the armed and the unarmed services will still be equally distributed.
-         */
-        long start = System.nanoTime();  // start timer
-        ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
-        long end = System.nanoTime();    // end timer
-        long elapsedMs = (end - start) / 1_000_000; // convert to ms
+        //long start = System.nanoTime();  // start timer
+        //ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
+        //long end = System.nanoTime();    // end timer
+        //long elapsedMs = (end - start) / 1_000_000; // convert to ms
         // 5. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
 
