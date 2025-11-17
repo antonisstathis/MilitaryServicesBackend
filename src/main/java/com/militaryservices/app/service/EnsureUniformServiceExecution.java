@@ -4,33 +4,19 @@ import com.militaryservices.app.dao.*;
 import com.militaryservices.app.dto.ServiceRatioDto;
 import com.militaryservices.app.enums.Active;
 import com.militaryservices.app.enums.Situation;
-import com.militaryservices.app.dto.SoldierProportion;
 import com.militaryservices.app.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
 public class EnsureUniformServiceExecution {
 
     @Autowired
-    AssignServicesForTheFirstDay assignServicesForTheFirstDay;
-    @Autowired
-    private SoldierAccessImpl soldierAccess;
-    @Autowired
-    private SoldierRepository soldierRepository;
-    @Autowired
-    SerOfUnitAccessImpl serOfUnitAccess;
-    @Autowired
     SerOfUnitRepository serOfUnitRepository;
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     CountServicesForEachSold countServicesForEachSold;
     @Autowired
