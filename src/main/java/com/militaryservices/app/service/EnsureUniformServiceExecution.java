@@ -54,7 +54,7 @@ public class EnsureUniformServiceExecution {
         List<ServiceRatioDto> ratiosForService;
         Soldier soldier;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, unarmedServices);
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
         for (Service service : unarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = allSoldiers.get(ratiosForService.get(0).getSoldId());
@@ -87,7 +87,7 @@ public class EnsureUniformServiceExecution {
 
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, unarmedServices);
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
         for(Service service : unarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = soldierMap.get(ratiosForService.get(0).getSoldId());
@@ -114,7 +114,7 @@ public class EnsureUniformServiceExecution {
 
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.ARMED.name().toLowerCase(),
-                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds, armedServices);
+                isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
         for(Service service : armedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = allSoldiers.get(ratiosForService.get(0).getSoldId());

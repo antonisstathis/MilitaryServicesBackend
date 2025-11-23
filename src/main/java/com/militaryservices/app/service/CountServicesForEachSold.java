@@ -43,7 +43,7 @@ public class CountServicesForEachSold {
     }
 
     public Map<String, List<ServiceRatioDto>> getRatioOfServicesForEachSoldier(Unit unit, String armed, boolean isPersonnel,
-            String group, String active, Map<Integer, Soldier> soldiersMap, List<Service> services) {
+            String group, String active, Map<Integer, Soldier> soldiersMap) {
 
         List<Integer> soldierIds = new ArrayList<>();
         for (Map.Entry<Integer, Soldier> entry : soldiersMap.entrySet())

@@ -59,7 +59,7 @@ public class CalculateServices {
         List<Service> unarmedServices = new ArrayList<>();
         List<SoldierProportion> proportionList;
         boolean flag = true;
-        // 1. Calculate the free of duty soldiers
+        // 1. Determine which soldiers are off duty
         calculateServicesHelper.setAsAvailableAllSoldiers(allSoldiers);
         calculateServicesHelper.addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
         calculateServicesHelper.excludeUnavailablePersonnel(allSoldiers,armedSoldiers,unarmedSoldiers);
@@ -76,11 +76,12 @@ public class CalculateServices {
             proportionList = countServicesForEachSold.getProportions(armedSoldiers,unarmedSoldiers,allSoldiers,soldierMap,false,Situation.UNARMED.name().toLowerCase(),isPersonnel, group);
             computeFreeSoldiersInRareCase(unarmedSoldiers,soldierMap,proportionList,numberOfFreePersonnel - numOfArmedSoldForOut);
         }
-        // 2. Calculate services for unarmed soldiers
+        // 2. Determine which unarmed soldiers will be assigned unarmed duties
         calculateServicesForUnarmedSoldiers(unarmedSoldiers,unarmedServices);
-        // 3. Calculate services for armed soldiers
+        // 3. Determine which armed soldiers will be assigned unarmed duties
         if(unarmedServices.size() != 0)
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
+        // 4. Determine which armed soldiers will be assigned armed duties
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
         //4. Ensure that all services are distributed uniformly
         ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
