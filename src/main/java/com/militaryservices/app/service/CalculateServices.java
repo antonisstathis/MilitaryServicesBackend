@@ -83,9 +83,9 @@ public class CalculateServices {
             setUnarmedServicesToArmedSoldiers(allSoldiers,armedSoldiers,soldierMap,unarmedServices,isPersonnel, group);
         // 4. Determine which armed soldiers will be assigned armed duties
         calculateServicesForArmedSoldiers(armedSoldiers,armedServices);
-        //4. Ensure that all services are distributed uniformly
+        // 5. Ensure that all services are distributed uniformly
         ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
-        // 5. Set dates and units
+        // 6. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
 
         return allSoldiers;
