@@ -35,7 +35,7 @@ public class User {
         this.enabled = enabled;
     }
 
-    public void setUserId(String usernamer) {
+    public void setUserId(String username) {
         this.username = username;
     }
 

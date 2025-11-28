@@ -11,7 +11,9 @@ public enum MessageKey {
     DISCHARGE_SOLDIER_SUCCESSFUL("dischargesoldier"),
     DISCHARGE_SOLDIER_NOT_PERMITTED("dischargesoldienotpermitted"),
     SOLDIER_SAVED("soldiersaved"),
-    REG_NUMBER_ALREADY_EXISTS("regnumberexists");
+    REG_NUMBER_ALREADY_EXISTS("regnumberexists"),
+    NEW_USER_SAVED("newusersaved"),
+    USER_ALREADY_EXISTS("useralreadyexists");
 
 
     private final String key;
