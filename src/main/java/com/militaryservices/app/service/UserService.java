@@ -57,7 +57,7 @@ public class UserService {
 
         List<Authority> authorities = new ArrayList<>();
         authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
-        authorities.add(new Authority(user, Role.COMMANDER.toString().toLowerCase()));
+        //authorities.add(new Authority(user, Role.COMMANDER.toString().toLowerCase()));
         user.setAuthorities(authorities);
 
         userRepository.save(user);
