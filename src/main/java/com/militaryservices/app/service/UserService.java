@@ -73,6 +73,11 @@ public class UserService {
         human, physical, and offline identity verification is required. There is no fully automated or remote-only process
         that can safely issue identity-bound certificates in a military environment.
          */
+
+        /*
+        At this stage, I will enable mTLS certificates for the signup process, assuming that the client has obtained their
+        certificate through the appropriate official channels.
+         */
         user.setAuthorities(authorities);
 
         userRepository.save(user);
