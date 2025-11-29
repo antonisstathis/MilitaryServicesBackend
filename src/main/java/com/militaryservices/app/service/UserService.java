@@ -66,6 +66,12 @@ public class UserService {
         to log in regardless of their assigned role. Additionally, the app verifies user permissions on each request
         to ensure they only access data they are authorized to view.
          */
+
+        /*
+        I have to mention here that an mTLS certificate is already checked before this method is invoked.
+        If we want military-grade PKI security, then some human, physical, offline verification must happen.
+        There is no fully automatic, zero-contact way to issue identity-binding certificates safely in a military environment.
+         */
         user.setAuthorities(authorities);
 
         userRepository.save(user);
