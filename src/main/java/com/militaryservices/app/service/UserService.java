@@ -58,6 +58,14 @@ public class UserService {
         List<Authority> authorities = new ArrayList<>();
         authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
         //authorities.add(new Authority(user, Role.COMMANDER.toString().toLowerCase()));
+        /*
+        The signup endpoint is designed for a specific purpose. However, if someone tests it in its current state,
+        they may notice that a user created through this endpoint will not be able to log in to the app or access
+        any unauthorized data. This is because the app requires valid soldier_id and unit_id foreign keys. If
+        these values are not set, or if no corresponding entry exists in the unit table, the user will not be able
+        to log in regardless of their assigned role. Additionally, the app verifies user permissions on each request
+        to ensure they only access data they are authorized to view.
+         */
         user.setAuthorities(authorities);
 
         userRepository.save(user);
