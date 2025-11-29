@@ -68,9 +68,10 @@ public class UserService {
          */
 
         /*
-        I have to mention here that an mTLS certificate is already checked before this method is invoked.
-        If we want military-grade PKI security, then some human, physical, offline verification must happen.
-        There is no fully automatic, zero-contact way to issue identity-binding certificates safely in a military environment.
+        I would like to note that an mTLS certificate must be verified before this method is invoked, and Spring Boot
+        provides built-in support for that. In addition, if we aim for military-grade PKI security, a certain level of
+        human, physical, and offline identity verification is required. There is no fully automated or remote-only process
+        that can safely issue identity-bound certificates in a military environment.
          */
         user.setAuthorities(authorities);
 
