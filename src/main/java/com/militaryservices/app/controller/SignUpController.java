@@ -20,7 +20,7 @@ public class SignUpController {
     UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
-    @PostMapping("/signUp")
+    @PostMapping("/api//signUp")
     public ResponseEntity<?> performSignup(@RequestBody SignupRequest signupRequest) {
 
         return userService.insertNewUser(signupRequest);

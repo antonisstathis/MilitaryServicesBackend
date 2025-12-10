@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        if ("/performLogin".equals(path) || "/signUp".equals(path)) {
+        if ("/api/performLogin".equals(path) || "/api/signUp".equals(path)) {
             filterChain.doFilter(request, response);
             return;
         }

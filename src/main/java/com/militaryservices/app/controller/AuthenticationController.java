@@ -30,7 +30,7 @@ public class AuthenticationController {
     AuthorityService authorityService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
-    @PostMapping("/performLogin")
+    @PostMapping("/api/performLogin")
     public ResponseEntity<?> performLogin(@RequestBody LoginRequest loginRequest) {
         try {
             UserDto user = userService.findUser(loginRequest.getUsername());

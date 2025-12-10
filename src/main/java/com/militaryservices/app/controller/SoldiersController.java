@@ -51,7 +51,7 @@ public class SoldiersController {
 
     }
 
-    @GetMapping("/getSoldiers")
+    @GetMapping("/api/getSoldiers")
     public ResponseEntity<?> getSoldiers(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierDto> soldiers = soldierService.findAll(userDto, isPersonnel);
@@ -59,7 +59,7 @@ public class SoldiersController {
         return ResponseEntity.ok(soldiers);
     }
 
-    @GetMapping("/getSoldiersOfUnit")
+    @GetMapping("/api/getSoldiersOfUnit")
     public ResponseEntity<?> getSoldiersOfUnit(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPersonalDataDto> soldiers = soldierService.loadSoldiers(userDto,isPersonnel);
@@ -67,7 +67,7 @@ public class SoldiersController {
         return ResponseEntity.ok(soldiers);
     }
 
-    @GetMapping("/getSoldierByRegistrationNumber")
+    @GetMapping("/api/getSoldierByRegistrationNumber")
     public ResponseEntity<?> getSoldierByRegistrationNumber(HttpServletRequest request,@RequestParam("regnumb") String registrationNumber) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPersonalDataDto> soldiers = soldierService.findSoldiersByRegistrationNumber(registrationNumber,userDto);
@@ -75,7 +75,7 @@ public class SoldiersController {
         return ResponseEntity.ok(soldiers);
     }
 
-    @GetMapping("/getServicesOfSoldier")
+    @GetMapping("/api/getServicesOfSoldier")
     public ResponseEntity<?> getServicesOfSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
         if(!jwtUtil.isTokenValid(soldierToken))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
@@ -85,7 +85,7 @@ public class SoldiersController {
         return ResponseEntity.ok(services);
     }
 
-    @GetMapping("/dischargeSoldier")
+    @GetMapping("/api/dischargeSoldier")
     public ResponseEntity<?> dischargeSoldier(HttpServletRequest request,@RequestParam("soldierToken") String soldierToken) {
         if(!jwtUtil.isTokenValid(soldierToken))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.UNAUTHORIZED.key(),Locale.ENGLISH));
@@ -95,21 +95,21 @@ public class SoldiersController {
                 ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(messageService.getMessage(MessageKey.DISCHARGE_SOLDIER_NOT_PERMITTED.key(), Locale.ENGLISH));
     }
 
-    @GetMapping("/getFirstCalcDate")
+    @GetMapping("/api/getFirstCalcDate")
     public ResponseEntity<?> getFirstCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         LocalDate dateOfFirstCalc = soldierService.getDateByCalculationNumber(userDto,1, isPersonnel);
         return ResponseEntity.ok(dateOfFirstCalc);
     }
 
-    @GetMapping("/getLastCalcDate")
+    @GetMapping("/api/getLastCalcDate")
     public ResponseEntity<?> getLastCalcDate(HttpServletRequest request, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         LocalDate dateOfLastCalculation = soldierService.getDateOfLastCalculation(user,isPersonnel);
         return ResponseEntity.ok(dateOfLastCalculation);
     }
 
-    @GetMapping("/getPreviousCalculation")
+    @GetMapping("/api/getPreviousCalculation")
     public ResponseEntity<?> getPreviousCalculation(HttpServletRequest request,@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate prevDate,@RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         List<SoldierPreviousServiceDto> soldiers = soldierService.findPreviousCalculation(userDto,prevDate,isPersonnel);
@@ -117,7 +117,7 @@ public class SoldiersController {
         return ResponseEntity.ok(soldiers);
     }
 
-    @GetMapping("/calc")
+    @GetMapping("/api/calc")
     public ResponseEntity<?> calculateNewServices(HttpServletRequest request,@RequestParam("lastDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate lastDate,
                                                   @RequestParam("isPersonnel") boolean isPersonnel){
         UserDto user = userRequestHelper.getUserFromRequest(request);
@@ -128,27 +128,27 @@ public class SoldiersController {
         return ResponseEntity.ok(messageService.getMessage(MessageKey.NEW_SERVICES_CALCULATED.key(),Locale.ENGLISH));
     }
 
-    @GetMapping("/getServices")
+    @GetMapping("/api/getServices")
     public ResponseEntity<?> getServices(HttpServletRequest request,@RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate prevDate,
                                          @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         return ResponseEntity.ok(serOfUnitService.getAllServices(user,prevDate,isPersonnel));
     }
 
-    @GetMapping("/getNameOfUnit")
+    @GetMapping("/api/getNameOfUnit")
     public ResponseEntity<?> getNameOfUnit(HttpServletRequest request) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         return ResponseEntity.ok(unitService.findNameOfUnit(user));
     }
 
-    @GetMapping("/getSoldiersStatistics")
+    @GetMapping("/api/getSoldiersStatistics")
     public ResponseEntity<?> getStatistics(HttpServletRequest request,@RequestParam StatisticalData statisticalDataOption, @RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         List<SoldierServiceStatDto> soldierServiceStatDtos = soldierService.getSoldierServiceStats(user, statisticalDataOption,isPersonnel);
         return ResponseEntity.ok(soldierServiceStatDtos);
     }
 
-    @PostMapping("/getSoldier")
+    @PostMapping("/api/getSoldier")
     public ResponseEntity<?> getSoldier(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
         String token = soldDto.getToken();
         if(!jwtUtil.isTokenValid(token))
@@ -163,7 +163,7 @@ public class SoldiersController {
         return ResponseEntity.ok(soldierDto);
     }
 
-    @PostMapping("/changeSoldSituation")
+    @PostMapping("/api/changeSoldSituation")
     public ResponseEntity<?> changeSoldierSituation(HttpServletRequest request,@Valid @RequestBody SoldierSelectDto soldDto) {
         UserDto userDto = userRequestHelper.getUserFromRequest(request);
         String token = soldDto.getToken();
@@ -176,7 +176,7 @@ public class SoldiersController {
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SOLDIER_UPDATED.key(),Locale.ENGLISH));
     }
 
-    @PostMapping("/saveNewSoldier")
+    @PostMapping("/api/saveNewSoldier")
     public ResponseEntity<?> saveNewSoldier(HttpServletRequest request,@Valid @RequestBody SoldierPersonalDataDto soldierDto) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
         SoldierPersonalDataDto soldier = new SoldierPersonalDataDto();
@@ -201,7 +201,7 @@ public class SoldiersController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.REG_NUMBER_ALREADY_EXISTS.key(), Locale.ENGLISH));
     }
 
-    @PostMapping("/saveNewServices")
+    @PostMapping("/api/saveNewServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
     public ResponseEntity<?> saveNewServices(HttpServletRequest request, @RequestBody @Valid ServiceOfUnitDto dto,@RequestParam("isPersonnel") boolean isPersonnel) {
         UserDto user = userRequestHelper.getUserFromRequest(request);
@@ -216,7 +216,7 @@ public class SoldiersController {
         return ResponseEntity.ok(messageService.getMessage(MessageKey.ADD_SERVICES.key(), Locale.ENGLISH));
     }
 
-    @PostMapping("/deleteServices")
+    @PostMapping("/api/deleteServices")
     @PreAuthorize(RoleExpressions.COMMANDER)
     public  ResponseEntity<?> deleteServices(HttpServletRequest request,@RequestBody List<Long> ids) {
         soldierService.deleteServices(ids);
