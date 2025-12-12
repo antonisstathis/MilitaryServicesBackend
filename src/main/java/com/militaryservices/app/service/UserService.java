@@ -47,17 +47,34 @@ public class UserService {
     }
 
     public ResponseEntity<?> insertNewUser(String userData, String verify,SignupRequest signupRequest) {
-        if (userRepository.existsById(signupRequest.getUsername()))
+        if(!"SUCCESS".equals(verify))
+            return ResponseEntity.badRequest().body(messageService.getMessage(MessageKey.USER_ALREADY_EXISTS.key(), Locale.ENGLISH));
+
+        CertificateDnParser.ParsedCertData parsedCertData = CertificateDnParser.parse(userData);
+        if (userRepository.existsById(parsedCertData.getUsername()))
             return ResponseEntity.badRequest().body(messageService.getMessage(MessageKey.USER_ALREADY_EXISTS.key(), Locale.ENGLISH));
 
         User user = new User();
-        user.setUserId(signupRequest.getUsername());
+        user.setUserId(parsedCertData.getUsername());
         user.setPassword(encoder.encode(signupRequest.getPassword()));
         user.setEnabled(true);
 
         List<Authority> authorities = new ArrayList<>();
-        authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
+        switch (parsedCertData.getAuthority()) {
+            case "soldier":
+                authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
+                user.setAuthorities(authorities);
+                break;
 
+            case "commander":
+                authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
+                authorities.add(new Authority(user, Role.COMMANDER.toString().toLowerCase()));
+                user.setAuthorities(authorities);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown authority: " + parsedCertData.getAuthority());
+        }
         user.setAuthorities(authorities);
 
         userRepository.save(user);
