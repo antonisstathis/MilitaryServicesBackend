@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +21,12 @@ public class SignUpController {
     UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
-    @PostMapping("/api//signUp")
-    public ResponseEntity<?> performSignup(@RequestBody SignupRequest signupRequest) {
+    @PostMapping("/api/signUp")
+    public ResponseEntity<?> performSignup(@RequestHeader("X-Client-DN") String username,
+                                           @RequestHeader("X-Client-Verify") String verify, @RequestBody SignupRequest signupRequest) {
 
+        signupRequest.setUsername(username);
+        //signupRequest.setAuthority(authority);
         return userService.insertNewUser(signupRequest);
     }
 

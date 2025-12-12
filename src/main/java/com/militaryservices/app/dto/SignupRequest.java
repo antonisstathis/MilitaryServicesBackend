@@ -4,8 +4,18 @@ public class SignupRequest {
 
     private String username;
     private String password;
+    private String authority;
 
     // Getters and setters
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
     public String getUsername() {
         return username;
     }
