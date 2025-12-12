@@ -46,7 +46,7 @@ public class UserService {
         return new UserDto(user.getUserId(), user.getPassword(), user.getSoldier().getId(), user.isEnabled(), user.getAuthorities());
     }
 
-    public ResponseEntity<?> insertNewUser(SignupRequest signupRequest) {
+    public ResponseEntity<?> insertNewUser(String userData, String verify,SignupRequest signupRequest) {
         if (userRepository.existsById(signupRequest.getUsername()))
             return ResponseEntity.badRequest().body(messageService.getMessage(MessageKey.USER_ALREADY_EXISTS.key(), Locale.ENGLISH));
 
@@ -57,27 +57,7 @@ public class UserService {
 
         List<Authority> authorities = new ArrayList<>();
         authorities.add(new Authority(user, Role.SOLDIER.toString().toLowerCase()));
-        //authorities.add(new Authority(user, Role.COMMANDER.toString().toLowerCase()));
-        /*
-        The signup endpoint is designed for a specific purpose. However, if someone tests it in its current state,
-        they may notice that a user created through this endpoint will not be able to log in to the app or access
-        any unauthorized data. This is because the app requires valid soldier_id and unit_id foreign keys. If
-        these values are not set, or if no corresponding entry exists in the unit table, the user will not be able
-        to log in regardless of their assigned role. Additionally, the app verifies user permissions on each request
-        to ensure they only access data they are authorized to view.
-         */
 
-        /*
-        I would like to note that an mTLS certificate must be verified before this method is invoked, and Spring Boot
-        provides built-in support for that. In addition, if we aim for military-grade PKI security, a certain level of
-        human, physical, and offline identity verification is required. There is no fully automated or remote-only process
-        that can safely issue identity-bound certificates in a military environment.
-         */
-
-        /*
-        At this stage, I will enable mTLS certificates for the signup process, assuming that the client has obtained their
-        certificate through the appropriate official channels.
-         */
         user.setAuthorities(authorities);
 
         userRepository.save(user);

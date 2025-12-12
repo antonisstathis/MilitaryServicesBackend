@@ -22,12 +22,10 @@ public class SignUpController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @PostMapping("/api/signUp")
-    public ResponseEntity<?> performSignup(@RequestHeader("X-Client-DN") String username,
+    public ResponseEntity<?> performSignup(@RequestHeader("X-Client-DN") String userData,
                                            @RequestHeader("X-Client-Verify") String verify, @RequestBody SignupRequest signupRequest) {
 
-        signupRequest.setUsername(username);
-        //signupRequest.setAuthority(authority);
-        return userService.insertNewUser(signupRequest);
+        return userService.insertNewUser(userData,verify,signupRequest);
     }
 
 }
