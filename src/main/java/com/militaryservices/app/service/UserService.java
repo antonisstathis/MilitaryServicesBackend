@@ -48,7 +48,7 @@ public class UserService {
 
     public ResponseEntity<?> insertNewUser(String userData, String verify,SignupRequest signupRequest) {
         if(!"SUCCESS".equals(verify))
-            return ResponseEntity.badRequest().body(messageService.getMessage(MessageKey.USER_ALREADY_EXISTS.key(), Locale.ENGLISH));
+            return ResponseEntity.badRequest().body(messageService.getMessage(MessageKey.VERIFY_CRT.key(), Locale.ENGLISH));
 
         CertificateDnParser.ParsedCertData parsedCertData = CertificateDnParser.parse(userData);
         if (userRepository.existsById(parsedCertData.getUsername()))

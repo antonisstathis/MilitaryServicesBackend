@@ -13,7 +13,8 @@ public enum MessageKey {
     SOLDIER_SAVED("soldiersaved"),
     REG_NUMBER_ALREADY_EXISTS("regnumberexists"),
     NEW_USER_SAVED("newusersaved"),
-    USER_ALREADY_EXISTS("useralreadyexists");
+    USER_ALREADY_EXISTS("useralreadyexists"),
+    VERIFY_CRT("verifycrt");
 
 
     private final String key;
