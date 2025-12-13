@@ -30,6 +30,10 @@ public class Unit {
         return nameOfUnit;
     }
 
+    public void setNameOfUnit(String nameOfUnit) {
+        this.nameOfUnit = nameOfUnit;
+    }
+
     public String getCompanies() {
         return companies;
     }

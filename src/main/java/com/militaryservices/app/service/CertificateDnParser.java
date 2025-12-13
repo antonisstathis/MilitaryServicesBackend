@@ -11,19 +11,22 @@ public final class CertificateDnParser {
             part = part.trim();
 
             if (part.startsWith("CN=")) {
-                username = part.substring(3);
+                username = part.substring(3).trim();
             }
 
             else if (part.startsWith("OU=")) {
-                String ouValue = part.substring(3);
+                String ouValue = part.substring(3).trim();
 
-                // Expected format: "Unit 1 - commander"
                 if (ouValue.contains(" - ")) {
                     String[] ouParts = ouValue.split(" - ", 2);
                     unitName = ouParts[0].trim();
-                    authority = ouParts[1].trim();
+
+                    authority = ouParts[1]
+                            .trim()
+                            .toLowerCase()
+                            .replaceFirst("^role_", "");
                 } else {
-                    unitName = ouValue.trim();
+                    unitName = ouValue;
                 }
             }
         }
@@ -39,6 +42,7 @@ public final class CertificateDnParser {
        DTO
     ========================== */
     public static class ParsedCertData {
+
         private final String username;
         private final String unitName;
         private final String authority;
@@ -62,4 +66,3 @@ public final class CertificateDnParser {
         }
     }
 }
-

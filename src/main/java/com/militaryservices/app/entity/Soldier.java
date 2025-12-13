@@ -89,6 +89,18 @@ public class Soldier implements Serializable {
 		services = new ArrayList<>();
 	}
 
+	public Soldier(String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean isPersonnel,boolean discharged)  {
+
+		this.name = name;
+		this.surname = surname;
+		this.situation = situation;
+		this.active = active;
+		this.isPersonnel = isPersonnel;
+		this.soldierRegistrationNumber = soldierRegistrationNumber;
+		this.discharged = discharged;
+		services = new ArrayList<>();
+	}
+
 	public Soldier(int id,String company,String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean isPersonnel,boolean discharged)  {
 
 		this.name = name;
