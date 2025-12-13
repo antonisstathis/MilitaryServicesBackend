@@ -89,7 +89,8 @@ public class Soldier implements Serializable {
 		services = new ArrayList<>();
 	}
 
-	public Soldier(String soldierRegistrationNumber,String name,String surname,String situation,String active,boolean isPersonnel,boolean discharged)  {
+	public Soldier(String soldierRegistrationNumber,String name,String surname,String situation, String patronymic, String matronymic,
+				   String mobilePhone, String city, String address,String active,boolean isPersonnel,boolean discharged)  {
 
 		this.name = name;
 		this.surname = surname;
@@ -97,6 +98,11 @@ public class Soldier implements Serializable {
 		this.active = active;
 		this.isPersonnel = isPersonnel;
 		this.soldierRegistrationNumber = soldierRegistrationNumber;
+		this.patronymic = patronymic;
+		this.matronymic = matronymic;
+		this.mobilePhone = mobilePhone;
+		this.city = city;
+		this.address = address;
 		this.discharged = discharged;
 		services = new ArrayList<>();
 	}

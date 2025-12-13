@@ -74,7 +74,8 @@ public class UserService {
         Unit unit = findUnit(parsedCertData.getUnitName());
 
         Soldier soldier = new Soldier(signupRequest.getRegistrationNumber(), signupRequest.getName(), signupRequest.getSurname(),
-                signupRequest.getSituation(), Active.ACTIVE.name().toLowerCase(), true, false);
+                signupRequest.getSituation(), signupRequest.getPatronymic(), signupRequest.getMatronymic(), signupRequest.getTelephone(),
+                signupRequest.getCity(), signupRequest.getAddress(), Active.ACTIVE.name().toLowerCase(), isPersonnel(signupRequest), false);
         soldier.setUnit(unit);
         user.setSoldier(soldier);
         soldierRepository.save(soldier);
@@ -129,6 +130,13 @@ public class UserService {
         request.setAddress(SanitizationUtil.sanitize(request.getAddress()));
         request.setSituation(SanitizationUtil.sanitize(request.getSituation()));
         request.setPersonnelType(SanitizationUtil.sanitize(request.getPersonnelType()));
+    }
+
+    private boolean isPersonnel (SignupRequest signupRequest) {
+        if("personnel".equals(signupRequest.getPersonnelType()))
+            return true;
+       else
+            return false;
     }
 
 }
