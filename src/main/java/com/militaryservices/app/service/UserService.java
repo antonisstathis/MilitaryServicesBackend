@@ -77,6 +77,7 @@ public class UserService {
                 signupRequest.getSituation(), Active.ACTIVE.name().toLowerCase(), true, false);
         soldier.setUnit(unit);
         user.setSoldier(soldier);
+        soldierRepository.save(soldier);
         userRepository.save(user);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
