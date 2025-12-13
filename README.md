@@ -11,6 +11,8 @@ to carry a gun due to health problems and they can be assigned services like wat
 Armed and unarmed ones. The front end of the app is in this repository https://github.com/antonisstathis/MilitaryServicesFrontend. 
 The backend is in java programming language and the framework is spring boot. The user that has the role of a soldier responsible for the calculation of the 
 services of the day can calculate the services for each day with just a click of a button.
+  The main purpose of this application is the daily service calculation, which is designed to assign services in a fair and uniform manner by taking into 
+account all historical data from past days in order to make informed decisions for each soldier.
 
 ## Disclaimer
 
