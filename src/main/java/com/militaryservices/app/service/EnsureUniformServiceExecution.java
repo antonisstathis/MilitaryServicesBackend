@@ -161,7 +161,7 @@ public class EnsureUniformServiceExecution {
         for(int i = 0; i < ratiosForService.size(); i++) {
             soldId = ratiosForService.get(i).getSoldId();
             if (soldiersIds.containsKey(soldId))
-                soldier = allSoldiers.get(ratiosForService.get(i).getSoldId());
+                return allSoldiers.get(ratiosForService.get(i).getSoldId());
         }
 
         return soldier;
