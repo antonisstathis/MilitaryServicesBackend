@@ -55,6 +55,15 @@ public class CountServicesForEachSold {
         return ratios;
     }
 
+    public List<Service> getServices(Unit unit, String armed, boolean isPersonnel, List<Service> servicesToLoad, String group) {
+
+        List<String> serviceNames = new ArrayList<>();
+        for(Service service : servicesToLoad)
+            serviceNames.add(service.getServiceName());
+
+        return soldierAccess.getServiceSpread(unit, isPersonnel, group, armed, serviceNames);
+    }
+
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
         List<HistoricalData> armedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(), Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
         List<HistoricalData> unarmedServices = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.UNARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());

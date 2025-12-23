@@ -48,14 +48,15 @@ public class EnsureUniformServiceExecution {
 
         Map<Service, Service> mapOfServices = new HashMap<>();
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        if(!addServicesToDataStructures(allSoldiers, unarmedServices, mapOfServices, soldiersIds))
+        List<Service> orderedUnarmedServices = countServicesForEachSold.getServices(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
+        if(!addServicesToDataStructures(allSoldiers, orderedUnarmedServices, mapOfServices, soldiersIds))
             return unarmedServices;
 
         List<ServiceRatioDto> ratiosForService;
         Soldier soldier;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
                 isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        for (Service service : unarmedServices) {
+        for (Service service : orderedUnarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = findSoldier(allSoldiers, ratiosForService, soldiersIds);
             soldier.setService(service);
@@ -89,7 +90,8 @@ public class EnsureUniformServiceExecution {
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
                 isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        for(Service service : unarmedServices) {
+        List<Service> orderedUnarmedServices = countServicesForEachSold.getServices(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
+        for(Service service : orderedUnarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = findSoldier(soldierMap, ratiosForService, soldiersIds);
             soldier.setService(service);
@@ -116,7 +118,8 @@ public class EnsureUniformServiceExecution {
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.ARMED.name().toLowerCase(),
                 isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        for(Service service : armedServices) {
+        List<Service> orderedArmedServices = countServicesForEachSold.getServices(unit, Situation.ARMED.name().toLowerCase(), isPersonnel, armedServices, group);
+        for(Service service : orderedArmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = findSoldier(allSoldiers, ratiosForService, soldiersIds);
             soldier.setService(service);

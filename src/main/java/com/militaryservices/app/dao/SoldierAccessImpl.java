@@ -1,9 +1,6 @@
 package com.militaryservices.app.dao;
 
-import com.militaryservices.app.dto.ServiceRatioDto;
-import com.militaryservices.app.dto.SoldierServiceStatDto;
-import com.militaryservices.app.dto.HistoricalData;
-import com.militaryservices.app.dto.SoldierServiceDto;
+import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Service;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
@@ -300,6 +297,72 @@ public class SoldierAccessImpl {
 			list.sort(Comparator.comparing(ServiceRatioDto::getPercentShare));
 
 		return result;
+	}
+
+	@Transactional
+	public List<Service> getServiceSpread(Unit unit, boolean isPersonnel, String group, String armed, List<String> serviceNames) {
+
+		if (serviceNames == null || serviceNames.isEmpty())
+			return Collections.emptyList();
+
+		String sql = "WITH service_spread AS (" +
+				"   SELECT x.ser_name, MAX(x.cnt) - MIN(x.cnt) AS service_spread " +
+				"   FROM ( " +
+				"       SELECT s.ser_name, s.sold_id, COUNT(*) AS cnt " +
+				"       FROM ms.services s " +
+				"       WHERE s.ser_name <> :excludedService " +
+				"         AND s.unit_id = :unitId " +
+				"         AND s.is_personnel = :isPersonnel " +
+				"         AND s.ser_group = :group " +
+				"         AND s.armed = :armed " +
+				"         AND s.ser_name IN (:serviceNames) " +
+				"       GROUP BY s.ser_name, s.sold_id " +
+				"   ) x " +
+				"   GROUP BY x.ser_name " +
+				"), " +
+				"service_metadata AS ( " +
+				"   SELECT DISTINCT ON (s.ser_name) " +
+				"       s.ser_name, s.ser_group, s.description, s.armed, s.unit_id, s.is_personnel " +
+				"   FROM ms.services s " +
+				"   WHERE s.ser_name <> :excludedService " +
+				"     AND s.unit_id = :unitId " +
+				"     AND s.is_personnel = :isPersonnel " +
+				"     AND s.ser_group = :group " +
+				"     AND s.armed = :armed " +
+				"     AND s.ser_name IN (:serviceNames) " +
+				"   ORDER BY s.ser_name, s.ser_date DESC " +
+				") " +
+				"SELECT sm.ser_name, sm.ser_group, sm.description, sm.armed, sm.unit_id, sm.is_personnel, ss.service_spread " +
+				"FROM service_metadata sm " +
+				"JOIN service_spread ss ON ss.ser_name = sm.ser_name " +
+				"ORDER BY ss.service_spread DESC, sm.ser_name;";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("excludedService", "out");
+		query.setParameter("unitId", unit.getId());
+		query.setParameter("isPersonnel", isPersonnel);
+		query.setParameter("group", group);
+		query.setParameter("armed", armed);
+		query.setParameter("serviceNames", serviceNames);
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> rows = query.getResultList();
+
+		List<Service> services = new ArrayList<>();
+
+		for (Object[] row : rows) {
+			Service service = new Service();
+
+			service.setServiceName((String) row[0]);
+			service.setGroup((String) row[1]);
+			service.setDescription((String) row[2]);
+			service.setArmed((String) row[3]);
+			service.setPersonnel(row[5] != null && (Boolean) row[5]);
+			service.setUnit(unit);
+			services.add(service);
+		}
+
+		return services;
 	}
 
 	@Transactional
