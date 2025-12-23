@@ -59,6 +59,7 @@ public class CalculateServices {
         List<Service> unarmedServices = new ArrayList<>();
         List<SoldierProportion> proportionList;
         boolean flag = true;
+        logger.info("\n\n----------------------------------------------------------------------------------------------------------New Calculation----------------------------------------------------------------------------------------------------------");
         // 1. Determine which soldiers are off duty
         calculateServicesHelper.setAsAvailableAllSoldiers(allSoldiers);
         calculateServicesHelper.addServicesAndSoldiers(allSoldiers,armedSoldiers,unarmedSoldiers,soldierMap,servicesOfUnit,armedServices,unarmedServices);
@@ -87,6 +88,7 @@ public class CalculateServices {
         ensureUniformServiceExecution.ensureAllServicesAreUniform(allSoldiers, unit, isPersonnel, group);
         // 6. Set dates and units
         calculateServicesHelper.setCalculationDateAndUnit(nextDate,allSoldiers);
+        logger.info("\n--------------------------------------------------------------------------------------------------------------------------------------------------End Of Calculation-----------------------------------------------------------------------------------------------------------------------------------------------");
 
         return allSoldiers;
     }
@@ -110,6 +112,7 @@ public class CalculateServices {
 
     // Assign as free of duty the soldiers with the worst proportion until now
     private void setFreeBasedOnProp(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
+        logger.info("\n----------------------------------------------------------------------------------------------------------setFreeBasedOnProp method----------------------------------------------------------------------------------------------------------");
         if(numberOfFreePersonnel == 0)
             return;
 
@@ -121,6 +124,9 @@ public class CalculateServices {
             if(numberOfFreePersonnel > 0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
                 soldier.setService(new Service("out", Active.getFreeOfDuty(), LocalDate.now(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
+                logger.info("SERVICE ASSIGNED - soldierId={}, soldierName={}, soldierSurname={}, situation={} unit={}, serviceName={}, date={}, personnel={}",
+                        soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(), soldier.getUnit().getNameOfUnit(), soldier.getService().getServiceName(),
+                        soldier.getService().getDate(), soldier.isPersonnel());
                 removeSoldier(armedSoldiers, unarmedSoldiers, soldier);
                 numberOfFreePersonnel -= 1;
             }
@@ -128,6 +134,7 @@ public class CalculateServices {
     }
 
     private void computeFreeSoldiersInRareCase(Set<Soldier> soldiers,Map<Integer,Soldier> soldierMap,List<SoldierProportion> proportionList,int numberOfFreePersonnel) {
+        logger.info("\n----------------------------------------------------------------------------------------------------------computeFreeSoldiersInRareCase method ----------------------------------------------------------------------------------------------------------");
         if(numberOfFreePersonnel == 0)
             return;
 
@@ -139,6 +146,9 @@ public class CalculateServices {
             if(numberOfFreePersonnel>0) {
                 soldier = soldierMap.get(soldierProportion.getSoldId());
                 soldier.setService(new Service("out", Active.getFreeOfDuty(), LocalDate.now(), soldier.getUnit(), Active.getFreeOfDuty(),"06:00-06:00", soldier.isPersonnel()));
+                logger.info("SERVICE ASSIGNED - soldierId={}, soldierName={}, soldierSurname={}, situation={} unit={}, serviceName={}, date={}, personnel={}",
+                        soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(), soldier.getUnit().getNameOfUnit(), soldier.getService().getServiceName(),
+                        soldier.getService().getDate(), soldier.isPersonnel());
                 soldiers.remove(soldier);
                 numberOfFreePersonnel -= 1;
             }
@@ -170,6 +180,7 @@ public class CalculateServices {
     }
 
     private void calculateServicesForUnarmedSoldiers(Set<Soldier> unarmedSoldiers,List<Service> unarmedServices) {
+        logger.info("\n----------------------------------------------------------------------------------------------------------calculateServicesForUnarmedSoldiers method----------------------------------------------------------------------------------------------------------");
         Random random = new Random();
         int randomIndex;
         Service service;
@@ -177,6 +188,9 @@ public class CalculateServices {
             randomIndex = random.nextInt(unarmedServices.size());
             service = unarmedServices.get(randomIndex);
             sold.setService(service);
+            logger.info("SERVICE ASSIGNED - soldierId={}, soldierName={}, soldierSurname={}, situation={} unit={}, serviceName={}, date={}, personnel={}",
+                    sold.getId(), sold.getName(), sold.getSurname(), sold.getSituation(), sold.getUnit().getNameOfUnit(), sold.getService().getServiceName(),
+                    sold.getService().getDate(), sold.isPersonnel());
             unarmedServices.remove(randomIndex);
             if(unarmedServices.size()==0)
                 break;
@@ -184,6 +198,7 @@ public class CalculateServices {
     }
 
     private void setUnarmedServicesToArmedSoldiers(List<Soldier> allSoldiers,Set<Soldier> armedSoldiers,Map<Integer,Soldier> soldierMap,List<Service> unarmedServices,boolean isPersonnel, String group) {
+        logger.info("\n----------------------------------------------------------------------------------------------------------setUnarmedServicesToArmedSoldiers method----------------------------------------------------------------------------------------------------------");
         List<HistoricalData> historicalData = soldierAccess.getHistoricalDataDesc(allSoldiers.get(0).getUnit(),Situation.ARMED.name().toLowerCase(),isPersonnel, group, Active.ACTIVE.name().toLowerCase());
 
         Map<Integer,Soldier> soldiersMap = new HashMap<>();
@@ -200,6 +215,9 @@ public class CalculateServices {
             if("out".equals(soldier.getService().getServiceName()))
                 continue;
             soldier.setService(unarmedServices.get(0));
+            logger.info("SERVICE ASSIGNED - soldierId={}, soldierName={}, soldierSurname={}, situation={} unit={}, serviceName={}, date={}, personnel={}",
+                    soldier.getId(), soldier.getName(), soldier.getSurname(), soldier.getSituation(), soldier.getUnit().getNameOfUnit(), soldier.getService().getServiceName(),
+                    soldier.getService().getDate(), soldier.isPersonnel());
             unarmedServices.remove(0);
             armedSoldiers.remove(soldier);
             if(unarmedServices.size() == 0)
@@ -208,6 +226,7 @@ public class CalculateServices {
     }
 
     private void calculateServicesForArmedSoldiers(Set<Soldier> armedSoldiers,List<Service> armedServices) {
+        logger.info("\n----------------------------------------------------------------------------------------------------------calculateServicesForArmedSoldiers method----------------------------------------------------------------------------------------------------------");
         Random random = new Random();
         int randomIndex;
         Service service;
@@ -215,6 +234,9 @@ public class CalculateServices {
             randomIndex = random.nextInt(armedServices.size());
             service = armedServices.get(randomIndex);
             sold.setService(service);
+            logger.info("SERVICE ASSIGNED - soldierId={}, soldierName={}, soldierSurname={}, situation={} unit={}, serviceName={}, date={}, personnel={}",
+                    sold.getId(), sold.getName(), sold.getSurname(), sold.getSituation(), sold.getUnit().getNameOfUnit(), sold.getService().getServiceName(),
+                    sold.getService().getDate(), sold.isPersonnel());
             armedServices.remove(randomIndex);
         }
     }

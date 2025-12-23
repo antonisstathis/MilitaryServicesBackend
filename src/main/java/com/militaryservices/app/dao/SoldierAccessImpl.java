@@ -223,47 +223,51 @@ public class SoldierAccessImpl {
 				      AND sol.sold_id IN (:soldierIds)
 				),
 				services_of_unit AS (
-				    SELECT ser_name
-				    FROM ms.ser_of_unit
-				    WHERE unit_id = :unitId
-				      AND armed = :armed
+				    SELECT su.ser_id, su.ser_name
+				    FROM ms.ser_of_unit su
+				    WHERE su.unit_id = :unitId
+				      AND su.armed = :armed
 				),
 				soldier_service_matrix AS (
-				    SELECT ss.sold_id, su.ser_name
+				    SELECT
+				        ss.sold_id,
+				        su.ser_id,
+				        su.ser_name
 				    FROM selected_soldiers ss
 				    CROSS JOIN services_of_unit su
 				),
 				soldier_service_counts AS (
 				    SELECT
-				        sm.sold_id,
-				        sm.ser_name,
-				        COALESCE(COUNT(s.ser_name), 0) AS service_count
-				    FROM soldier_service_matrix sm
+				        m.sold_id,
+				        m.ser_name,
+				        COUNT(s.ser_id) AS done_services
+				    FROM soldier_service_matrix m
 				    LEFT JOIN ms.services s
-				           ON s.sold_id = sm.sold_id
-				          AND s.ser_name = sm.ser_name
+				           ON s.sold_id = m.sold_id
+				          AND s.ser_id = m.ser_id
 				          AND s.armed = :armed
-				    GROUP BY sm.sold_id, sm.ser_name
+				    GROUP BY m.sold_id, m.ser_name
 				),
-				total_counts AS (
-				    SELECT
-				        sold_id,
-				        SUM(service_count) AS total_count
-				    FROM soldier_service_counts
-				    GROUP BY sold_id
+				total_services_of_unit AS (
+				    SELECT COUNT(*) AS total_services
+				    FROM services_of_unit
 				)
 				SELECT
-				    sc.sold_id,
-				    sc.ser_name,
-				    sc.service_count AS service_heavy_count,
-				    tc.total_count AS total_heavy_count,
-				    CASE\s
-				        WHEN tc.total_count = 0 THEN 0
-				        ELSE ROUND((sc.service_count::NUMERIC / tc.total_count) * 100, 2)
-				    END AS percent_share
-				FROM soldier_service_counts sc
-				JOIN total_counts tc ON sc.sold_id = tc.sold_id
-				ORDER BY percent_share ASC, sc.sold_id, sc.ser_name;
+				    ssc.sold_id                          AS sold_id,
+				    ssc.ser_name                         AS ser_name,
+				    ssc.done_services                    AS service_heavy_count,
+				    ts.total_services                    AS total_heavy_count,
+				    CASE
+				        WHEN ssc.done_services = 0 THEN 0
+				        WHEN ts.total_services = 0 THEN 0
+				        ELSE ROUND(
+				            (ssc.done_services::NUMERIC / ts.total_services) * 100,
+				            2
+				        )
+				    END                                  AS percent_share
+				FROM soldier_service_counts ssc
+				CROSS JOIN total_services_of_unit ts
+				ORDER BY ssc.ser_name, ssc.sold_id;
 				""";
 
 		Query query = entityManager.createNativeQuery(sql, "ServiceRatioMapping");
@@ -274,7 +278,6 @@ public class SoldierAccessImpl {
 		query.setParameter("active", active);
 		query.setParameter("soldierIds", soldierIds);
 
-		@SuppressWarnings("unchecked")
 		List<ServiceRatioDto> flatList = query.getResultList();
 
 		Map<String, List<ServiceRatioDto>> result = new HashMap<>();

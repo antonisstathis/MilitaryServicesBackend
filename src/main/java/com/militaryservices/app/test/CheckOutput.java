@@ -1,9 +1,12 @@
 package com.militaryservices.app.test;
 
+import com.militaryservices.app.controller.SoldiersController;
 import com.militaryservices.app.dao.SerOfUnitRepository;
 import com.militaryservices.app.dao.SoldierAccessImpl;
 import com.militaryservices.app.dao.UserRepository;
 import com.militaryservices.app.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +22,14 @@ public class CheckOutput {
     SoldierAccessImpl soldierAccess;
     @Autowired
     SerOfUnitRepository serOfUnitRepository;
+    private static final Logger logger = LoggerFactory.getLogger(SoldiersController.class);
 
     public CheckOutput( ) {
     }
 
 
     public boolean checkResults(String username) {
+        logger.info("CHECK METHOD CALLED for user {}", username);
         Optional<User> user = userRepository.findById(username);
         Unit unit = user.get().getSoldier().getUnit();
         LocalDate dateOfLastCalculation = soldierAccess.getDateOfLastCalculation(unit,false);
@@ -47,16 +52,21 @@ public class CheckOutput {
                 freq = servicesMap.get(serviceName);
                 servicesMap.put(serviceName, freq - 1);
             }
-            if (!servicesMap.containsKey(serviceName) && !"out".equals(soldier.getService().getServiceName()) && !"free of duty".equals(soldier.getService().getServiceName()))
+            if (!servicesMap.containsKey(serviceName) && !"out".equals(soldier.getService().getServiceName()) && !"free of duty".equals(soldier.getService().getServiceName())) {
+                logger.error("CHECK FAILED [UNEXPECTED SERVICE] - user={}, unit={}, soldierId={}, service={}", username, unit.getNameOfUnit(), soldier.getId(), serviceName);
                 return false;
+            }
         }
 
         for (Map.Entry<String, Integer> entry : servicesMap.entrySet()) {
             freq = entry.getValue();
-            if (freq != 0)
+            if (freq != 0) {
+                logger.error("CHECK FAILED [UNEXPECTED SERVICE] - user={}, unit={}, service={}", username, unit.getNameOfUnit(), entry.getKey());
                 return false;
+            }
         }
 
+        logger.info("CHECKS SUCCEED for user {}", username);
         return true;
     }
 
