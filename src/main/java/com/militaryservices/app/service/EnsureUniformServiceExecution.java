@@ -48,7 +48,7 @@ public class EnsureUniformServiceExecution {
 
         Map<Service, Service> mapOfServices = new HashMap<>();
         Map<Integer, Soldier> soldiersIds = new HashMap<>();
-        List<Service> orderedUnarmedServices = countServicesForEachSold.getServices(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
+        List<Service> orderedUnarmedServices = countServicesForEachSold.getServicesOrderedBySpread(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
         if(!addServicesToDataStructures(allSoldiers, orderedUnarmedServices, mapOfServices, soldiersIds))
             return unarmedServices;
 
@@ -90,7 +90,7 @@ public class EnsureUniformServiceExecution {
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.UNARMED.name().toLowerCase(),
                 isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        List<Service> orderedUnarmedServices = countServicesForEachSold.getServices(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
+        List<Service> orderedUnarmedServices = countServicesForEachSold.getServicesOrderedBySpread(unit, Situation.UNARMED.name().toLowerCase(), isPersonnel, unarmedServices, group);
         for(Service service : orderedUnarmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = findSoldier(soldierMap, ratiosForService, soldiersIds);
@@ -118,7 +118,7 @@ public class EnsureUniformServiceExecution {
         List<ServiceRatioDto> ratiosForService;
         Map<String, List<ServiceRatioDto>> ratios = countServicesForEachSold.getRatioOfServicesForEachSoldier(unit, Situation.ARMED.name().toLowerCase(),
                 isPersonnel, group, Active.ACTIVE.name().toLowerCase(), soldiersIds);
-        List<Service> orderedArmedServices = countServicesForEachSold.getServices(unit, Situation.ARMED.name().toLowerCase(), isPersonnel, armedServices, group);
+        List<Service> orderedArmedServices = countServicesForEachSold.getServicesOrderedBySpread(unit, Situation.ARMED.name().toLowerCase(), isPersonnel, armedServices, group);
         for(Service service : orderedArmedServices) {
             ratiosForService = ratios.get(service.getServiceName());
             soldier = findSoldier(allSoldiers, ratiosForService, soldiersIds);

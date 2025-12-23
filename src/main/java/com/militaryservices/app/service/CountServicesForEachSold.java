@@ -55,7 +55,7 @@ public class CountServicesForEachSold {
         return ratios;
     }
 
-    public List<Service> getServices(Unit unit, String armed, boolean isPersonnel, List<Service> servicesToLoad, String group) {
+    public List<Service> getServicesOrderedBySpread(Unit unit, String armed, boolean isPersonnel, List<Service> servicesToLoad, String group) {
 
         List<String> serviceNames = new ArrayList<>();
         for(Service service : servicesToLoad)
