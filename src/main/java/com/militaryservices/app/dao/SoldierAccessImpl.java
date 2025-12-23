@@ -223,7 +223,7 @@ public class SoldierAccessImpl {
 				      AND sol.sold_id IN (:soldierIds)
 				),
 				services_of_unit AS (
-				    SELECT su.ser_id, su.ser_name
+				    SELECT su.ser_name
 				    FROM ms.ser_of_unit su
 				    WHERE su.unit_id = :unitId
 				      AND su.armed = :armed
@@ -231,7 +231,6 @@ public class SoldierAccessImpl {
 				soldier_service_matrix AS (
 				    SELECT
 				        ss.sold_id,
-				        su.ser_id,
 				        su.ser_name
 				    FROM selected_soldiers ss
 				    CROSS JOIN services_of_unit su
@@ -240,33 +239,42 @@ public class SoldierAccessImpl {
 				    SELECT
 				        m.sold_id,
 				        m.ser_name,
-				        COUNT(s.ser_id) AS done_services
+				        COUNT(s.ser_name) AS done_services
 				    FROM soldier_service_matrix m
 				    LEFT JOIN ms.services s
 				           ON s.sold_id = m.sold_id
-				          AND s.ser_id = m.ser_id
+				          AND s.ser_name = m.ser_name
 				          AND s.armed = :armed
+				          AND s.unit_id = :unitId
 				    GROUP BY m.sold_id, m.ser_name
 				),
-				total_services_of_unit AS (
-				    SELECT COUNT(*) AS total_services
-				    FROM services_of_unit
+				soldier_total_service_counts AS (
+				    SELECT
+				        s.sold_id,
+				        COUNT(*) AS total_done_services
+				    FROM ms.services s
+				    JOIN services_of_unit su
+				      ON su.ser_name = s.ser_name
+				    WHERE s.armed = :armed
+				      AND s.unit_id = :unitId
+				      AND s.sold_id IN (SELECT sold_id FROM selected_soldiers)
+				    GROUP BY s.sold_id
 				)
 				SELECT
-				    ssc.sold_id                          AS sold_id,
-				    ssc.ser_name                         AS ser_name,
-				    ssc.done_services                    AS service_heavy_count,
-				    ts.total_services                    AS total_heavy_count,
+				    ssc.sold_id                                 AS sold_id,
+				    ssc.ser_name                                AS ser_name,
+				    ssc.done_services                           AS service_heavy_count,
+				    COALESCE(st.total_done_services, 0)         AS total_heavy_count,
 				    CASE
-				        WHEN ssc.done_services = 0 THEN 0
-				        WHEN ts.total_services = 0 THEN 0
+				        WHEN COALESCE(st.total_done_services, 0) = 0 THEN 0
 				        ELSE ROUND(
-				            (ssc.done_services::NUMERIC / ts.total_services) * 100,
+				            (ssc.done_services::NUMERIC / st.total_done_services) * 100,
 				            2
 				        )
-				    END                                  AS percent_share
+				    END                                         AS percent_share
 				FROM soldier_service_counts ssc
-				CROSS JOIN total_services_of_unit ts
+				LEFT JOIN soldier_total_service_counts st
+				       ON st.sold_id = ssc.sold_id
 				ORDER BY ssc.ser_name, ssc.sold_id;
 				""";
 
