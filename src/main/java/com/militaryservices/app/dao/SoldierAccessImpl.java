@@ -300,7 +300,7 @@ public class SoldierAccessImpl {
 	}
 
 	@Transactional
-	public List<Service> getServiceSpread(Unit unit, boolean isPersonnel, String group, String armed, List<String> serviceNames) {
+	public List<Service> getServicesOrderedBySpread(Unit unit, boolean isPersonnel, String group, String armed, List<String> serviceNames) {
 
 		if (serviceNames == null || serviceNames.isEmpty())
 			return Collections.emptyList();
