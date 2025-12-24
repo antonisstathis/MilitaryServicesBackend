@@ -61,7 +61,7 @@ public class CountServicesForEachSold {
         for(Service service : servicesToLoad)
             serviceNames.add(service.getServiceName());
 
-        return soldierAccess.getServicesOrderedBySpread(unit, isPersonnel, group, armed, serviceNames);
+        return soldierAccess.getServicesOrderedBySpreadDesc(unit, isPersonnel, group, armed, serviceNames);
     }
 
     private CountServices getHistoricalData(Set<Soldier> armedSoldiers,Set<Soldier> unarmedSoldiers,List<Soldier> allSoldiers, Map<Integer,Soldier> soldierMap,boolean isPersonnel, String group) {
