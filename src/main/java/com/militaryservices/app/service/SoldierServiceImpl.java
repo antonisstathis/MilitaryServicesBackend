@@ -2,6 +2,7 @@ package com.militaryservices.app.service;
 
 import com.militaryservices.app.dao.*;
 import com.militaryservices.app.dto.*;
+import com.militaryservices.app.entity.DeletedService;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,8 @@ public class SoldierServiceImpl implements SoldierService {
 	private ServiceRepository serviceRepository;
 	@Autowired
 	private SerOfUnitRepository serOfUnitRepository;
+	@Autowired
+	private DeletedServiceRepository deletedServiceRepository;
 	@PersistenceContext
 	private EntityManager entityManager;
 	private static final Logger logger = LoggerFactory.getLogger(SoldierServiceImpl.class);
@@ -395,6 +400,7 @@ public class SoldierServiceImpl implements SoldierService {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteServicesAfterDate(UserDto userDto, LocalDate date, boolean isPersonnel) {
 		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
@@ -408,6 +414,21 @@ public class SoldierServiceImpl implements SoldierService {
 			logger.warn("Selected date {} is before the earliest allowed date {}", date, earliestAllowed);
 			return false;
 		}
+
+		List<com.militaryservices.app.entity.Service> servicesToDelete =
+				serviceRepository.findByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
+		if (servicesToDelete.isEmpty()) {
+			logger.info("No services to delete after {} for unit {}", date, unit.getId());
+			return false;
+		}
+		List<DeletedService> archived = servicesToDelete.stream()
+				.map(s -> new DeletedService(
+						s,
+						userDto.getUsername(),
+						LocalDateTime.now()
+				))
+				.toList();
+		deletedServiceRepository.saveAll(archived);
 
 		serviceRepository.deleteByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
 		logger.info("Deleted services after {} for user {} (isPersonnel={})",

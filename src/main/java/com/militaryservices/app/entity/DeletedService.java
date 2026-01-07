@@ -53,7 +53,6 @@ public class DeletedService implements Serializable {
     }
 
     public DeletedService(Service service, String deletedBy, LocalDateTime deletedAt) {
-        this.id = service.getId();
         this.serviceName = service.getServiceName();
         this.armed = service.getArmed();
         this.date = service.getDate();
