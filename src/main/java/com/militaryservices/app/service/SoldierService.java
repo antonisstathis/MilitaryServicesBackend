@@ -36,4 +36,6 @@ public interface SoldierService {
     LocalDate getDateOfLastCalculation(UserDto user,boolean isPersonnel);
 
     boolean saveNewSoldier(SoldierPersonalDataDto soldier, UserDto user);
+
+    boolean deleteServicesAfterDate(UserDto user, LocalDate date, boolean isPersonnel);
 }

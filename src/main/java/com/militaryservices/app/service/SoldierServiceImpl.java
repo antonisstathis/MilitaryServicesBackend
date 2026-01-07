@@ -5,10 +5,7 @@ import com.militaryservices.app.dto.*;
 import com.militaryservices.app.entity.Soldier;
 import com.militaryservices.app.entity.Unit;
 import com.militaryservices.app.entity.User;
-import com.militaryservices.app.enums.Active;
-import com.militaryservices.app.enums.Discharged;
-import com.militaryservices.app.enums.Situation;
-import com.militaryservices.app.enums.StatisticalData;
+import com.militaryservices.app.enums.*;
 import com.militaryservices.app.security.JwtUtil;
 import com.militaryservices.app.test.CheckOutput;
 import jakarta.persistence.EntityManager;
@@ -395,6 +392,30 @@ public class SoldierServiceImpl implements SoldierService {
 	@Override
 	public void deleteServices(List<Long> ids) {
 		serOfUnitRepository.deleteAllById(ids);
+	}
+
+	@Override
+	public boolean deleteServicesAfterDate(UserDto userDto, LocalDate date, boolean isPersonnel) {
+		LocalDate firstDate = getDateByCalculationNumber(userDto, 1, isPersonnel);
+		LocalDate lastDate = getDateOfLastCalculation(userDto, isPersonnel);
+		Optional<User> user = userRepository.findById(userDto.getUsername());
+		Unit unit = user.get().getSoldier().getUnit();
+
+		// ---------- period validation ----------
+		if (date.isBefore(firstDate) || date.isAfter(lastDate)) {
+			String msg = String.format(
+					"Selected date must be between %s and %s",
+					firstDate,
+					lastDate
+			);
+			logger.warn("Rejected delete request outside range: {}", msg);
+			return false;
+		}
+
+		serviceRepository.deleteByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
+		logger.info("Deleted services after {} for user {} (isPersonnel={})",
+				date, userDto.getUsername(), isPersonnel);
+		return true;
 	}
 
 }

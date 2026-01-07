@@ -223,4 +223,18 @@ public class SoldiersController {
         return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(),Locale.ENGLISH));
     }
 
+    @DeleteMapping("/api/deleteServicesAfterDate")
+    @PreAuthorize(RoleExpressions.COMMANDER)
+    public ResponseEntity<?> deleteServicesAfterDate(HttpServletRequest request,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+            @RequestParam("isPersonnel") boolean isPersonnel) {
+
+        UserDto user = userRequestHelper.getUserFromRequest(request);
+
+        if(soldierService.deleteServicesAfterDate(user, date, isPersonnel))
+            return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(), Locale.ENGLISH));
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+    }
+
 }
