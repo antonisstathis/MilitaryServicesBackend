@@ -396,19 +396,16 @@ public class SoldierServiceImpl implements SoldierService {
 
 	@Override
 	public boolean deleteServicesAfterDate(UserDto userDto, LocalDate date, boolean isPersonnel) {
-		LocalDate firstDate = getDateByCalculationNumber(userDto, 1, isPersonnel);
 		LocalDate lastDate = getDateOfLastCalculation(userDto, isPersonnel);
 		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
 
+		// --- allow only 7 days back from selected date ---
+		LocalDate earliestAllowed = lastDate.minusDays(7);
+
 		// ---------- period validation ----------
-		if (date.isBefore(firstDate) || date.isAfter(lastDate)) {
-			String msg = String.format(
-					"Selected date must be between %s and %s",
-					firstDate,
-					lastDate
-			);
-			logger.warn("Rejected delete request outside range: {}", msg);
+		if (date.isAfter(lastDate) || date.isBefore(earliestAllowed)) {
+			logger.warn("Selected date {} is after last allowed date {}", date, lastDate);
 			return false;
 		}
 
@@ -417,5 +414,6 @@ public class SoldierServiceImpl implements SoldierService {
 				date, userDto.getUsername(), isPersonnel);
 		return true;
 	}
+
 
 }
