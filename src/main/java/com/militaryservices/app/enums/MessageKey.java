@@ -5,6 +5,7 @@ public enum MessageKey {
     SOLDIER_UPDATED("soldierupdated"),
     UNAUTHORIZED("unauthorized"),
     SERVICES_DELETED("servicesdeleted"),
+    NOT_ALLOWED_TO_DELETE_MORE_THAN_7DAYS("7dayscheck"),
     ADD_SERVICES("addservices"),
     ADD_SERVICES_REJECTED("addservicesrejected"),
     NEW_SERVICES_CALCULATED("newservicescalculated"),
