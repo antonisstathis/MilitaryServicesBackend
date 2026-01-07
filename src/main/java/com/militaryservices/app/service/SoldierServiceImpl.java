@@ -400,8 +400,8 @@ public class SoldierServiceImpl implements SoldierService {
 		Unit unit = user.get().getSoldier().getUnit();
 		LocalDate lastDate = getDateOfLastCalculation(userDto, isPersonnel);
 
-		// --- allow only 7 days back from selected date ---
-		LocalDate earliestAllowed = lastDate.minusDays(7);
+		// --- allow only 3 days back from selected date ---
+		LocalDate earliestAllowed = lastDate.minusDays(3);
 
 		// ---------- period validation ----------
 		if (date.isAfter(lastDate) || date.isBefore(earliestAllowed)) {

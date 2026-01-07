@@ -234,7 +234,7 @@ public class SoldiersController {
         if(soldierService.deleteServicesAfterDate(user, date, isPersonnel))
             return ResponseEntity.ok(messageService.getMessage(MessageKey.SERVICES_DELETED.key(), Locale.ENGLISH));
         else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.NOT_ALLOWED_TO_DELETE_MORE_THAN_7DAYS.key(),Locale.ENGLISH));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageService.getMessage(MessageKey.NOT_ALLOWED_TO_DELETE_MORE_THAN_3DAYS.key(),Locale.ENGLISH));
     }
 
 }
