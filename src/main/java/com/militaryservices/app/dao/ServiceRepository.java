@@ -17,6 +17,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     List<Service> findByUnitAndDateAndIsPersonnel(Unit unit, LocalDate date, boolean isPersonnel);
     List<Service> findByUnitAndDateAfterAndIsPersonnel(Unit unit, LocalDate date, boolean isPersonnel);
     List<Service> findBySoldierOrderByDateAsc(Soldier soldier);
+    List<Service> findByUnitAndIsPersonnel(Unit unit, boolean isPersonnel);
 
     @Transactional
     @Modifying

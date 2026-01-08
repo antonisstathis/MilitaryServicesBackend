@@ -404,35 +404,38 @@ public class SoldierServiceImpl implements SoldierService {
 	public boolean deleteServicesAfterDate(UserDto userDto, LocalDate date, boolean isPersonnel) {
 		Optional<User> user = userRepository.findById(userDto.getUsername());
 		Unit unit = user.get().getSoldier().getUnit();
+		LocalDate firstDate = getDateByCalculationNumber(userDto,1, isPersonnel);
 		LocalDate lastDate = getDateOfLastCalculation(userDto, isPersonnel);
-
-		// --- allow only 3 days back from selected date ---
 		LocalDate earliestAllowed = lastDate.minusDays(3);
 
-		// ---------- period validation ----------
-		if (date.isAfter(lastDate) || date.isBefore(earliestAllowed)) {
+		if(!servicesExistForUnit(unit, date, isPersonnel)) {
+			logger.warn("An attempt was made by the user {} to delete services; " +
+					"however, no services currently exist for the specified unit ID: {}", userDto.getUsername(), unit.getId());
+			return false;
+		}
+		if (date.isBefore(firstDate) || date.isAfter(lastDate) || date.isBefore(earliestAllowed)) {
 			logger.warn("Selected date {} is before the earliest allowed date {}", date, earliestAllowed);
 			return false;
 		}
-
-		List<com.militaryservices.app.entity.Service> servicesToDelete =
-				serviceRepository.findByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
-		if (servicesToDelete.isEmpty()) {
-			logger.info("No services to delete after {} for unit {}", date, unit.getId());
+		if(firstDate.isBefore(lastDate) && date.equals(lastDate))
 			return false;
-		}
-		List<DeletedService> archived = servicesToDelete.stream()
-				.map(s -> new DeletedService(
-						s,
-						userDto.getUsername(),
-						LocalDateTime.now()
-				))
-				.toList();
+		if(date.equals(firstDate) && date.equals(lastDate))
+			date = date.minusDays(1);
+
+		List<com.militaryservices.app.entity.Service> servicesToDelete = serviceRepository.findByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
+		List<DeletedService> archived = servicesToDelete.stream().map(s -> new DeletedService(s, userDto.getUsername(), LocalDateTime.now())).toList();
 		deletedServiceRepository.saveAll(archived);
 
 		serviceRepository.deleteByUnitAndDateAfterAndIsPersonnel(unit, date, isPersonnel);
-		logger.info("Deleted services after {} for user {} (isPersonnel={})",
-				date, userDto.getUsername(), isPersonnel);
+		logger.info("Deleted services after {} for user {} (isPersonnel={})", date, userDto.getUsername(), isPersonnel);
+		return true;
+	}
+
+	private boolean servicesExistForUnit(Unit unit, LocalDate date, boolean isPersonnel) {
+		List<com.militaryservices.app.entity.Service> servicesToDelete = serviceRepository.findByUnitAndIsPersonnel(unit, isPersonnel);
+		if (servicesToDelete.isEmpty())
+			return false;
+
 		return true;
 	}
 
