@@ -417,8 +417,10 @@ public class SoldierServiceImpl implements SoldierService {
 			logger.warn("Selected date {} is before the earliest allowed date {}", date, earliestAllowed);
 			return false;
 		}
-		if(firstDate.isBefore(lastDate) && date.equals(lastDate))
+		if(firstDate.isBefore(lastDate) && date.equals(lastDate)) {
+			logger.warn("The user {} selected the date of the most recent service calculation.", userDto.getUsername());
 			return false;
+		}
 		if(date.equals(firstDate) && date.equals(lastDate))
 			date = date.minusDays(1);
 
